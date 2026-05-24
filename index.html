@@ -126,7 +126,7 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
 .spine-row { display: flex; gap: 8px; align-items: flex-end; height: 150px;
   padding-bottom: 8px; overflow-x: auto; scrollbar-width: none; }
 .spine-row::-webkit-scrollbar { display: none; }
-.book-spine { flex-shrink: 0; width: 72px; height: 104px;
+.book-spine { flex-shrink: 0; width: 76px; height: 110px;
   border-radius: 3px 4px 4px 3px; overflow: hidden; cursor: pointer;
   position: relative; box-shadow: 2px 4px 12px var(--spine-shadow);
   transition: transform .15s, box-shadow .15s;
@@ -146,20 +146,25 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
   color: var(--ink-faint); display: flex; justify-content: space-between; }
 .book-progress-label em { font-family: var(--ff-body); color: var(--ink-mid);
   font-size: 9px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 50px; }
-.book-grid { display: flex; gap: 14px; overflow-x: auto; padding: 4px 0 8px;
-  scrollbar-width: none; }
-.book-grid::-webkit-scrollbar { display: none; }
-.book-card { flex-shrink: 0; width: 90px; cursor: pointer;
-  -webkit-tap-highlight-color: transparent; }
-.book-cover { width: 90px; height: 128px; border-radius: 3px 5px 5px 3px;
-  overflow: hidden; box-shadow: 2px 4px 14px var(--spine-shadow); }
+.book-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  padding: 8px 0;
+}
+.book-card { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.book-cover {
+  width: 100%; aspect-ratio: 2/3;
+  border-radius: 3px 5px 5px 3px;
+  overflow: hidden; box-shadow: 2px 4px 14px var(--spine-shadow);
+}
 .book-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .book-cover-fallback { width: 100%; height: 100%; display: flex; align-items: center;
-  justify-content: center; padding: 8px; }
+  justify-content: center; padding: 6px; }
 .book-cover-title { font-family: var(--ff-body); font-size: 9px;
   color: rgba(255,255,255,.92); text-align: center; line-height: 1.3; word-break: break-word; }
-.book-card-author { font-family: var(--ff-sc); font-size: 8px; letter-spacing: .02em;
-  color: var(--ink-faint); margin-top: 6px;
+.book-card-author { font-family: var(--ff-sc); font-size: 11px; letter-spacing: .02em;
+  color: var(--ink-faint); margin-top: 5px;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .fab { position: fixed; bottom: calc(72px + var(--safe-bottom)); right: 20px;
   width: 52px; height: 52px; border-radius: 50%; background: var(--ink);
@@ -998,11 +1003,16 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
 
 // ── COVER HELPERS ────────────────────────────────────────────────
 function coverImg(b, w, h, extraStyle='') {
-  const style = `width:${w}px;height:${h}px;${extraStyle}`;
+  const sized = !!(w && h);
+  const style = sized ? `width:${w}px;height:${h}px;${extraStyle}` : `width:100%;height:100%;${extraStyle}`;
+  const color = spineColor(b.title);
+  const safeTitle = (b.title||'').replace(/"/g,'&quot;');
+  const fallbackInner = `<div style="width:100%;height:100%;background:${color};display:flex;align-items:center;justify-content:center;padding:6px"><span style="font-family:var(--ff-body);font-size:9px;color:rgba(255,255,255,.9);text-align:center;line-height:1.3">${safeTitle.slice(0,22)}</span></div>`;
   if(b.thumbnail) {
-    return `<img src="${b.thumbnail}" style="${style};object-fit:cover;display:block;border-radius:inherit" onerror="this.parentNode.innerHTML=coverFallback('${b.title.replace(/'/g,"\'")}','${spineColor(b.title)}','${w}','${h}')">`;
+    const src = b.thumbnail.replace('http://','https://').replace('zoom=1','zoom=3');
+    return `<img src="${src}" style="${style};object-fit:cover;display:block;border-radius:inherit" loading="lazy" onerror="this.style.display='none';this.insertAdjacentHTML('afterend','${fallbackInner.replace(/'/g,"\\'")}')">` ;
   }
-  return coverFallback(b.title, spineColor(b.title), w, h);
+  return sized ? coverFallback(b.title, color, w, h) : fallbackInner;
 }
 function coverFallback(title, color, w, h) {
   return `<div style="width:${w}px;height:${h}px;background:${color};display:flex;align-items:center;justify-content:center;padding:6px"><span style="font-family:var(--ff-body);font-size:9px;color:rgba(255,255,255,.92);text-align:center;line-height:1.3;word-break:break-word">${title}</span></div>`;
@@ -1090,7 +1100,7 @@ function renderShelf(){
       <div class="book-grid">`;
     toread.forEach(b=>{
       html+=`<div class="book-card" onclick="openBook('${b.id}')">
-        <div class="book-cover">${coverImg(b,90,128)}</div>
+        <div class="book-cover">${coverImg(b,0,0)}</div>
         <div class="book-card-author">${b.author||''}</div></div>`;
     });
     html+=`</div></div>`;
@@ -1102,7 +1112,7 @@ function renderShelf(){
       <div class="book-grid">`;
     finished.forEach(b=>{
       html+=`<div class="book-card" onclick="openBook('${b.id}')">
-        <div class="book-cover" style="opacity:.8">${coverImg(b,90,128)}</div>
+        <div class="book-cover" style="opacity:.8">${coverImg(b,0,0)}</div>
         <div class="book-card-author">${b.author||''}</div></div>`;
     });
     html+=`</div></div>`;
