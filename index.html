@@ -1840,445 +1840,116 @@ async function searchBooks() {
   if (!q) return;
   const el = document.getElementById('book-search-results');
   el.innerHTML = '<div class="searching-hint">Searching…</div>';
-
   const enc = encodeURIComponent(q);
-  const isCJK = /[\u2e80-\u9fff\uf900-\ufaff]/.test(q);
-
-  let results = [];
-  const seen = new Set();
+  const isCJK = /[\u2e80-\u9fff]/.test(q);
+  let results = []; const seen = new Set();
   function addBook(b) {
-    if (!b.title || b.title === 'Unknown') return;
+    if (!b.title || b.title==='Unknown') return;
     const key = b.title.replace(/\s/g,'').toLowerCase().slice(0,10);
-    if (seen.has(key)) return;
-    seen.add(key);
-    results.push(b);
+    if (seen.has(key)) return; seen.add(key); results.push(b);
   }
-
-  // ── Race proxies: try all 3 simultaneously, take first that works ──
-  async function proxyRace(targetUrl) {
-    const proxies = [
-      `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`,
-      `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`,
-      `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(targetUrl)}`,
-    ];
-    const attempts = proxies.map(p =>
-      fetch(p, { signal: AbortSignal.timeout(6000) })
-        .then(async r => {
-          const text = await r.text();
-          // allorigins wraps in JSON; others return raw
-          if (text.trim().startsWith('{"contents"')) {
-            return JSON.parse(text).contents || '';
-          }
-          return text;
-        })
-        .catch(() => null)
-    );
-    const results = await Promise.allSettled(attempts);
-    for (const r of results) {
-      if (r.status === 'fulfilled' && r.value && r.value.length > 200) return r.value;
-    }
-    return '';
+  function norm(o) {
+    return { id:uid(), title:o.title||'Unknown', author:o.author||'', year:o.year||'',
+      totalPages:o.pages||0, thumbnail:(o.thumb||'').replace('http://','https://').replace('zoom=1','zoom=3'),
+      isbn:o.isbn||'', categories:o.categories||[], status:'to-read', currentPage:0, addedAt:new Date().toISOString() };
   }
-
-  // ── Parse 博客來 search HTML (handles multiple layout variants) ──
   function parseBK(html) {
-    if (!html) return [];
-    const doc = new DOMParser().parseFromString(html, 'text/html');
-    const out = [];
-    // Try every known 博客來 search result selector
-    const selectors = [
-      'ul.searchbook > li',
-      '.type02_bd-a',
-      '.item',
-      '.prod-item',
-      'li[id^="item"]'
-    ];
+    if (!html || html.length < 200) return [];
+    const doc = new DOMParser().parseFromString(html,'text/html'); const out = [];
     let items = [];
-    for (const sel of selectors) {
-      items = [...doc.querySelectorAll(sel)];
-      if (items.length) break;
+    for (const sel of ['ul.searchbook > li','li[id^="item"]','.type02_bd-a','.prod-item']) {
+      items = [...doc.querySelectorAll(sel)]; if (items.length) break;
     }
-    // Fallback: find all h4 > a combinations
-    if (!items.length) {
-      doc.querySelectorAll('h4 a[href*="/products/"]').forEach(a => {
-        const li = a.closest('li') || a.closest('div');
-        if (li && !items.includes(li)) items.push(li);
-      });
-    }
+    if (!items.length) { doc.querySelectorAll('a[href*="/products/"]').forEach(a=>{const li=a.closest('li')||a.closest('.item')||a.parentElement;if(li&&!items.includes(li))items.push(li);}); }
     items.slice(0,8).forEach(item => {
-      const titleEl = item.querySelector('h4 a, .table-td h4 a, strong a, a[href*="/products/"]');
-      if (!titleEl) return;
-      const title = titleEl.textContent.trim();
-      if (!title || title.length < 2) return;
-      const authorEl = item.querySelector('ul.msg li a, .author a, [class*="author"] a');
-      const author = authorEl?.textContent.trim() || '';
-      const imgEl = item.querySelector('img');
-      const thumb = (imgEl?.getAttribute('data-original') ||
-                     imgEl?.getAttribute('data-src') ||
-                     imgEl?.getAttribute('src') || '').replace('http://','https://');
-      const href = titleEl.getAttribute('href') || '';
-      const isbnMatch = href.match(/\/products\/([\w\d]+)/);
-      out.push({ title, author, thumb, isbn: isbnMatch?.[1] || '', year: '', pages: 0, categories: [] });
+      const tEl = item.querySelector('h4 a, strong a, a[href*="/products/"]'); if (!tEl) return;
+      const title = tEl.textContent.trim(); if (!title || title.length < 2) return;
+      const aEl = item.querySelector('ul.msg li a, .author a');
+      const img = item.querySelector('img');
+      const thumb = (img?.getAttribute('data-original')||img?.getAttribute('data-src')||img?.getAttribute('src')||'').replace('http://','https://');
+      out.push({ title, author:aEl?.textContent.trim()||'', thumb, isbn:'', year:'', pages:0, categories:[] });
     });
     return out;
   }
-
-  // ── Normalise to internal format ──
-  function norm(o) {
-    return {
-      id: uid(), title: o.title || 'Unknown', author: o.author || '',
-      year: o.year || '', totalPages: o.pages || 0,
-      thumbnail: (o.thumb||'').replace('http://','https://').replace('zoom=1','zoom=3'),
-      isbn: o.isbn || '', categories: o.categories || [],
-      status: 'to-read', currentPage: 0, addedAt: new Date().toISOString()
-    };
-  }
-
-  // ── Run all sources in parallel ───────────────────────────────
   await Promise.allSettled([
-
-    // A: Google Books
-    fetch(`https://www.googleapis.com/books/v1/volumes?q=${enc}&maxResults=10&printType=books`)
-      .then(r => r.json())
-      .then(d => {
-        (d.items||[]).forEach(item => {
-          const info = item.volumeInfo;
-          const ids = info.industryIdentifiers || [];
-          addBook(norm({
-            title: info.title,
-            author: (info.authors||[]).join(', '),
-            year: info.publishedDate?.slice(0,4),
-            pages: info.pageCount,
-            thumb: info.imageLinks?.thumbnail || info.imageLinks?.smallThumbnail,
-            isbn: ids.find(x=>x.type==='ISBN_13')?.identifier ||
-                  ids.find(x=>x.type==='ISBN_10')?.identifier || '',
-            categories: info.categories
-          }));
-        });
-      }).catch(()=>{}),
-
-    // B: Open Library
-    fetch(`https://openlibrary.org/search.json?q=${enc}&fields=title,author_name,number_of_pages_median,cover_i,first_publish_year,isbn&limit=6`)
-      .then(r => r.json())
-      .then(d => {
-        (d.docs||[]).forEach(doc => {
-          addBook(norm({
-            title: doc.title,
-            author: (doc.author_name||[]).join(', '),
-            year: doc.first_publish_year ? String(doc.first_publish_year) : '',
-            pages: doc.number_of_pages_median,
-            thumb: doc.cover_i ? `https://covers.openlibrary.org/b/id/${doc.cover_i}-M.jpg` : '',
-            isbn: (doc.isbn||[])[0] || ''
-          }));
-        });
-      }).catch(()=>{}),
-
-    // C: 博客來 (via proxy race — always, critical for TW/CJK)
-    proxyRace(`https://search.books.com.tw/search/query/key/${enc}/cat/BKA/`)
-      .then(html => parseBK(html).forEach(b => addBook(norm(b))))
-      .catch(()=>{})
-
+    fetch(`https://www.googleapis.com/books/v1/volumes?q=${enc}&maxResults=8&printType=books`)
+      .then(r=>r.json()).then(d=>{(d.items||[]).forEach(item=>{const info=item.volumeInfo,ids=info.industryIdentifiers||[];addBook(norm({title:info.title,author:(info.authors||[]).join(', '),year:info.publishedDate?.slice(0,4),pages:info.pageCount,thumb:info.imageLinks?.thumbnail||info.imageLinks?.smallThumbnail,isbn:ids.find(x=>x.type==='ISBN_13')?.identifier||ids.find(x=>x.type==='ISBN_10')?.identifier||'',categories:info.categories}));});}).catch(()=>{}),
+    fetch(`https://www.googleapis.com/books/v1/volumes?q=${enc}&maxResults=6&country=TW&printType=books`)
+      .then(r=>r.json()).then(d=>{(d.items||[]).forEach(item=>{const info=item.volumeInfo,ids=info.industryIdentifiers||[];addBook(norm({title:info.title,author:(info.authors||[]).join(', '),year:info.publishedDate?.slice(0,4),pages:info.pageCount,thumb:info.imageLinks?.thumbnail||info.imageLinks?.smallThumbnail,isbn:ids.find(x=>x.type==='ISBN_13')?.identifier||ids.find(x=>x.type==='ISBN_10')?.identifier||'',categories:info.categories}));});}).catch(()=>{}),
+    fetch(`https://openlibrary.org/search.json?q=${enc}&fields=title,author_name,number_of_pages_median,cover_i,first_publish_year,isbn&limit=5`)
+      .then(r=>r.json()).then(d=>{(d.docs||[]).forEach(doc=>{addBook(norm({title:doc.title,author:(doc.author_name||[]).join(', '),year:doc.first_publish_year?String(doc.first_publish_year):'',pages:doc.number_of_pages_median,thumb:doc.cover_i?`https://covers.openlibrary.org/b/id/${doc.cover_i}-M.jpg`:'',isbn:(doc.isbn||[])[0]||''}));});}).catch(()=>{}),
+    isCJK ? fetch(`https://search.books.com.tw/search/query/key/${enc}/cat/BKA/`,{headers:{'Accept':'text/html,*/*','Accept-Language':'zh-TW,zh;q=0.9'},signal:AbortSignal.timeout(6000)}).then(r=>r.text()).then(html=>parseBK(html).forEach(b=>addBook(norm(b)))).catch(()=>{}) : Promise.resolve()
   ]);
-
-  if (!results.length) {
-    el.innerHTML = `<div class="searching-hint">
-      No results found.<br>
-      <span style="font-size:13px;color:var(--ink-faint)">
-        Try different keywords or use the ISBN tab.</span></div>`;
-    return;
-  }
-
+  if (!results.length) { el.innerHTML='<div class="searching-hint">No results found.<br><span style="font-size:13px;color:var(--ink-faint)">Try different keywords or use the ISBN tab.</span></div>'; return; }
   window._searchResults = results;
-
-  el.innerHTML = results.map((book, i) => {
+  el.innerHTML = results.map((book,i) => {
     const color = spineColor(book.title);
-    const thumbHtml = book.thumbnail
-      ? `<img src="${book.thumbnail}" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy"
-             onerror="_coverErr(this)" data-color="${color}">`
-      : `<div style="width:100%;height:100%;background:${color};display:flex;align-items:center;
-              justify-content:center;padding:4px">
-           <span style="font-family:var(--ff-body);font-size:10px;color:rgba(255,255,255,.9);
-                 text-align:center;line-height:1.3">${book.title.slice(0,20)}</span></div>`;
-    const meta = [book.year, book.totalPages ? book.totalPages+'pp' : ''].filter(Boolean).join(' · ');
-    return `<div class="search-book-result" id="sbr-${i}">
-      <div class="search-book-thumb" onclick="expandSearchResult(${i})">${thumbHtml}</div>
-      <div style="flex:1;min-width:0">
-        <div class="search-book-info-title" onclick="expandSearchResult(${i})">${book.title}</div>
-        ${book.author ? `<div class="search-book-info-author">${book.author}</div>` : ''}
-        ${meta ? `<div class="search-book-info-meta">${meta}</div>` : ''}
-        <div class="search-book-add-row" id="sbr-add-${i}" style="display:none;margin-top:10px">
-          <div style="display:flex;gap:6px;margin-bottom:8px">
-            <button class="filter-chip active" id="sbr-s-${i}-to-read"
-              onclick="setSBRStatus(${i},'to-read')">TO READ</button>
-            <button class="filter-chip" id="sbr-s-${i}-reading"
-              onclick="setSBRStatus(${i},'reading')">READING</button>
-            <button class="filter-chip" id="sbr-s-${i}-finished"
-              onclick="setSBRStatus(${i},'finished')">FINISHED</button>
-          </div>
-          <button class="add-btn-primary" style="padding:12px"
-            onclick="doAddSearchBookDirect(${i})">ADD TO SHELF →</button>
-        </div>
-      </div>
-    </div>`;
+    const tH = book.thumbnail
+      ? `<img src="${book.thumbnail}" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy" data-color="${color}" onerror="_coverErr(this)">`
+      : `<div style="width:100%;height:100%;background:${color};display:flex;align-items:center;justify-content:center;padding:4px"><span style="font-family:var(--ff-body);font-size:10px;color:rgba(255,255,255,.9);text-align:center;line-height:1.3">${book.title.slice(0,20)}</span></div>`;
+    const meta = [book.year,book.totalPages?book.totalPages+'pp':''].filter(Boolean).join(' · ');
+    return `<div class="search-book-result" id="sbr-${i}"><div class="search-book-thumb" onclick="expandSearchResult(${i})">${tH}</div><div style="flex:1;min-width:0"><div class="search-book-info-title" onclick="expandSearchResult(${i})">${book.title}</div>${book.author?`<div class="search-book-info-author">${book.author}</div>`:''}${meta?`<div class="search-book-info-meta">${meta}</div>`:''}<div class="search-book-add-row" id="sbr-add-${i}" style="display:none;margin-top:10px"><div style="display:flex;gap:6px;margin-bottom:8px"><button class="filter-chip active" id="sbr-s-${i}-to-read" onclick="setSBRStatus(${i},'to-read')">TO READ</button><button class="filter-chip" id="sbr-s-${i}-reading" onclick="setSBRStatus(${i},'reading')">READING</button><button class="filter-chip" id="sbr-s-${i}-finished" onclick="setSBRStatus(${i},'finished')">FINISHED</button></div><button class="add-btn-primary" style="padding:12px" onclick="doAddSearchBookDirect(${i})">ADD TO SHELF →</button></div></div></div>`;
   }).join('');
 }
-
-function expandSearchResult(i) {
-  document.querySelectorAll('.search-book-add-row').forEach((row, idx) => {
-    row.style.display = (idx === i && row.style.display === 'none') ? '' : 'none';
-  });
-  if (!window._sbrStatus) window._sbrStatus = {};
-  window._sbrStatus[i] = window._sbrStatus[i] || 'to-read';
-}
-function setSBRStatus(i, s) {
-  if (!window._sbrStatus) window._sbrStatus = {};
-  window._sbrStatus[i] = s;
-  ['to-read','reading','finished'].forEach(x =>
-    document.getElementById(`sbr-s-${i}-${x}`)?.classList.toggle('active', x === s));
-}
-function doAddSearchBookDirect(i) {
-  const book = window._searchResults?.[i]; if (!book) return;
-  const b = Object.assign({}, book, {
-    id: uid(), status: window._sbrStatus?.[i] || 'to-read',
-    addedAt: new Date().toISOString()
-  });
-  if (b.status === 'reading') b.startedReading = new Date().toISOString();
-  DATA.books.push(b); DB.save(DATA);
-  if (window._sbrStatus) delete window._sbrStatus[i];
-  showToast(`"${b.title}" added.`);
-  goScreen('shelf');
-}
-
-// keep old confirmAddSearchBook / csStatus / doAddSearchBook for any residual calls
-function confirmAddSearchBook(i) { expandSearchResult(i); }
-function csStatus(s) { window._confirmStatus = s; }
-function doAddSearchBook(i) { doAddSearchBookDirect(i); }
-
+function expandSearchResult(i){document.querySelectorAll('.search-book-add-row').forEach((row,idx)=>{row.style.display=(idx===i&&row.style.display==='none')?'':'none';});if(!window._sbrStatus)window._sbrStatus={};window._sbrStatus[i]=window._sbrStatus[i]||'to-read';}
+function setSBRStatus(i,s){if(!window._sbrStatus)window._sbrStatus={};window._sbrStatus[i]=s;['to-read','reading','finished'].forEach(x=>document.getElementById(`sbr-s-${i}-${x}`)?.classList.toggle('active',x===s));}
+function doAddSearchBookDirect(i){const book=window._searchResults?.[i];if(!book)return;const b=Object.assign({},book,{id:uid(),status:window._sbrStatus?.[i]||'to-read',addedAt:new Date().toISOString()});if(b.status==='reading')b.startedReading=new Date().toISOString();DATA.books.push(b);DB.save(DATA);if(window._sbrStatus)delete window._sbrStatus[i];showToast(`"${b.title}" added.`);goScreen('shelf');}
+function confirmAddSearchBook(i){expandSearchResult(i);}
+function csStatus(s){window._confirmStatus=s;}
+function doAddSearchBook(i){doAddSearchBookDirect(i);}
 async function lookupISBNField() {
   const raw = document.getElementById('isbn-field').value.trim();
-  const v = raw.replace(/[-\s]/g, '');
-  if (v.length < 10) { showToast('Enter a valid ISBN-10 or ISBN-13.'); return; }
-
+  const v = raw.replace(/[-\s]/g,'');
+  if(v.length<10){showToast('Enter a valid ISBN-10 or ISBN-13.');return;}
   const el = document.getElementById('isbn-field-result');
-  const isTW = v.startsWith('9786') || v.startsWith('978626');
+  const isTW = v.startsWith('9786')||v.startsWith('978626');
   const isCN = v.startsWith('9787');
-
-  const srcNames = ['博客來','Google Books','Open Library','Extended'];
-  let si = 0;
-  const showStep = () => {
-    el.innerHTML = `<div style="font-family:var(--ff-display);font-style:italic;
-      font-size:15px;color:var(--ink-faint)">
-      Checking <b style="color:var(--ink)">${srcNames[si % srcNames.length]}</b>…</div>`;
-  };
-  showStep();
-  const tick = setInterval(() => { si++; showStep(); }, 900);
-
-  // ── Proxy race helper ──
-  async function proxyRace(targetUrl) {
-    const proxies = [
-      `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`,
-      `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`,
-      `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(targetUrl)}`,
-    ];
-    const results = await Promise.allSettled(proxies.map(p =>
-      fetch(p, { signal: AbortSignal.timeout(6000) })
-        .then(async r => {
-          const t = await r.text();
-          if (t.trim().startsWith('{"contents"')) return JSON.parse(t).contents || '';
-          return t;
-        }).catch(() => null)
-    ));
-    for (const r of results) {
-      if (r.status === 'fulfilled' && r.value && r.value.length > 200) return r.value;
-    }
-    return '';
+  const srcN=['博客來','Google Books (TW)','Google Books','Open Library','NCL'];
+  let si=0;
+  el.innerHTML=`<div style="font-family:var(--ff-display);font-style:italic;font-size:15px;color:var(--ink-faint)">Checking <b style="color:var(--ink)">${srcN[0]}</b>…</div>`;
+  const tick=setInterval(()=>{si=(si+1)%srcN.length;el.innerHTML=`<div style="font-family:var(--ff-display);font-style:italic;font-size:15px;color:var(--ink-faint)">Checking <b style="color:var(--ink)">${srcN[si]}</b>…</div>`;},900);
+  function norm(o){return{id:uid(),isbn:v,title:o.title||'Unknown',author:o.author||'',year:o.year||'',totalPages:o.pages||0,thumbnail:(o.thumb||'').replace('http://','https://').replace('zoom=1','zoom=3'),categories:o.categories||[],status:'to-read',currentPage:0,addedAt:new Date().toISOString()};}
+  function parseBKFirst(html){
+    if(!html||html.length<200)return null;
+    const doc=new DOMParser().parseFromString(html,'text/html');
+    let item=null;
+    for(const sel of ['ul.searchbook > li','li[id^="item"]','.type02_bd-a','.prod-item']){item=doc.querySelector(sel);if(item)break;}
+    if(!item){const a=doc.querySelector('a[href*="/products/"]');if(a)item=a.closest('li')||a.closest('div')||a.parentElement;}
+    if(!item)return null;
+    const tEl=item.querySelector('h4 a, strong a, a[href*="/products/"]');
+    if(!tEl)return null;
+    const title=tEl.textContent.trim();if(!title||title.length<2)return null;
+    const aEl=item.querySelector('ul.msg li a, .author a');
+    const img=item.querySelector('img');
+    const thumb=(img?.getAttribute('data-original')||img?.getAttribute('data-src')||img?.getAttribute('src')||'').replace('http://','https://');
+    return{title,author:aEl?.textContent.trim()||'',thumb,isbn:v,year:'',pages:0,categories:[]};
   }
-
-  // ── Parse 博客來 search HTML ──
-  function parseBKFirst(html) {
-    if (!html) return null;
-    const doc = new DOMParser().parseFromString(html, 'text/html');
-    const selectors = ['ul.searchbook > li','li[id^="item"]','.type02_bd-a','.item','.prod-item'];
-    let item = null;
-    for (const sel of selectors) {
-      item = doc.querySelector(sel);
-      if (item) break;
-    }
-    if (!item) {
-      // Last resort: find first product link
-      const a = doc.querySelector('a[href*="/products/"]');
-      if (a) item = a.closest('li') || a.closest('div') || a.parentElement;
-    }
-    if (!item) return null;
-    const titleEl = item.querySelector('h4 a, strong a, a[href*="/products/"]');
-    if (!titleEl) return null;
-    const title = titleEl.textContent.trim();
-    if (!title || title.length < 2) return null;
-    const authorEl = item.querySelector('ul.msg li a, .author a, [class*="author"] a');
-    const author = authorEl?.textContent.trim() || '';
-    const imgEl = item.querySelector('img');
-    const thumb = (imgEl?.getAttribute('data-original') ||
-                   imgEl?.getAttribute('data-src') ||
-                   imgEl?.getAttribute('src') || '').replace('http://','https://');
-    return { title, author, thumb, isbn: v, year: '', pages: 0, categories: [] };
-  }
-
-  // ── Normalise ──
-  function norm(o) {
-    return {
-      id: uid(), isbn: v,
-      title: o.title || 'Unknown', author: o.author || '',
-      year: o.year || '', totalPages: o.pages || 0,
-      thumbnail: (o.thumb||'').replace('http://','https://').replace('zoom=1','zoom=3'),
-      categories: o.categories || [],
-      status: 'to-read', currentPage: 0, addedAt: new Date().toISOString()
-    };
-  }
-
-  let book = null, source = '';
-
-  // ── 1. 博客來 search by ISBN ──────────────────────────────────
-  try {
-    const html = await proxyRace(`https://search.books.com.tw/search/query/key/${v}/cat/BKA/`);
-    const hit = parseBKFirst(html);
-    if (hit) { book = norm(hit); source = '博客來'; }
-  } catch(e) {}
-
-  // ── 2. Google Books isbn: ─────────────────────────────────────
-  if (!book) {
-    try {
-      const r = await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${v}&maxResults=1`);
-      const d = await r.json();
-      if (d.items?.length) {
-        const info = d.items[0].volumeInfo;
-        book = norm({ title: info.title, author: (info.authors||[]).join(', '),
-          year: info.publishedDate?.slice(0,4), pages: info.pageCount,
-          thumb: info.imageLinks?.thumbnail || info.imageLinks?.smallThumbnail,
-          categories: info.categories });
-        source = 'Google Books';
-      }
-    } catch(e) {}
-  }
-
-  // ── 3. Open Library books API ─────────────────────────────────
-  if (!book) {
-    try {
-      const r = await fetch(`https://openlibrary.org/api/books?bibkeys=ISBN:${v}&format=json&jscmd=data`);
-      const d = await r.json();
-      const entry = d[`ISBN:${v}`];
-      if (entry) {
-        book = norm({ title: entry.title, author: (entry.authors||[]).map(a=>a.name).join(', '),
-          year: entry.publish_date?.match(/\d{4}/)?.[0],
-          pages: entry.number_of_pages,
-          thumb: entry.cover?.large || entry.cover?.medium || entry.cover?.small,
-          categories: entry.subjects ? [entry.subjects[0]?.name] : [] });
-        source = 'Open Library';
-      }
-    } catch(e) {}
-  }
-
-  // ── 4. Open Library search ────────────────────────────────────
-  if (!book) {
-    try {
-      const r = await fetch(`https://openlibrary.org/search.json?isbn=${v}&fields=title,author_name,number_of_pages_median,cover_i,first_publish_year`);
-      const d = await r.json();
-      if (d.docs?.length) {
-        const doc = d.docs[0];
-        book = norm({ title: doc.title, author: (doc.author_name||[]).join(', '),
-          year: doc.first_publish_year ? String(doc.first_publish_year) : '',
-          pages: doc.number_of_pages_median,
-          thumb: doc.cover_i ? `https://covers.openlibrary.org/b/id/${doc.cover_i}-L.jpg` : '' });
-        source = 'Open Library';
-      }
-    } catch(e) {}
-  }
-
-  // ── 5. Google Books plain text (TW books indexed differently) ──
-  if (!book) {
-    try {
-      const r = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${v}&maxResults=5`);
-      const d = await r.json();
-      const match = (d.items||[]).find(item =>
-        (item.volumeInfo.industryIdentifiers||[]).some(x => x.identifier?.replace(/-/g,'') === v));
-      if (match) {
-        const info = match.volumeInfo;
-        book = norm({ title: info.title, author: (info.authors||[]).join(', '),
-          year: info.publishedDate?.slice(0,4), pages: info.pageCount,
-          thumb: info.imageLinks?.thumbnail || info.imageLinks?.smallThumbnail,
-          categories: info.categories });
-        source = 'Google Books';
-      }
-    } catch(e) {}
-  }
-
+  let book=null,source='';
+  // 1. 博客來 DIRECT
+  try{const r=await fetch(`https://search.books.com.tw/search/query/key/${v}/cat/BKA/`,{headers:{'Accept':'text/html,*/*','Accept-Language':'zh-TW,zh;q=0.9'},signal:AbortSignal.timeout(7000)});const html=await r.text();const hit=parseBKFirst(html);if(hit){book=norm(hit);source='博客來';}}catch(e){}
+  // 2. Google Books country=TW
+  if(!book){try{const r=await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${v}&country=TW&maxResults=1`);const d=await r.json();if(d.items?.length){const info=d.items[0].volumeInfo;book=norm({title:info.title,author:(info.authors||[]).join(', '),year:info.publishedDate?.slice(0,4),pages:info.pageCount,thumb:info.imageLinks?.thumbnail||info.imageLinks?.smallThumbnail,categories:info.categories});source='Google Books (TW)';}}catch(e){}}
+  // 3. Google Books standard
+  if(!book){try{const r=await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${v}&maxResults=1`);const d=await r.json();if(d.items?.length){const info=d.items[0].volumeInfo;book=norm({title:info.title,author:(info.authors||[]).join(', '),year:info.publishedDate?.slice(0,4),pages:info.pageCount,thumb:info.imageLinks?.thumbnail||info.imageLinks?.smallThumbnail,categories:info.categories});source='Google Books';}}catch(e){}}
+  // 4. Open Library books
+  if(!book){try{const r=await fetch(`https://openlibrary.org/api/books?bibkeys=ISBN:${v}&format=json&jscmd=data`);const d=await r.json();const entry=d[`ISBN:${v}`];if(entry){book=norm({title:entry.title,author:(entry.authors||[]).map(a=>a.name).join(', '),year:entry.publish_date?.match(/\d{4}/)?.[0],pages:entry.number_of_pages,thumb:entry.cover?.large||entry.cover?.medium||entry.cover?.small,categories:entry.subjects?[entry.subjects[0]?.name]:[]});source='Open Library';}}catch(e){}}
+  // 5. Open Library search
+  if(!book){try{const r=await fetch(`https://openlibrary.org/search.json?isbn=${v}&fields=title,author_name,number_of_pages_median,cover_i,first_publish_year`);const d=await r.json();if(d.docs?.length){const doc=d.docs[0];book=norm({title:doc.title,author:(doc.author_name||[]).join(', '),year:doc.first_publish_year?String(doc.first_publish_year):'',pages:doc.number_of_pages_median,thumb:doc.cover_i?`https://covers.openlibrary.org/b/id/${doc.cover_i}-L.jpg`:''});source='Open Library';}}catch(e){}}
+  // 6. NCL Taiwan
+  if(!book&&isTW){try{const r=await fetch(`https://apin.ncl.edu.tw/opac/servlet/Query?format=json&q=${v}&field=isbn&count=1`,{signal:AbortSignal.timeout(5000)});const d=await r.json();const rec=d?.result?.[0]||Object.values(d||{})[0];if(rec){const title=rec.title||rec.TI||'';if(title){book=norm({title,author:rec.author||rec.AU||'',year:rec.year||rec.PY||'',pages:parseInt(rec.pages||0)||0,thumb:''});source='NCL Taiwan';}}}catch(e){}}
+  // 7. Google Books plain
+  if(!book){try{const r=await fetch(`https://www.googleapis.com/books/v1/volumes?q=${v}&maxResults=5`);const d=await r.json();const match=(d.items||[]).find(item=>(item.volumeInfo.industryIdentifiers||[]).some(x=>x.identifier?.replace(/-/g,'')=== v));if(match){const info=match.volumeInfo;book=norm({title:info.title,author:(info.authors||[]).join(', '),year:info.publishedDate?.slice(0,4),pages:info.pageCount,thumb:info.imageLinks?.thumbnail||info.imageLinks?.smallThumbnail,categories:info.categories});source='Google Books';}}catch(e){}}
   clearInterval(tick);
-
-  // ── Not found → auto-trigger search by ISBN number ────────────
-  if (!book) {
-    const hint = isTW
-      ? '找不到此台灣 ISBN。已自動切換到搜尋模式，請輸入書名搜尋。'
-      : isCN
-      ? '找不到此大陸版 ISBN。請改用書名搜尋，或手動輸入。'
-      : 'Not found. Try searching by title instead.';
-
-    el.innerHTML = `
-      <div style="border-left:4px solid var(--rule);padding:14px 16px;margin-bottom:16px">
-        <div style="font-family:var(--ff-sc);font-size:11px;color:var(--ink-faint);margin-bottom:8px">
-          NOT FOUND · 5 SOURCES CHECKED</div>
-        <div style="font-family:var(--ff-body);font-size:15px;color:var(--ink);line-height:1.65">
-          ${hint}</div>
-      </div>
-      <div style="display:flex;gap:8px">
-        <button class="modal-btn" style="flex:1"
-          onclick="setAddTab('search');document.getElementById('isbn-field-result').innerHTML='';
-                   document.getElementById('add-search-field').value='${v.replace(/'/g,"\\'")}';
-                   searchBooks();">搜尋書名 →</button>
-        <button class="modal-btn primary" style="flex:1"
-          onclick="prefillManualFromISBN('${v}')">手動新增 →</button>
-      </div>`;
+  if(!book){
+    const hint=isTW?'找不到此台灣 ISBN。請改用書名搜尋（輸入中文書名），或手動新增。':isCN?'找不到此大陸版 ISBN。請改用書名搜尋，或手動輸入。':'Not found. Try searching by title or add manually.';
+    el.innerHTML=`<div style="border-left:4px solid var(--rule);padding:14px 16px;margin-bottom:16px"><div style="font-family:var(--ff-sc);font-size:11px;color:var(--ink-faint);margin-bottom:8px">NOT FOUND · 7 SOURCES</div><div style="font-family:var(--ff-body);font-size:15px;color:var(--ink);line-height:1.65">${hint}</div></div><div style="display:flex;gap:8px"><button class="modal-btn" style="flex:1" onclick="setAddTab('search');document.getElementById('isbn-field-result').innerHTML='';document.getElementById('add-search-field').value='${v}';searchBooks();">搜尋書名 →</button><button class="modal-btn primary" style="flex:1" onclick="prefillManualFromISBN('${v}')">手動新增 →</button></div>`;
     return;
   }
-
-  // ── Found ─────────────────────────────────────────────────────
-  window._isbnBook = book;
-  const color = spineColor(book.title);
-  const safeT2 = (book.title||'').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  const thumbHtml = book.thumbnail
-    ? `<img src="${book.thumbnail}" style="width:64px;height:88px;max-width:64px;max-height:88px;
-           flex-shrink:0;object-fit:cover;display:block;
-           border-radius:2px 4px 4px 2px;box-shadow:2px 3px 10px var(--spine-shadow)"
-           onerror="this.style.display='none'">`
-    : `<div style="width:64px;height:88px;flex-shrink:0;background:${color};
-           border-radius:2px 4px 4px 2px;
-           display:flex;align-items:center;justify-content:center;padding:4px">
-         <span style="font-family:var(--ff-body);font-size:9px;color:rgba(255,255,255,.9);
-               text-align:center;line-height:1.3">${safeT2.slice(0,24)}</span></div>`;
-
-  el.innerHTML = `
-    <div style="border:1.5px solid var(--rule);padding:18px;border-radius:4px">
-      <div style="font-family:var(--ff-sc);font-size:11px;color:var(--ink-faint);margin-bottom:14px">
-        FOUND · ${source.toUpperCase()}</div>
-      <div style="display:flex;gap:14px;margin-bottom:18px;align-items:flex-start">
-        ${thumbHtml}
-        <div style="flex:1;min-width:0">
-          <div style="font-family:var(--ff-display);font-style:italic;font-size:22px;
-               margin-bottom:5px;line-height:1.2">${book.title}</div>
-          <div style="font-family:var(--ff-body);font-size:15px;color:var(--ink-mid);
-               margin-bottom:4px">${book.author}</div>
-          <div style="font-family:var(--ff-sc);font-size:11px;color:var(--ink-faint)">
-            ${[book.year, book.totalPages ? book.totalPages+' pp':''].filter(Boolean).join(' · ')}
-          </div>
-        </div>
-      </div>
-      <div style="font-family:var(--ff-sc);font-size:11px;color:var(--ink-faint);margin-bottom:10px">
-        ADD AS</div>
-      <div style="display:flex;gap:8px;margin-bottom:16px">
-        <button class="filter-chip active" id="isbn-s-to-read" onclick="isbnStatus('to-read')">TO READ</button>
-        <button class="filter-chip" id="isbn-s-reading" onclick="isbnStatus('reading')">READING</button>
-        <button class="filter-chip" id="isbn-s-finished" onclick="isbnStatus('finished')">FINISHED</button>
-      </div>
-      <button class="add-btn-primary" onclick="saveISBNBook()">ADD TO SHELF →</button>
-    </div>`;
+  window._isbnBook=book;
+  const color=spineColor(book.title);
+  const safeT=(book.title||'').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const tH=book.thumbnail?`<img src="${book.thumbnail}" style="width:64px;height:88px;max-width:64px;max-height:88px;flex-shrink:0;object-fit:cover;display:block;border-radius:2px 4px 4px 2px;box-shadow:2px 3px 10px var(--spine-shadow)" data-color="${color}" onerror="_coverErr(this)">`:`<div style="width:64px;height:88px;flex-shrink:0;background:${color};border-radius:2px 4px 4px 2px;display:flex;align-items:center;justify-content:center;padding:4px"><span style="font-family:var(--ff-body);font-size:9px;color:rgba(255,255,255,.9);text-align:center;line-height:1.3">${safeT.slice(0,24)}</span></div>`;
+  el.innerHTML=`<div style="border:1.5px solid var(--rule);padding:18px;border-radius:4px"><div style="font-family:var(--ff-sc);font-size:11px;color:var(--ink-faint);margin-bottom:14px">FOUND · ${source.toUpperCase()}</div><div style="display:flex;gap:14px;margin-bottom:18px;align-items:flex-start">${tH}<div style="flex:1;min-width:0"><div style="font-family:var(--ff-display);font-style:italic;font-size:22px;margin-bottom:5px;line-height:1.2">${book.title}</div><div style="font-family:var(--ff-body);font-size:15px;color:var(--ink-mid);margin-bottom:4px">${book.author}</div><div style="font-family:var(--ff-sc);font-size:11px;color:var(--ink-faint)">${[book.year,book.totalPages?book.totalPages+' pp':''].filter(Boolean).join(' · ')}</div></div></div><div style="font-family:var(--ff-sc);font-size:11px;color:var(--ink-faint);margin-bottom:10px">ADD AS</div><div style="display:flex;gap:8px;margin-bottom:16px"><button class="filter-chip active" id="isbn-s-to-read" onclick="isbnStatus('to-read')">TO READ</button><button class="filter-chip" id="isbn-s-reading" onclick="isbnStatus('reading')">READING</button><button class="filter-chip" id="isbn-s-finished" onclick="isbnStatus('finished')">FINISHED</button></div><button class="add-btn-primary" onclick="saveISBNBook()">ADD TO SHELF →</button></div>`;
 }
 
 function prefillManualFromISBN(isbn) {
