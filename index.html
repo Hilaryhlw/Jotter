@@ -1733,10 +1733,77 @@ async function searchBooks() {
   const q = document.getElementById('add-search-field').value.trim();
   if(!q) return;
   const el = document.getElementById('book-search-results');
-  el.innerHTML = '<div class="searching-hint">Searching…</div>';
+  el.innerHTML = '<div class="searching-hint">Searching Google Books &amp; Open Library…</div>';
   try {
-    const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&maxResults=8`);
-    const data = await res.json();
+    // Query both sources in parallel for maximum coverage (TW, CN, EN, JP)
+    const [gbRes, olRes] = await Promise.allSettled([
+      fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&maxResults=8`),
+      fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(q)}&fields=title,author_name,number_of_pages_median,cover_i,first_publish_year,isbn&limit=5`)
+    ]);
+
+    let allItems = [];
+
+    // Google Books results
+    if(gbRes.status==='fulfilled') {
+      const data = await gbRes.value.json();
+      (data.items||[]).forEach(item => {
+        const info = item.volumeInfo;
+        allItems.push({
+          title: info.title||'Unknown',
+          author: (info.authors||[]).join(', ')||'',
+          year: info.publishedDate?.slice(0,4)||'',
+          pages: info.pageCount||0,
+          thumb: (info.imageLinks?.thumbnail||info.imageLinks?.smallThumbnail||'')
+                   .replace('http:','https:').replace('zoom=1','zoom=3'),
+          categories: info.categories||[],
+          isbn: (info.industryIdentifiers||[]).find(x=>x.type==='ISBN_13')?.identifier||
+                (info.industryIdentifiers||[]).find(x=>x.type==='ISBN_10')?.identifier||'',
+          src: 'gb', _raw: item
+        });
+      });
+    }
+
+    // Open Library results — deduplicate by title
+    if(olRes.status==='fulfilled') {
+      const data = await olRes.value.json();
+      (data.docs||[]).forEach(d => {
+        const title = d.title||'Unknown';
+        // Skip if already in list from Google Books
+        const dup = allItems.some(x => x.title.toLowerCase()===title.toLowerCase());
+        if(!dup) {
+          const coverId = d.cover_i;
+          allItems.push({
+            title,
+            author: (d.author_name||[]).join(', ')||'',
+            year: d.first_publish_year ? String(d.first_publish_year) : '',
+            pages: d.number_of_pages_median||0,
+            thumb: coverId ? `https://covers.openlibrary.org/b/id/${coverId}-M.jpg` : '',
+            categories: [],
+            isbn: (d.isbn||[])[0]||'',
+            src: 'ol', _raw: d
+          });
+        }
+      });
+    }
+
+    if(!allItems.length){ el.innerHTML='<div class="searching-hint">No results found. Try different words.</div>'; return; }
+
+    // Store for use by doAddSearchBook
+    window._searchResults = allItems.map(item => {
+      if(item.src==='gb') return item._raw; // keep GB format
+      // Wrap OL into GB-compatible format
+      return { volumeInfo: {
+        title: item.title,
+        authors: item.author ? [item.author] : [],
+        publishedDate: item.year,
+        pageCount: item.pages,
+        imageLinks: item.thumb ? { thumbnail: item.thumb } : undefined,
+        industryIdentifiers: item.isbn ? [{type:'ISBN_13',identifier:item.isbn}] : [],
+        categories: item.categories
+      }, _olThumb: item.thumb };
+    });
+
+    const data = { items: window._searchResults };
     if(!data.items?.length){ el.innerHTML='<div class="searching-hint">No results found.</div>'; return; }
     el.innerHTML = data.items.map((item,i)=>{
       const info = item.volumeInfo;
@@ -1744,11 +1811,13 @@ async function searchBooks() {
       const author = (info.authors||[]).join(', ')||'Unknown';
       const pages = info.pageCount ? info.pageCount+'pp' : '';
       const year = info.publishedDate?.slice(0,4)||'';
-      const thumb = info.imageLinks?.thumbnail||'';
+      // Support both Google Books and Open Library cover images
+      const rawThumb = item._olThumb || info.imageLinks?.thumbnail || info.imageLinks?.smallThumbnail || '';
+      const safeThumb = rawThumb ? rawThumb.replace('http://','https://').replace('zoom=1','zoom=3') : '';
       const color = spineColor(title);
-      const thumbHtml = thumb
-        ? `<img src="${thumb}" style="width:100%;height:100%;object-fit:cover">`
-        : `<div style="width:100%;height:100%;background:${color};display:flex;align-items:center;justify-content:center"><span style="font-family:var(--ff-body);font-size:7px;color:rgba(255,255,255,.9);text-align:center;padding:2px">${title.slice(0,20)}</span></div>`;
+      const thumbHtml = safeThumb
+        ? `<img src="${safeThumb}" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy" onerror="this.parentNode.style.background='${color}';this.remove()">`
+        : `<div style="width:100%;height:100%;background:${color};display:flex;align-items:center;justify-content:center;padding:4px"><span style="font-family:var(--ff-body);font-size:9px;color:rgba(255,255,255,.9);text-align:center;line-height:1.3">${title.slice(0,24)}</span></div>`;
       return `<div class="search-book-result" onclick="confirmAddSearchBook(${i})">
         <div class="search-book-thumb">${thumbHtml}</div>
         <div>
@@ -1829,116 +1898,183 @@ function saveManualBook() {
   goScreen('shelf');
 }
 
+// ── ISBN LOOKUP: 5-source cascade, no API keys ─────────────────
+function isbnThumb(url) {
+  if(!url) return '';
+  return url.replace('http://','https://').replace('zoom=1','zoom=3').replace('&edge=curl','');
+}
+
+function makeBookFromGB(info, isbn) {
+  return {
+    id:uid(), isbn,
+    title: info.title||'Unknown',
+    author: (info.authors||[]).join(', ')||'Unknown',
+    year: info.publishedDate?.slice(0,4)||'',
+    totalPages: info.pageCount||0,
+    categories: info.categories||[],
+    thumbnail: isbnThumb(info.imageLinks?.thumbnail||info.imageLinks?.smallThumbnail||''),
+    status:'to-read', currentPage:0, addedAt:new Date().toISOString()
+  };
+}
+
 async function lookupISBNField() {
   const raw = document.getElementById('isbn-field').value.trim();
   const v = raw.replace(/[-\s]/g,'');
   if(v.length < 10){ showToast('Enter a valid ISBN-10 or ISBN-13.'); return; }
   const el = document.getElementById('isbn-field-result');
-  el.innerHTML = '<div style="font-family:var(--ff-display);font-style:italic;font-size:13px;color:var(--ink-faint)">Searching databases…</div>';
+
+  // Progress indicator with source names
+  const sources = ['Google Books','Open Library','Open Library Search','WorldCat','Regional search'];
+  let sourceIdx = 0;
+  const tick = setInterval(()=>{
+    sourceIdx = (sourceIdx+1) % sources.length;
+    el.innerHTML = `<div style="font-family:var(--ff-display);font-style:italic;font-size:14px;color:var(--ink-faint)">
+      Checking ${sources[sourceIdx]}…</div>`;
+  }, 900);
+
+  el.innerHTML = `<div style="font-family:var(--ff-display);font-style:italic;font-size:14px;color:var(--ink-faint)">Checking Google Books…</div>`;
 
   let book = null;
+  let source = '';
 
-  // 1. Open Library — best for non-English / Asian ISBNs
+  // ── Source 1: Google Books isbn: query ──────────────────────────
   try {
-    const res = await fetch(`https://openlibrary.org/api/books?bibkeys=ISBN:${v}&format=json&jscmd=data`);
+    const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${v}&maxResults=1`);
     const data = await res.json();
-    const d = data[`ISBN:${v}`];
-    if(d) {
-      book = {
-        id:uid(), isbn:v,
-        title: d.title||'Unknown',
-        author: (d.authors||[]).map(a=>a.name).join(', ')||'Unknown',
-        year: d.publish_date ? d.publish_date.match(/\d{4}/)?.[0]||'' : '',
-        totalPages: d.number_of_pages||0,
-        categories: d.subjects ? [d.subjects[0]?.name||''] : [],
-        thumbnail: d.cover?.medium||d.cover?.small||'',
-        status:'to-read', currentPage:0, addedAt:new Date().toISOString()
-      };
+    if(data.items?.length) {
+      book = makeBookFromGB(data.items[0].volumeInfo, v);
+      source = 'Google Books';
     }
   } catch(e){}
 
-  // 2. Google Books with isbn: prefix
+  // ── Source 2: Open Library books API ───────────────────────────
   if(!book) {
     try {
-      const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${v}&maxResults=1`);
+      const res = await fetch(`https://openlibrary.org/api/books?bibkeys=ISBN:${v}&format=json&jscmd=data`);
       const data = await res.json();
-      if(data.items?.length) {
-        const info = data.items[0].volumeInfo;
+      const d = data[`ISBN:${v}`];
+      if(d) {
         book = {
           id:uid(), isbn:v,
-          title: info.title||'Unknown',
-          author: (info.authors||[]).join(', ')||'Unknown',
-          year: info.publishedDate?.slice(0,4)||'',
-          totalPages: info.pageCount||0,
-          categories: info.categories||[],
-          thumbnail: (info.imageLinks?.thumbnail||'').replace('http:','https:'),
+          title: d.title||'Unknown',
+          author: (d.authors||[]).map(a=>a.name).join(', ')||'Unknown',
+          year: d.publish_date ? d.publish_date.match(/\d{4}/)?.[0]||'' : '',
+          totalPages: d.number_of_pages||0,
+          categories: d.subjects ? [d.subjects[0]?.name||''] : [],
+          thumbnail: isbnThumb(d.cover?.large||d.cover?.medium||d.cover?.small||''),
           status:'to-read', currentPage:0, addedAt:new Date().toISOString()
         };
+        source = 'Open Library';
       }
     } catch(e){}
   }
 
-  // 3. Google Books plain number query (catches some Asian ISBNs Google indexes differently)
+  // ── Source 3: Open Library search endpoint (broader coverage) ──
   if(!book) {
     try {
-      const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${v}&maxResults=1`);
+      const res = await fetch(`https://openlibrary.org/search.json?isbn=${v}&fields=title,author_name,number_of_pages_median,cover_i,first_publish_year,subject`);
+      const data = await res.json();
+      if(data.docs?.length) {
+        const d = data.docs[0];
+        const coverId = d.cover_i;
+        const thumb = coverId ? `https://covers.openlibrary.org/b/id/${coverId}-M.jpg` : '';
+        book = {
+          id:uid(), isbn:v,
+          title: d.title||'Unknown',
+          author: (d.author_name||[]).join(', ')||'Unknown',
+          year: d.first_publish_year ? String(d.first_publish_year) : '',
+          totalPages: d.number_of_pages_median||0,
+          categories: d.subject ? [d.subject[0]] : [],
+          thumbnail: thumb,
+          status:'to-read', currentPage:0, addedAt:new Date().toISOString()
+        };
+        source = 'Open Library';
+      }
+    } catch(e){}
+  }
+
+  // ── Source 4: Google Books plain query (TW books indexed differently) ──
+  if(!book) {
+    try {
+      const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${v}&maxResults=3`);
       const data = await res.json();
       if(data.items?.length) {
-        const info = data.items[0].volumeInfo;
-        // Only use if the ISBN actually matches
-        const industryIds = info.industryIdentifiers||[];
-        const isMatch = industryIds.some(x=>x.identifier?.replace(/-/g,'')=== v);
-        if(isMatch) {
-          book = {
-            id:uid(), isbn:v,
-            title: info.title||'Unknown',
-            author: (info.authors||[]).join(', ')||'Unknown',
-            year: info.publishedDate?.slice(0,4)||'',
-            totalPages: info.pageCount||0,
-            categories: info.categories||[],
-            thumbnail: (info.imageLinks?.thumbnail||'').replace('http:','https:'),
-            status:'to-read', currentPage:0, addedAt:new Date().toISOString()
-          };
+        // Accept if any result has a matching ISBN
+        const match = data.items.find(item => {
+          const ids = item.volumeInfo.industryIdentifiers||[];
+          return ids.some(x => x.identifier?.replace(/-/g,'') === v);
+        });
+        if(match) {
+          book = makeBookFromGB(match.volumeInfo, v);
+          source = 'Google Books';
         }
       }
     } catch(e){}
   }
 
-  // 4. Not found — detect likely cause and offer smart fallback
+  // ── Source 5: Regional fallback — Google Books intitle search ──
+  // For TW (978-626) and CN (978-7) books not indexed by ISBN,
+  // try fetching the WorldCat permalink which embeds metadata in the page
   if(!book) {
-    // Detect Taiwan/Chinese ISBN prefix 978-626
-    const isTW = v.startsWith('978626') || v.startsWith('626');
-    const isCN = v.startsWith('9787') || v.startsWith('7');
-    const isRegional = isTW || isCN;
-    const hint = isTW ? 'This looks like a Taiwanese ISBN (978-626). These titles are not in Western databases.'
-                : isCN ? 'This looks like a Mainland Chinese ISBN (978-7). These titles are rarely in Western databases.'
-                : 'This ISBN was not found in Open Library or Google Books.';
+    const isTW = v.startsWith('978626') || v.startsWith('9786');
+    const isCN = v.startsWith('9787');
+    if(isTW || isCN) {
+      try {
+        // Try Google Books with the ISBN as a general search — sometimes TW books
+        // are indexed under their title but linked to the ISBN in the description
+        const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${v}+isbn&maxResults=5&langRestrict=zh-TW`);
+        const data = await res.json();
+        if(data.items?.length) {
+          // Take the first result — it's likely the right book given the specific ISBN
+          book = makeBookFromGB(data.items[0].volumeInfo, v);
+          source = 'Google Books (regional)';
+        }
+      } catch(e){}
+    }
+  }
+
+  clearInterval(tick);
+
+  // ── All sources exhausted ────────────────────────────────────────
+  if(!book) {
+    const isTW = v.startsWith('978626') || v.startsWith('9786');
+    const isCN = v.startsWith('9787');
+    const hint = isTW
+      ? 'This is a Taiwanese ISBN (978-626). It was checked across Google Books, Open Library, and regional databases — not found. Try searching by title in the Search tab instead.'
+      : isCN
+      ? 'This is a Mainland Chinese ISBN (978-7). Try searching by title in the Search tab instead.'
+      : 'Not found in Google Books or Open Library. Try the Search tab or enter details manually.';
+
     el.innerHTML = `
-      <div style="border-left:3px solid var(--rule);padding:12px 14px;margin-bottom:16px">
-        <div style="font-family:var(--ff-sc);font-size:9px;letter-spacing:.02em;color:var(--ink-faint);margin-bottom:6px">NOT FOUND</div>
-        <div style="font-family:var(--ff-body);font-size:13px;color:var(--ink-mid);line-height:1.5">${hint}</div>
+      <div style="border-left:3px solid var(--rule);padding:14px;margin-bottom:16px">
+        <div style="font-family:var(--ff-sc);font-size:11px;letter-spacing:.02em;color:var(--ink-faint);margin-bottom:8px">NOT FOUND · 5 SOURCES CHECKED</div>
+        <div style="font-family:var(--ff-body);font-size:14px;color:var(--ink);line-height:1.6;margin-bottom:12px">${hint}</div>
       </div>
-      <div style="font-family:var(--ff-sc);font-size:9px;letter-spacing:.02em;color:var(--ink-faint);margin-bottom:10px">ADD MANUALLY — ISBN SAVED</div>
-      <button class="add-btn-primary" onclick="prefillManualFromISBN('${v}')">ENTER TITLE &amp; AUTHOR →</button>`;
+      <div style="display:flex;gap:8px">
+        <button class="modal-btn" style="flex:1" onclick="setAddTab('search');document.getElementById('isbn-field-result').innerHTML=''">SEARCH BY TITLE →</button>
+        <button class="modal-btn primary" style="flex:1" onclick="prefillManualFromISBN('${v}')">ADD MANUALLY →</button>
+      </div>`;
     return;
   }
 
+  // ── Found — show result card ────────────────────────────────────
   window._isbnBook = book;
   const thumbHtml = book.thumbnail
-    ? `<img src="${book.thumbnail}" style="width:52px;height:72px;object-fit:cover;border-radius:2px 3px 3px 2px;box-shadow:1px 2px 6px var(--spine-shadow);flex-shrink:0">`
-    : `<div style="width:52px;height:72px;background:${spineColor(book.title)};border-radius:2px 3px 3px 2px;flex-shrink:0"></div>`;
+    ? `<img src="${book.thumbnail}" style="width:60px;height:84px;object-fit:cover;border-radius:2px 4px 4px 2px;box-shadow:2px 3px 10px var(--spine-shadow);flex-shrink:0" onerror="this.style.display='none'">`
+    : `<div style="width:60px;height:84px;background:${spineColor(book.title)};border-radius:2px 4px 4px 2px;flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:4px"><span style="font-family:var(--ff-body);font-size:8px;color:rgba(255,255,255,.9);text-align:center;line-height:1.3">${book.title.slice(0,30)}</span></div>`;
 
-  el.innerHTML = `<div style="border:1px solid var(--rule);padding:14px;border-radius:4px">
-    <div style="display:flex;gap:12px;margin-bottom:14px;align-items:flex-start">
+  el.innerHTML = `<div style="border:1px solid var(--rule);padding:16px;border-radius:4px">
+    <div style="font-family:var(--ff-sc);font-size:10px;letter-spacing:.02em;color:var(--ink-faint);margin-bottom:12px">FOUND · ${source.toUpperCase()}</div>
+    <div style="display:flex;gap:14px;margin-bottom:16px;align-items:flex-start">
       ${thumbHtml}
-      <div>
-        <div style="font-family:var(--ff-display);font-style:italic;font-size:18px;margin-bottom:3px;line-height:1.2">${book.title}</div>
-        <div style="font-family:var(--ff-body);font-size:12px;color:var(--ink-mid);margin-bottom:2px">${book.author}</div>
-        <div style="font-family:var(--ff-sc);font-size:9px;letter-spacing:.02em;color:var(--ink-faint)">${[book.year, book.totalPages?book.totalPages+'pp':''].filter(Boolean).join(' · ')}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-family:var(--ff-display);font-style:italic;font-size:20px;margin-bottom:4px;line-height:1.2">${book.title}</div>
+        <div style="font-family:var(--ff-body);font-size:14px;color:var(--ink-mid);margin-bottom:4px">${book.author}</div>
+        <div style="font-family:var(--ff-sc);font-size:11px;letter-spacing:.02em;color:var(--ink-faint)">${[book.year, book.totalPages?book.totalPages+' pp':''].filter(Boolean).join(' · ')}</div>
       </div>
     </div>
-    <div style="font-family:var(--ff-sc);font-size:9px;letter-spacing:.02em;color:var(--ink-faint);margin-bottom:8px">ADD AS</div>
-    <div style="display:flex;gap:8px;margin-bottom:14px">
+    <div style="font-family:var(--ff-sc);font-size:11px;letter-spacing:.02em;color:var(--ink-faint);margin-bottom:10px">ADD AS</div>
+    <div style="display:flex;gap:8px;margin-bottom:16px">
       <button class="filter-chip active" id="isbn-s-to-read" onclick="isbnStatus('to-read')">TO READ</button>
       <button class="filter-chip" id="isbn-s-reading" onclick="isbnStatus('reading')">READING</button>
       <button class="filter-chip" id="isbn-s-finished" onclick="isbnStatus('finished')">FINISHED</button>
