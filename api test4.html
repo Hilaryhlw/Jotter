@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Jotter API Test v4</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, sans-serif; padding: 16px; font-size: 14px; background: #f9f7f2; }
+h2 { font-size: 20px; margin-bottom: 4px; }
+.proto { padding: 8px 12px; border-radius: 6px; margin: 12px 0; font-weight: bold; font-size: 13px; }
+.proto.ok  { background: #d4edda; color: #155724; }
+.proto.bad { background: #f8d7da; color: #721c24; }
+button { display: block; width: 100%; padding: 14px; background: #1a1710; color: #f0ebe0; border: none; border-radius: 6px; font-size: 16px; margin: 12px 0; cursor: pointer; }
+.card { background: #fff; border-radius: 8px; border: 1px solid #e0ddd8; padding: 12px; margin: 6px 0; }
+.card b { font-size: 13px; }
+.ok  { color: #2a7a4a; }
+.bad { color: #c0392b; }
+.detail { font-size: 11px; color: #666; margin-top: 4px; word-break: break-all; }
+.cover { width: 48px; height: 68px; object-fit: cover; border-radius: 3px; float: right; margin-left: 8px; }
+</style>
+</head>
+<body>
+<h2>Jotter API Test</h2>
+<p style="font-size:12px;color:#888;margin-top:4px">Upload this to your GitHub Pages then open from there</p>
+
+<div id="proto-display" class="proto bad">Checking protocol…</div>
+
+<button onclick="runAll()">▶ Run All Tests</button>
+<div id="out"></div>
+
+<script>
+const P = location.protocol;
+const el = document.getElementById('proto-display');
+if (P === 'https:') {
+  el.className = 'proto ok';
+  el.textContent = '✓ https:// — APIs should work';
+} else {
+  el.className = 'proto bad';
+  el.textContent = `✗ Protocol is "${P}" — must be https://. Upload to GitHub Pages first.`;
+}
+
+const isbn1 = "9786267752111";
+const isbn2 = "9786267045213";
+const title  = "金剛經白話講座";
+const enc    = encodeURIComponent(title);
+const out    = () => document.getElementById('out');
+
+function card(id, ok, summary, detail, thumbUrl) {
+  const img = thumbUrl ? `<img class="cover" src="${thumbUrl}" onerror="this.style.display='none'">` : '';
+  out().innerHTML += `<div class="card">
+    <b class="${ok ? 'ok' : 'bad'}">${ok ? '✓' : '✗'} ${id}</b>
+    ${img}
+    <div class="detail">${summary}</div>
+    ${detail ? `<div class="detail" style="margin-top:4px;color:#444">${detail}</div>` : ''}
+  </div>`;
+}
+
+async function test(id, url) {
+  try {
+    const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
+    const d = await r.json();
+    const items = d.items || d.docs || [];
+    if (!items.length) {
+      card(id, false, `0 results (totalItems=${d.totalItems || d.numFound || 0})`, url);
+      return;
+    }
+    const info  = items[0].volumeInfo || items[0];
+    const t     = info.title || (Array.isArray(info.title_suggest) ? info.title_suggest[0] : '') || '?';
+    const a     = (info.authors || info.author_name || ['?'])[0];
+    const ids   = (info.industryIdentifiers || []);
+    const isbn  = ids.find(x => x.type === 'ISBN_13')?.identifier || ids.find(x => x.type === 'ISBN_10')?.identifier || '–';
+    const covId = info.cover_i;
+    const thumb = info.imageLinks?.thumbnail?.replace('http:','https:') ||
+                  (covId ? `https://covers.openlibrary.org/b/id/${covId}-M.jpg` : '');
+    card(id, true,
+      `${items.length} result(s) — <b>"${t}"</b> by ${a}`,
+      `ISBN: ${isbn} | thumb: ${thumb ? 'yes' : 'none'}`,
+      thumb || null);
+  } catch(e) {
+    card(id, false, e.message, url);
+  }
+}
+
+async function runAll() {
+  out().innerHTML = '<div class="card"><b>Running…</b></div>';
+
+  // Google Books — various strategies
+  await test('GB isbn1',         `https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn1}`);
+  await test('GB isbn2',         `https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn2}`);
+  await test('GB isbn1 +TW',     `https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn1}&country=TW`);
+  await test('GB isbn2 +TW',     `https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn2}&country=TW`);
+  await test('GB title',         `https://www.googleapis.com/books/v1/volumes?q=${enc}&maxResults=5`);
+  await test('GB title +TW',     `https://www.googleapis.com/books/v1/volumes?q=${enc}&country=TW&maxResults=5`);
+  await test('GB intitle +TW',   `https://www.googleapis.com/books/v1/volumes?q=intitle:${enc}&country=TW&maxResults=5`);
+
+  // Open Library
+  await test('OL isbn1',         `https://openlibrary.org/search.json?isbn=${isbn1}`);
+  await test('OL isbn2',         `https://openlibrary.org/search.json?isbn=${isbn2}`);
+  await test('OL title',         `https://openlibrary.org/search.json?q=${enc}&limit=5`);
+
+  // Test a known English book to confirm APIs work at all
+  await test('GB en (Atomic Habits)', `https://www.googleapis.com/books/v1/volumes?q=isbn:9780735211292`);
+
+  out().innerHTML = out().innerHTML.replace('<div class="card"><b>Running…</b></div>','');
+}
+</script>
+</body>
+</html>
