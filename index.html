@@ -36,7 +36,7 @@
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; background: var(--parchment); color: var(--ink);
-  font-family: var(--ff-body); font-size: 15px; font-weight: 400; -webkit-font-smoothing: antialiased;
+  font-family: var(--ff-body); font-size: 16px; font-weight: 400; -webkit-font-smoothing: antialiased;
   overscroll-behavior: none; }
 
 .screen { position: fixed; inset: 0; background: var(--parchment);
@@ -49,24 +49,24 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
   display: flex; justify-content: space-around; align-items: flex-start;
   padding: 10px 0 calc(10px + var(--safe-bottom)); z-index: 100; }
 .nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px;
-  font-family: var(--ff-sc); font-size: 9px; letter-spacing: .01em;
+  font-family: var(--ff-sc); font-size: 11px; letter-spacing: .01em;
   color: var(--ink-faint); cursor: pointer; padding: 0 12px;
   transition: color .2s; background: none; border: none;
   -webkit-tap-highlight-color: transparent; }
 .nav-item.active { color: var(--ink); }
 .nav-item.active .nav-dot { background: var(--crimson); }
 .nav-dot { width: 4px; height: 4px; border-radius: 50%; background: transparent; margin-top: 2px; }
-.nav-icon { font-size: 18px; line-height: 1; }
+.nav-icon { font-size: 20px; line-height: 1; }
 
 .folio-header { flex-shrink: 0; padding: 52px 24px 16px;
   border-bottom: 1px solid var(--rule); position: relative; }
-.folio-label { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em;
+.folio-label { font-family: var(--ff-sc); font-size: 11px; letter-spacing: .02em;
   color: var(--ink-faint); position: absolute; top: 16px; left: 24px; }
 .folio-title { font-family: var(--ff-display); font-style: italic;
-  font-size: 34px; line-height: 1.1; }
+  font-size: 38px; line-height: 1.1; }
 .folio-sub { font-family: var(--ff-body); font-style: italic;
-  font-size: 12px; color: var(--ink-faint); margin-top: 2px; }
-.folio-stats { font-family: var(--ff-sc); font-size: 11px; letter-spacing: .02em;
+  font-size: 14px; color: var(--ink-faint); margin-top: 2px; }
+.folio-stats { font-family: var(--ff-sc); font-size: 13px; letter-spacing: .02em;
   color: var(--ink); margin-top: 8px; }
 .folio-stats span { color: var(--crimson); }
 .folio-btn { position: absolute; top: 14px; right: 24px;
@@ -121,7 +121,7 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
 .shelf-section-header { display: flex; justify-content: space-between;
   align-items: baseline; margin-bottom: 12px; }
 .shelf-section-title { font-family: var(--ff-display); font-style: italic; font-size: 24px; color: var(--ink); }
-.shelf-section-count { font-family: var(--ff-sc); font-size: 10px;
+.shelf-section-count { font-family: var(--ff-sc); font-size: 12px;
   letter-spacing: .01em; color: var(--ink-faint); }
 .spine-row { display: flex; gap: 8px; align-items: flex-end; height: 150px;
   padding-bottom: 8px; overflow-x: auto; scrollbar-width: none; }
@@ -142,28 +142,24 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
 .book-progress-bar { margin: 6px 0 2px; height: 2px; background: var(--rule);
   border-radius: 1px; overflow: hidden; }
 .book-progress-fill { height: 100%; background: var(--crimson); border-radius: 1px; }
-.book-progress-label { font-family: var(--ff-sc); font-size: 8px; letter-spacing: .02em;
+.book-progress-label { font-family: var(--ff-sc); font-size: 10px; letter-spacing: .02em;
   color: var(--ink-faint); display: flex; justify-content: space-between; }
 .book-progress-label em { font-family: var(--ff-body); color: var(--ink-mid);
   font-size: 9px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 50px; }
 .book-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
+  gap: 12px;
   padding: 8px 0;
 }
-.book-card {
-  cursor: pointer; -webkit-tap-highlight-color: transparent;
-  position: relative;
-}
+.book-card { cursor: pointer; -webkit-tap-highlight-color: transparent; position: relative; }
 .book-card-delete {
   position: absolute; top: 4px; right: 4px; z-index: 10;
   width: 22px; height: 22px; border-radius: 50%;
   background: rgba(26,23,16,.7); border: none; color: #fff;
-  font-size: 14px; line-height: 22px; text-align: center;
-  cursor: pointer; opacity: 0; transition: opacity .15s;
-  -webkit-tap-highlight-color: transparent;
+  font-size: 14px; cursor: pointer; opacity: 0; transition: opacity .15s;
   display: flex; align-items: center; justify-content: center;
+  -webkit-tap-highlight-color: transparent;
 }
 .book-card:hover .book-card-delete,
 .book-card.show-delete .book-card-delete { opacity: 1; }
@@ -174,32 +170,15 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
   overflow: hidden;
   box-shadow: 2px 4px 14px var(--spine-shadow);
   background: var(--parchment-dark);
-  display: block;
 }
-.book-cover img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  border-radius: inherit;
-}
-.book-cover div {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 5px;
-}
+.book-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .book-cover-fallback { width: 100%; height: 100%; display: flex; align-items: center;
-  justify-content: center; padding: 6px; }
+  justify-content: center; padding: 8px; }
 .book-cover-title { font-family: var(--ff-body); font-size: 9px;
   color: rgba(255,255,255,.92); text-align: center; line-height: 1.3; word-break: break-word; }
-.book-card-author {
-  font-family: var(--ff-sc); font-size: 10px; letter-spacing: .02em;
-  color: var(--ink-faint); margin-top: 5px;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
+.book-card-author { font-family: var(--ff-sc); font-size: 11px; letter-spacing: .02em;
+  color: var(--ink-faint); margin-top: 6px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .fab { position: fixed; bottom: calc(72px + var(--safe-bottom)); right: 20px;
   width: 52px; height: 52px; border-radius: 50%; background: var(--ink);
   color: var(--parchment); display: flex; align-items: center; justify-content: center;
@@ -215,25 +194,25 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
   border-radius: 3px 5px 5px 3px; box-shadow: 2px 4px 14px var(--spine-shadow);
   overflow: hidden; }
 .book-detail-meta { flex: 1; padding-top: 4px; }
-.book-detail-genre { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em;
+.book-detail-genre { font-family: var(--ff-sc); font-size: 11px; letter-spacing: .02em;
   color: var(--ink-faint); margin-bottom: 4px; }
 .book-detail-title { font-family: var(--ff-display); font-style: italic;
   font-size: 24px; line-height: 1.15; color: var(--ink); margin-bottom: 4px; }
-.book-detail-author { font-family: var(--ff-body); font-size: 13px;
+.book-detail-author { font-family: var(--ff-body); font-size: 15px;
   color: var(--ink-mid); margin-bottom: 8px; }
 .status-pill { display: inline-flex; align-items: center; gap: 4px;
-  font-family: var(--ff-sc); font-size: 9px; letter-spacing: .01em;
-  padding: 4px 10px; border-radius: 12px; background: var(--crimson);
+  font-family: var(--ff-sc); font-size: 11px; letter-spacing: .01em;
+  padding: 5px 12px; border-radius: 12px; background: var(--crimson);
   color: var(--cream); margin-right: 6px; }
 .pages-pill { display: inline-flex; align-items: center;
-  font-family: var(--ff-sc); font-size: 9px; letter-spacing: .01em;
-  padding: 4px 10px; border-radius: 12px;
+  font-family: var(--ff-sc); font-size: 11px; letter-spacing: .01em;
+  padding: 5px 12px; border-radius: 12px;
   border: 1px solid var(--rule); color: var(--ink-mid); }
 .pace-section { padding: 16px 24px; border-bottom: 1px solid var(--rule); }
 .pace-label { display: flex; justify-content: space-between; align-items: baseline;
   margin-bottom: 10px; }
-.pace-label-text { font-family: var(--ff-display); font-style: italic; font-size: 18px; }
-.pace-since { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .01em; color: var(--ink-faint); }
+.pace-label-text { font-family: var(--ff-display); font-style: italic; font-size: 20px; }
+.pace-since { font-family: var(--ff-sc); font-size: 11px; letter-spacing: .01em; color: var(--ink-faint); }
 .pace-ruler { position: relative; height: 28px; margin-bottom: 10px; }
 .pace-track { position: absolute; top: 50%; left: 0; right: 0; height: 1px;
   background: var(--rule); transform: translateY(-50%); }
@@ -251,7 +230,7 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
 .pace-stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-top: 8px; }
 .pace-stat { text-align: center; }
 .pace-stat-val { font-family: var(--ff-display); font-style: italic; font-size: 22px; color: var(--ink); }
-.pace-stat-key { font-family: var(--ff-sc); font-size: 8px; letter-spacing: .02em;
+.pace-stat-key { font-family: var(--ff-sc); font-size: 10px; letter-spacing: .02em;
   color: var(--ink-faint); margin-top: 1px; }
 .marginalia-header { display: flex; justify-content: space-between; align-items: center;
   padding: 16px 24px 8px; }
@@ -263,16 +242,16 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
   -webkit-tap-highlight-color: transparent; }
 .jot-ref { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
 .jot-ref-left { display: flex; align-items: center; gap: 8px; }
-.jot-page { font-family: var(--ff-sc); font-size: 11px; letter-spacing: .02em;
+.jot-page { font-family: var(--ff-sc); font-size: 13px; letter-spacing: .02em;
   color: var(--ink); font-weight: 500; }
-.jot-date { font-family: var(--ff-sc); font-size: 10px; letter-spacing: .02em; color: var(--ink-faint); }
+.jot-date { font-family: var(--ff-sc); font-size: 12px; letter-spacing: .02em; color: var(--ink-faint); }
 .jot-actions { display: flex; gap: 6px; align-items: center; }
-.jot-edit-btn { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em;
+.jot-edit-btn { font-family: var(--ff-sc); font-size: 11px; letter-spacing: .02em;
   padding: 4px 10px; border: 1px solid var(--ink); background: none;
   color: var(--ink); cursor: pointer; border-radius: 2px;
   -webkit-tap-highlight-color: transparent; transition: background .15s; }
 .jot-edit-btn:active { background: var(--ink); color: var(--parchment); }
-.jot-discard-btn { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em;
+.jot-discard-btn { font-family: var(--ff-sc); font-size: 11px; letter-spacing: .02em;
   padding: 4px 10px; border: 1px solid var(--crimson); background: none;
   color: var(--crimson); cursor: pointer; border-radius: 2px;
   -webkit-tap-highlight-color: transparent; transition: background .15s; }
@@ -282,7 +261,7 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
   padding-left: 12px; margin-bottom: 10px; }
 .jot-body { font-family: var(--ff-body); font-size: 15px; color: var(--ink); line-height: 1.65; }
 .jot-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
-.tag-chip { font-family: var(--ff-sc); font-size: 10px; letter-spacing: .02em;
+.tag-chip { font-family: var(--ff-sc); font-size: 12px; letter-spacing: .02em;
   background: var(--parchment-dark); border: 1px solid var(--ink-faint);
   color: var(--ink); padding: 4px 11px; border-radius: 12px; cursor: pointer; }
 .tag-chip.active { background: var(--crimson); border-color: var(--crimson); color: var(--cream); }
@@ -296,7 +275,7 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
 .jot-save { background: none; border: none; cursor: pointer; color: var(--crimson);
   font-family: var(--ff-sc); font-size: 10px; letter-spacing: .02em;
   padding: 4px 8px; -webkit-tap-highlight-color: transparent; }
-.jot-header-title { font-family: var(--ff-sc); font-size: 11px; letter-spacing: .02em; }
+.jot-header-title { font-family: var(--ff-sc); font-size: 13px; letter-spacing: .02em; }
 .jot-book-ref { display: flex; align-items: center; justify-content: space-between;
   padding: 10px 20px; border-bottom: 1px solid var(--rule);
   cursor: pointer; -webkit-tap-highlight-color: transparent; }
@@ -305,13 +284,13 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
   box-shadow: 1px 2px 6px var(--spine-shadow); flex-shrink: 0; }
 .jot-book-name { font-family: var(--ff-display); font-style: italic; font-size: 14px; }
 .jot-book-ch { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em; color: var(--ink-faint); }
-.jot-page-badge { font-family: var(--ff-sc); font-size: 10px; letter-spacing: .02em;
+.jot-page-badge { font-family: var(--ff-sc); font-size: 12px; letter-spacing: .02em;
   background: var(--crimson); color: var(--cream);
   padding: 5px 10px; border-radius: 3px; cursor: pointer;
   border: none; -webkit-tap-highlight-color: transparent; }
 .jot-tabs { display: flex; align-items: center; padding: 0 20px;
   border-bottom: 1px solid var(--rule); flex-shrink: 0; }
-.jot-tab { font-family: var(--ff-sc); font-size: 10px; letter-spacing: .02em;
+.jot-tab { font-family: var(--ff-sc); font-size: 12px; letter-spacing: .02em;
   color: var(--ink-faint); padding: 10px 12px 8px;
   border-bottom: 2px solid transparent; cursor: pointer;
   background: none; border-top: none; border-left: none; border-right: none;
@@ -335,17 +314,17 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
 .jot-preview-pane em { font-style: italic; font-family: var(--ff-display); }
 .jot-preview-pane h3 { font-family: var(--ff-sc); font-size: 12px; letter-spacing: .02em; margin: 12px 0 4px; }
 .jot-threads-section { flex-shrink: 0; padding: 10px 20px; border-top: 1px solid var(--rule); }
-.jot-threads-label { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em;
+.jot-threads-label { font-family: var(--ff-sc); font-size: 11px; letter-spacing: .02em;
   color: var(--ink-faint); margin-bottom: 8px; }
 .tag-input-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 .tag-input { background: none; border: none; outline: none;
-  font-family: var(--ff-sc); font-size: 10px; letter-spacing: .01em;
+  font-family: var(--ff-sc); font-size: 12px; letter-spacing: .01em;
   color: var(--ink); width: 80px; }
 .jot-toolbar { flex-shrink: 0; display: flex; align-items: center; gap: 2px;
   padding: 8px 20px calc(8px + var(--safe-bottom)); border-top: 1px solid var(--rule);
   background: var(--parchment); }
 .toolbar-btn { background: none; border: none; cursor: pointer;
-  font-family: var(--ff-body); font-size: 14px; font-weight: 700;
+  font-family: var(--ff-body); font-size: 16px; font-weight: 700;
   color: var(--ink); padding: 8px 10px; border-radius: 4px;
   -webkit-tap-highlight-color: transparent; transition: background .1s; }
 .toolbar-btn:active { background: var(--parchment-dark); }
@@ -443,8 +422,8 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
   -webkit-tap-highlight-color: transparent; }
 .thread-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
 .thread-item-header-left { display: flex; flex-direction: column; gap: 3px; }
-.thread-item-tag { font-family: var(--ff-sc); font-size: 14px; letter-spacing: .02em; color: var(--crimson); font-weight: 500; }
-.thread-item-count { font-family: var(--ff-sc); font-size: 10px; letter-spacing: .02em; color: var(--ink-faint); }
+.thread-item-tag { font-family: var(--ff-sc); font-size: 15px; letter-spacing: .02em; color: var(--crimson); font-weight: 500; }
+.thread-item-count { font-family: var(--ff-sc); font-size: 12px; letter-spacing: .02em; color: var(--ink-faint); }
 .thread-item-actions { display: flex; gap: 6px; }
 .thread-add-btn { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em;
   padding: 5px 11px; border: 1px solid var(--ink); background: var(--ink);
@@ -461,7 +440,7 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
 .thread-item-quote { font-family: var(--ff-display); font-style: italic; font-size: 15px;
   color: var(--ink); line-height: 1.5; border-left: 3px solid var(--rule);
   padding-left: 12px; margin-bottom: 6px; }
-.thread-item-source { font-family: var(--ff-sc); font-size: 10px; letter-spacing: .02em; color: var(--ink-faint); }
+.thread-item-source { font-family: var(--ff-sc); font-size: 12px; letter-spacing: .02em; color: var(--ink-faint); }
 
 /* THREAD DETAIL SCREEN */
 #screen-thread-detail { background: var(--parchment); }
@@ -481,21 +460,21 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
 .almanac-stat-cell { background: var(--parchment); padding: 18px 16px; }
 .almanac-stat-num { font-family: var(--ff-display); font-style: italic;
   font-size: 32px; line-height: 1; }
-.almanac-stat-label { font-family: var(--ff-sc); font-size: 8px; letter-spacing: .01em;
+.almanac-stat-label { font-family: var(--ff-sc); font-size: 11px; letter-spacing: .01em;
   color: var(--ink-faint); margin-top: 4px; }
 .almanac-section { padding: 20px 24px; border-bottom: 1px solid var(--rule); }
 .almanac-section-header { display: flex; justify-content: space-between;
   align-items: baseline; margin-bottom: 14px; }
 .almanac-section-title { font-family: var(--ff-display); font-style: italic; font-size: 20px; }
-.almanac-section-sub { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .01em; color: var(--ink-faint); }
+.almanac-section-sub { font-family: var(--ff-sc); font-size: 11px; letter-spacing: .01em; color: var(--ink-faint); }
 .bar-chart { display: flex; align-items: flex-end; gap: 3px; height: 80px; }
 .bar-day { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; }
 .bar-fill { width: 100%; background: var(--rule); border-radius: 2px 2px 0 0; min-height: 2px; }
 .bar-fill.today { background: var(--crimson); }
-.bar-label { font-family: var(--ff-sc); font-size: 7px; letter-spacing: .02em; color: var(--ink-faint); }
-.bar-val { font-family: var(--ff-sc); font-size: 7px; letter-spacing: .01em; color: var(--ink-mid); }
+.bar-label { font-family: var(--ff-sc); font-size: 10px; letter-spacing: .02em; color: var(--ink-faint); }
+.bar-val { font-family: var(--ff-sc); font-size: 10px; letter-spacing: .01em; color: var(--ink-mid); }
 .heat-grid { display: grid; grid-template-columns: repeat(12,1fr); gap: 4px; }
-.heat-month-label { font-family: var(--ff-sc); font-size: 7px; letter-spacing: .02em;
+.heat-month-label { font-family: var(--ff-sc); font-size: 10px; letter-spacing: .02em;
   color: var(--ink-faint); text-align: center; margin-bottom: 3px; }
 .heat-cell { aspect-ratio: 1; border-radius: 2px; background: var(--parchment-dark); }
 .heat-cell.h1 { background: #d4a8a8; }
@@ -505,7 +484,7 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
 .almanac-insight { padding: 20px 24px; border-bottom: 1px solid var(--rule); }
 .almanac-insight-num { font-family: var(--ff-display); font-style: italic;
   font-size: 28px; margin-bottom: 4px; }
-.almanac-insight-text { font-family: var(--ff-body); font-size: 13px;
+.almanac-insight-text { font-family: var(--ff-body); font-size: 15px;
   color: var(--ink-mid); line-height: 1.55; }
 .almanac-insight-text em { font-style: italic; }
 .io-section { padding: 20px 24px; border-bottom: 1px solid var(--rule); }
@@ -515,8 +494,8 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
   padding: 14px 16px; margin-bottom: 8px; cursor: pointer;
   -webkit-tap-highlight-color: transparent; transition: background .15s; }
 .io-btn:active { background: var(--parchment-dark); }
-.io-btn-label { font-family: var(--ff-sc); font-size: 11px; letter-spacing: .02em; }
-.io-btn-sub { font-family: var(--ff-body); font-style: italic; font-size: 11px; color: var(--ink-faint); margin-top: 1px; }
+.io-btn-label { font-family: var(--ff-sc); font-size: 13px; letter-spacing: .02em; }
+.io-btn-sub { font-family: var(--ff-body); font-style: italic; font-size: 13px; color: var(--ink-faint); margin-top: 1px; }
 .io-btn-icon { font-size: 18px; color: var(--ink-faint); }
 .io-upload-area { border: 1px dashed var(--rule); padding: 20px; text-align: center;
   margin-bottom: 8px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
@@ -539,13 +518,13 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
   max-height: 80vh; overflow-y: auto; border-radius: 12px 12px 0 0;
   transform: translateY(20px); transition: transform .25s ease; }
 .modal-overlay.open .modal-sheet { transform: translateY(0); }
-.modal-title { font-family: var(--ff-display); font-style: italic; font-size: 24px; margin-bottom: 16px; }
+.modal-title { font-family: var(--ff-display); font-style: italic; font-size: 26px; margin-bottom: 16px; }
 .modal-input { width: 100%; background: none; border: none;
   border-bottom: 1px solid var(--ink); outline: none;
   font-family: var(--ff-body); font-size: 16px; color: var(--ink);
   padding: 8px 0; margin-bottom: 20px; }
 .modal-btn-row { display: flex; gap: 10px; }
-.modal-btn { flex: 1; padding: 14px; font-family: var(--ff-sc); font-size: 11px;
+.modal-btn { flex: 1; padding: 14px; font-family: var(--ff-sc); font-size: 13px;
   letter-spacing: .02em; border: 1px solid var(--rule); cursor: pointer;
   background: none; color: var(--ink); -webkit-tap-highlight-color: transparent; }
 .modal-btn.primary { background: var(--ink); color: var(--parchment); border-color: var(--ink); }
@@ -580,7 +559,7 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
 /* TOAST */
 .toast { position: fixed; bottom: calc(90px + var(--safe-bottom)); left: 20px; right: 20px;
   background: var(--ink); color: var(--parchment); font-family: var(--ff-sc);
-  font-size: 10px; letter-spacing: .02em; padding: 14px 18px; z-index: 300;
+  font-size: 13px; letter-spacing: .02em; padding: 14px 18px; z-index: 300;
   opacity: 0; transition: opacity .2s; pointer-events: none; }
 .toast.show { opacity: 1; }
 
@@ -607,11 +586,11 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
   -webkit-tap-highlight-color: transparent; transition: color .15s; }
 .add-tab.active { color: var(--ink); border-bottom-color: var(--ink); }
 .add-pane { flex: 1; overflow-y: auto; padding: 20px 24px calc(20px + var(--safe-bottom)); }
-.add-field-label { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em;
+.add-field-label { font-family: var(--ff-sc); font-size: 11px; letter-spacing: .02em;
   color: var(--ink-faint); margin-bottom: 6px; }
 .add-field { width: 100%; background: none; border: none;
   border-bottom: 1px solid var(--rule); outline: none;
-  font-family: var(--ff-body); font-size: 16px; color: var(--ink);
+  font-family: var(--ff-body); font-size: 18px; color: var(--ink);
   padding: 8px 0; margin-bottom: 20px; }
 .add-field:focus { border-bottom-color: var(--ink); }
 .add-field-row { display: flex; gap: 16px; }
@@ -629,13 +608,15 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
   border-bottom: 1px solid var(--rule); cursor: pointer;
   -webkit-tap-highlight-color: transparent; }
 .search-book-result:active { background: var(--parchment-dark); margin: 0 -24px; padding: 12px 24px; }
-.search-book-thumb { flex-shrink: 0; width: 44px; height: 60px;
+.search-book-thumb { flex-shrink: 0; width: 56px; height: 76px;
   border-radius: 2px 3px 3px 2px; box-shadow: 1px 2px 6px var(--spine-shadow);
-  display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  display: flex; align-items: center; justify-content: center; overflow: hidden;
+  cursor: pointer; }
+.search-book-add-row { border-top: 1px solid var(--rule); padding-top: 10px; }
 .search-book-info-title { font-family: var(--ff-display); font-style: italic;
-  font-size: 15px; color: var(--ink); margin-bottom: 3px; line-height: 1.3; }
-.search-book-info-author { font-family: var(--ff-body); font-size: 12px; color: var(--ink-mid); }
-.search-book-info-meta { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em;
+  font-size: 17px; color: var(--ink); margin-bottom: 3px; line-height: 1.3; }
+.search-book-info-author { font-family: var(--ff-body); font-size: 14px; color: var(--ink-mid); }
+.search-book-info-meta { font-family: var(--ff-sc); font-size: 11px; letter-spacing: .02em;
   color: var(--ink-faint); margin-top: 3px; }
 .add-btn-primary { display: block; width: 100%; background: var(--ink);
   color: var(--parchment); font-family: var(--ff-sc); font-size: 11px;
@@ -666,7 +647,7 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
 .search-bar-wrap { display: flex; gap: 10px; align-items: center;
   border-bottom: 1px solid var(--rule); padding-bottom: 14px; }
 .search-bar { flex: 1; background: none; border: none; outline: none;
-  font-family: var(--ff-body); font-size: 16px; color: var(--ink); padding: 4px 0; }
+  font-family: var(--ff-body); font-size: 18px; color: var(--ink); padding: 4px 0; }
 .search-bar::placeholder { color: var(--ink-faint); }
 .search-clear { background: none; border: none; color: var(--ink-faint);
   font-size: 18px; cursor: pointer; padding: 4px;
@@ -1036,34 +1017,31 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
 <script>
 
 // ── COVER HELPERS ────────────────────────────────────────────────
+function httpsThumb(url) {
+  if(!url) return '';
+  // Force https, remove zoom restrictions Google adds
+  return url.replace('http://','https://').replace('&edge=curl','').replace('zoom=1','zoom=3');
+}
 function coverImg(b, w, h, extraStyle='') {
-  const sized = !!(w && h);
   const color = spineColor(b.title);
   const safeT = (b.title||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  if (b.thumbnail) {
-    const src = b.thumbnail.replace('http://','https://').replace('zoom=1','zoom=3');
-    // For both sized and unsized: let CSS handle all layout, img just fills parent
-    const style = sized
-      ? `width:${w}px;height:${h}px;object-fit:cover;display:block;border-radius:inherit;${extraStyle}`
-      : `width:100%;height:100%;object-fit:cover;display:block;border-radius:inherit;${extraStyle}`;
-    return `<img src="${src}" data-color="${color}" data-title="${safeT}" style="${style}" loading="lazy" onerror="_coverErr(this)">`;
+  const thumb = httpsThumb(b.thumbnail);
+  if (thumb) {
+    // w=0 means "fill container via CSS" (used for 4-col grid)
+    const style = w ? `width:${w}px;height:${h}px;${extraStyle}` : `width:100%;height:100%;${extraStyle}`;
+    return `<img src="${thumb}" data-color="${color}" data-title="${safeT}" style="${style};object-fit:cover;display:block;border-radius:inherit" loading="lazy" onerror="_coverErr(this)">`;
   }
-  if (sized) return coverFallback(b.title, color, w, h);
+  if (w) return coverFallback(b.title, color, w, h);
   return `<div style="width:100%;height:100%;background:${color};display:flex;align-items:center;justify-content:center;padding:5px"><span style="font-family:var(--ff-body);font-size:9px;color:rgba(255,255,255,.9);text-align:center;line-height:1.3">${safeT.slice(0,22)}</span></div>`;
 }
-function coverFallback(title, color, w, h) {
-  const t = (title||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  return `<div style="width:${w}px;height:${h}px;background:${color};display:flex;align-items:center;justify-content:center;padding:6px;border-radius:inherit;overflow:hidden"><span style="font-family:var(--ff-body);font-size:9px;color:rgba(255,255,255,.92);text-align:center;line-height:1.3;word-break:break-word">${t}</span></div>`;
-}
 
-// Global cover image error handler
 window._coverErr = function(img) {
   try {
     img.style.display = 'none';
-    var p = img.parentNode; if(!p) return;
-    var color = img.dataset.color || spineColor(img.dataset.title||'');
+    var p = img.parentNode; if (!p) return;
+    var color = img.dataset.color || '#8b2020';
     var title = img.dataset.title || '';
-    if(!p.querySelector('.fb-div')) {
+    if (!p.querySelector('.fb-div')) {
       var d = document.createElement('div');
       d.className = 'fb-div';
       d.style.cssText = 'width:100%;height:100%;background:'+color+';display:flex;align-items:center;justify-content:center;padding:5px;';
@@ -1072,6 +1050,10 @@ window._coverErr = function(img) {
     }
   } catch(e) {}
 };
+function coverFallback(title, color, w, h) {
+  return `<div style="width:${w}px;height:${h}px;background:${color};display:flex;align-items:center;justify-content:center;padding:6px"><span style="font-family:var(--ff-body);font-size:9px;color:rgba(255,255,255,.92);text-align:center;line-height:1.3;word-break:break-word">${title}</span></div>`;
+}
+
 // ── DATA ──────────────────────────────────────────────────────────
 const SPINE_COLORS = [
   '#8b2020','#2a4a7a','#2a5a3a','#6a4a2a','#4a2a6a',
@@ -1153,7 +1135,10 @@ function renderShelf(){
       <div class="shelf-section-count">${toread.length}</div></div>
       <div class="book-grid">`;
     toread.forEach(b=>{
-      html+=`<div class="book-card" id="bc-${b.id}" onclick="openBook('${b.id}')" ontouchstart="startLongPress('${b.id}',event)" ontouchend="endLongPress()" ontouchmove="endLongPress()">
+      html+=`<div class="book-card" id="bc-${b.id}"
+          onclick="openBook('${b.id}')"
+          ontouchstart="startLongPress('${b.id}',event)"
+          ontouchend="endLongPress()" ontouchmove="endLongPress()">
         <button class="book-card-delete" onclick="confirmDeleteBook('${b.id}',event)">×</button>
         <div class="book-cover">${coverImg(b,0,0)}</div>
         <div class="book-card-author">${b.author||''}</div></div>`;
@@ -1166,7 +1151,10 @@ function renderShelf(){
       <div class="shelf-section-count">${finished.length}</div></div>
       <div class="book-grid">`;
     finished.forEach(b=>{
-      html+=`<div class="book-card" id="bc-${b.id}" onclick="openBook('${b.id}')" ontouchstart="startLongPress('${b.id}',event)" ontouchend="endLongPress()" ontouchmove="endLongPress()">
+      html+=`<div class="book-card" id="bc-${b.id}"
+          onclick="openBook('${b.id}')"
+          ontouchstart="startLongPress('${b.id}',event)"
+          ontouchend="endLongPress()" ontouchmove="endLongPress()">
         <button class="book-card-delete" onclick="confirmDeleteBook('${b.id}',event)">×</button>
         <div class="book-cover" style="opacity:.8">${coverImg(b,0,0)}</div>
         <div class="book-card-author">${b.author||''}</div></div>`;
@@ -1287,46 +1275,30 @@ function deleteBook(id){
   DATA.jots=DATA.jots.filter(x=>x.bookId!==id);
   DB.save(DATA); goScreen('shelf');
 }
-
-let _lpTimer = null;
-function startLongPress(id, e) {
-  endLongPress();
-  _lpTimer = setTimeout(() => {
-    const card = document.getElementById('bc-'+id);
-    if (!card) return;
-    const isShowing = card.classList.contains('show-delete');
-    document.querySelectorAll('.book-card.show-delete').forEach(c => c.classList.remove('show-delete'));
-    if (!isShowing) card.classList.add('show-delete');
-  }, 480);
-}
-function endLongPress() {
-  if (_lpTimer) { clearTimeout(_lpTimer); _lpTimer = null; }
-}
-
-// Tap anywhere else → hide delete buttons
-document.addEventListener('touchstart', e => {
-  if (!e.target.closest('.book-card')) {
-    document.querySelectorAll('.book-card.show-delete').forEach(c => c.classList.remove('show-delete'));
-  }
-}, {passive:true});
-
-function confirmDeleteBook(id, e) {
+let _lpTimer=null;
+function startLongPress(id,e){endLongPress();_lpTimer=setTimeout(()=>{
+  const card=document.getElementById('bc-'+id); if(!card)return;
+  document.querySelectorAll('.book-card.show-delete').forEach(c=>c.classList.remove('show-delete'));
+  card.classList.toggle('show-delete');
+},480);}
+function endLongPress(){if(_lpTimer){clearTimeout(_lpTimer);_lpTimer=null;}}
+document.addEventListener('touchstart',e=>{
+  if(!e.target.closest('.book-card'))
+    document.querySelectorAll('.book-card.show-delete').forEach(c=>c.classList.remove('show-delete'));
+},{passive:true});
+function confirmDeleteBook(id,e){
   e.stopPropagation();
-  const b = DATA.books.find(x => x.id === id);
-  if (!b) return;
-  const n = DATA.jots.filter(j => j.bookId === id).length;
-  showModal('Remove from shelf?', `
-    <div style="font-family:var(--ff-display);font-style:italic;font-size:19px;
-         margin-bottom:6px;line-height:1.3">${b.title}</div>
-    <div style="font-family:var(--ff-body);font-size:14px;color:var(--ink-mid);
-         margin-bottom:20px;font-style:italic;line-height:1.55">
-      ${n > 0 ? `This will also delete ${n} note${n>1?'s':''} you made.` : 'No notes will be lost.'}</div>
+  const b=DATA.books.find(x=>x.id===id); if(!b)return;
+  const n=DATA.jots.filter(j=>j.bookId===id).length;
+  showModal('Remove from shelf?',`
+    <div style="font-family:var(--ff-display);font-style:italic;font-size:19px;margin-bottom:6px;line-height:1.3">${b.title}</div>
+    <div style="font-family:var(--ff-body);font-size:14px;color:var(--ink-mid);margin-bottom:20px;font-style:italic;line-height:1.55">
+      ${n>0?`This will also delete ${n} note${n>1?'s':''}.`:'No notes will be lost.'}</div>
     <div class="modal-btn-row">
       <button class="modal-btn" onclick="closeModal()">KEEP</button>
       <button class="modal-btn" style="background:var(--crimson);color:var(--cream);border-color:var(--crimson)"
         onclick="deleteBook('${id}');closeModal()">REMOVE</button>
-    </div>`);
-}
+    </div>`);}
 
 function confirmDeleteJot(jid, bid) {
   showModal('Discard this note?', `
@@ -1837,255 +1809,247 @@ function selectStatus(s) {
 
 async function searchBooks() {
   const q = document.getElementById('add-search-field').value.trim();
-  if (!q) return;
+  if(!q) return;
   const el = document.getElementById('book-search-results');
   el.innerHTML = '<div class="searching-hint">Searching…</div>';
-  const enc = encodeURIComponent(q);
-  const isCJK = /[\u2e80-\u9fff]/.test(q);
-  let results = []; const seen = new Set();
-  function addBook(b) {
-    if (!b.title || b.title==='Unknown') return;
-    const key = b.title.replace(/\s/g,'').toLowerCase().slice(0,10);
-    if (seen.has(key)) return; seen.add(key); results.push(b);
-  }
-  function norm(o) {
-    return { id:uid(), title:o.title||'Unknown', author:o.author||'', year:o.year||'',
-      totalPages:o.pages||0, thumbnail:(o.thumb||'').replace('http://','https://').replace('zoom=1','zoom=3'),
-      isbn:o.isbn||'', categories:o.categories||[], status:'to-read', currentPage:0, addedAt:new Date().toISOString() };
-  }
-  function parseBK(html) {
-    if (!html || html.length < 200) return [];
-    const doc = new DOMParser().parseFromString(html,'text/html'); const out = [];
-    let items = [];
-    for (const sel of ['ul.searchbook > li','li[id^="item"]','.type02_bd-a','.prod-item']) {
-      items = [...doc.querySelectorAll(sel)]; if (items.length) break;
-    }
-    if (!items.length) { doc.querySelectorAll('a[href*="/products/"]').forEach(a=>{const li=a.closest('li')||a.closest('.item')||a.parentElement;if(li&&!items.includes(li))items.push(li);}); }
-    items.slice(0,8).forEach(item => {
-      const tEl = item.querySelector('h4 a, strong a, a[href*="/products/"]'); if (!tEl) return;
-      const title = tEl.textContent.trim(); if (!title || title.length < 2) return;
-      const aEl = item.querySelector('ul.msg li a, .author a');
-      const img = item.querySelector('img');
-      const thumb = (img?.getAttribute('data-original')||img?.getAttribute('data-src')||img?.getAttribute('src')||'').replace('http://','https://');
-      out.push({ title, author:aEl?.textContent.trim()||'', thumb, isbn:'', year:'', pages:0, categories:[] });
-    });
-    return out;
-  }
-  await Promise.allSettled([
-    fetch(`https://www.googleapis.com/books/v1/volumes?q=${enc}&maxResults=8&printType=books`)
-      .then(r=>r.json()).then(d=>{(d.items||[]).forEach(item=>{const info=item.volumeInfo,ids=info.industryIdentifiers||[];addBook(norm({title:info.title,author:(info.authors||[]).join(', '),year:info.publishedDate?.slice(0,4),pages:info.pageCount,thumb:info.imageLinks?.thumbnail||info.imageLinks?.smallThumbnail,isbn:ids.find(x=>x.type==='ISBN_13')?.identifier||ids.find(x=>x.type==='ISBN_10')?.identifier||'',categories:info.categories}));});}).catch(()=>{}),
-    fetch(`https://www.googleapis.com/books/v1/volumes?q=${enc}&maxResults=6&country=TW&printType=books`)
-      .then(r=>r.json()).then(d=>{(d.items||[]).forEach(item=>{const info=item.volumeInfo,ids=info.industryIdentifiers||[];addBook(norm({title:info.title,author:(info.authors||[]).join(', '),year:info.publishedDate?.slice(0,4),pages:info.pageCount,thumb:info.imageLinks?.thumbnail||info.imageLinks?.smallThumbnail,isbn:ids.find(x=>x.type==='ISBN_13')?.identifier||ids.find(x=>x.type==='ISBN_10')?.identifier||'',categories:info.categories}));});}).catch(()=>{}),
-    fetch(`https://openlibrary.org/search.json?q=${enc}&fields=title,author_name,number_of_pages_median,cover_i,first_publish_year,isbn&limit=5`)
-      .then(r=>r.json()).then(d=>{(d.docs||[]).forEach(doc=>{addBook(norm({title:doc.title,author:(doc.author_name||[]).join(', '),year:doc.first_publish_year?String(doc.first_publish_year):'',pages:doc.number_of_pages_median,thumb:doc.cover_i?`https://covers.openlibrary.org/b/id/${doc.cover_i}-M.jpg`:'',isbn:(doc.isbn||[])[0]||''}));});}).catch(()=>{}),
-    isCJK ? fetch(`https://search.books.com.tw/search/query/key/${enc}/cat/BKA/`,{headers:{'Accept':'text/html,*/*','Accept-Language':'zh-TW,zh;q=0.9'},signal:AbortSignal.timeout(6000)}).then(r=>r.text()).then(html=>parseBK(html).forEach(b=>addBook(norm(b)))).catch(()=>{}) : Promise.resolve()
-  ]);
-  if (!results.length) { el.innerHTML='<div class="searching-hint">No results found.<br><span style="font-size:13px;color:var(--ink-faint)">Try different keywords or use the ISBN tab.</span></div>'; return; }
-  window._searchResults = results;
-  el.innerHTML = results.map((book,i) => {
-    const color = spineColor(book.title);
-    const tH = book.thumbnail
-      ? `<img src="${book.thumbnail}" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy" data-color="${color}" onerror="_coverErr(this)">`
-      : `<div style="width:100%;height:100%;background:${color};display:flex;align-items:center;justify-content:center;padding:4px"><span style="font-family:var(--ff-body);font-size:10px;color:rgba(255,255,255,.9);text-align:center;line-height:1.3">${book.title.slice(0,20)}</span></div>`;
-    const meta = [book.year,book.totalPages?book.totalPages+'pp':''].filter(Boolean).join(' · ');
-    return `<div class="search-book-result" id="sbr-${i}"><div class="search-book-thumb" onclick="expandSearchResult(${i})">${tH}</div><div style="flex:1;min-width:0"><div class="search-book-info-title" onclick="expandSearchResult(${i})">${book.title}</div>${book.author?`<div class="search-book-info-author">${book.author}</div>`:''}${meta?`<div class="search-book-info-meta">${meta}</div>`:''}<div class="search-book-add-row" id="sbr-add-${i}" style="display:none;margin-top:10px"><div style="display:flex;gap:6px;margin-bottom:8px"><button class="filter-chip active" id="sbr-s-${i}-to-read" onclick="setSBRStatus(${i},'to-read')">TO READ</button><button class="filter-chip" id="sbr-s-${i}-reading" onclick="setSBRStatus(${i},'reading')">READING</button><button class="filter-chip" id="sbr-s-${i}-finished" onclick="setSBRStatus(${i},'finished')">FINISHED</button></div><button class="add-btn-primary" style="padding:12px" onclick="doAddSearchBookDirect(${i})">ADD TO SHELF →</button></div></div></div>`;
-  }).join('');
+  try {
+    const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&maxResults=8`);
+    const data = await res.json();
+    if(!data.items?.length){ el.innerHTML='<div class="searching-hint">No results found.</div>'; return; }
+    el.innerHTML = data.items.map((item,i)=>{
+      const info = item.volumeInfo;
+      const title = info.title||'Unknown';
+      const author = (info.authors||[]).join(', ')||'Unknown';
+      const pages = info.pageCount ? info.pageCount+'pp' : '';
+      const year = info.publishedDate?.slice(0,4)||'';
+      const thumb = info.imageLinks?.thumbnail||'';
+      const color = spineColor(title);
+      const safeThumb = thumb ? thumb.replace('http://','https://').replace('zoom=1','zoom=3') : '';
+      const thumbHtml = safeThumb
+        ? `<img src="${safeThumb}" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy" onerror="_coverErr(this)" data-color="${color}">`
+        : `<div style="width:100%;height:100%;background:${color};display:flex;align-items:center;justify-content:center"><span style="font-family:var(--ff-body);font-size:8px;color:rgba(255,255,255,.9);text-align:center;padding:4px;line-height:1.3">${title.slice(0,24)}</span></div>`;
+      return `<div class="search-book-result" id="sbr-${i}">
+        <div class="search-book-thumb" onclick="expandSearchResult(${i})">${thumbHtml}</div>
+        <div style="flex:1;min-width:0">
+          <div class="search-book-info-title" onclick="expandSearchResult(${i})">${title}</div>
+          <div class="search-book-info-author">${author}</div>
+          <div class="search-book-info-meta">${[year,pages].filter(Boolean).join(' · ')}</div>
+          <div class="search-book-add-row" id="sbr-add-${i}" style="display:none;margin-top:10px">
+            <div style="display:flex;gap:6px;margin-bottom:8px">
+              <button class="filter-chip active" id="sbr-s-${i}-to-read" onclick="setSBRStatus(${i},'to-read')">TO READ</button>
+              <button class="filter-chip" id="sbr-s-${i}-reading" onclick="setSBRStatus(${i},'reading')">READING</button>
+              <button class="filter-chip" id="sbr-s-${i}-finished" onclick="setSBRStatus(${i},'finished')">FINISHED</button>
+            </div>
+            <button class="add-btn-primary" style="padding:10px" onclick="doAddSearchBook(${i})">ADD TO SHELF →</button>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+    // Store results for confirmation
+    window._searchResults = data.items;
+  } catch(e) { el.innerHTML='<div class="searching-hint">Search failed. Check connection.</div>'; }
 }
-function expandSearchResult(i){document.querySelectorAll('.search-book-add-row').forEach((row,idx)=>{row.style.display=(idx===i&&row.style.display==='none')?'':'none';});if(!window._sbrStatus)window._sbrStatus={};window._sbrStatus[i]=window._sbrStatus[i]||'to-read';}
-function setSBRStatus(i,s){if(!window._sbrStatus)window._sbrStatus={};window._sbrStatus[i]=s;['to-read','reading','finished'].forEach(x=>document.getElementById(`sbr-s-${i}-${x}`)?.classList.toggle('active',x===s));}
-function doAddSearchBookDirect(i){const book=window._searchResults?.[i];if(!book)return;const b=Object.assign({},book,{id:uid(),status:window._sbrStatus?.[i]||'to-read',addedAt:new Date().toISOString()});if(b.status==='reading')b.startedReading=new Date().toISOString();DATA.books.push(b);DB.save(DATA);if(window._sbrStatus)delete window._sbrStatus[i];showToast(`"${b.title}" added.`);goScreen('shelf');}
-function confirmAddSearchBook(i){expandSearchResult(i);}
-function csStatus(s){window._confirmStatus=s;}
-function doAddSearchBook(i){doAddSearchBookDirect(i);}
+
+function expandSearchResult(i) {
+  // Collapse any open rows first
+  document.querySelectorAll('.search-book-add-row').forEach((el,idx)=>{
+    if(idx!==i) el.style.display='none';
+  });
+  const row = document.getElementById(`sbr-add-${i}`);
+  if(!row) return;
+  const isOpen = row.style.display !== 'none';
+  row.style.display = isOpen ? 'none' : '';
+  if(!isOpen) {
+    window._sbrStatus = window._sbrStatus||{};
+    window._sbrStatus[i] = 'to-read';
+  }
+}
+
+function setSBRStatus(i, s) {
+  if(!window._sbrStatus) window._sbrStatus = {};
+  window._sbrStatus[i] = s;
+  ['to-read','reading','finished'].forEach(x=>{
+    document.getElementById(`sbr-s-${i}-${x}`)?.classList.toggle('active', x===s);
+  });
+}
+
+function csStatus(s) {
+  window._confirmStatus = s;
+  ['to-read','reading','finished'].forEach(x=>document.getElementById('cs-'+x)?.classList.toggle('active',x===s));
+}
+
+function doAddSearchBook(i) {
+  const item = window._searchResults?.[i]; if(!item) return;
+  const info = item.volumeInfo;
+  const book = {
+    id: uid(), title: info.title||'Unknown',
+    author: (info.authors||[]).join(', ')||'Unknown',
+    year: info.publishedDate?.slice(0,4)||'',
+    totalPages: info.pageCount||0,
+    categories: info.categories||[],
+    thumbnail: httpsThumb(info.imageLinks?.thumbnail||''),
+    status: (window._sbrStatus?.[i])||window._confirmStatus||'to-read',
+    currentPage: 0,
+    addedAt: new Date().toISOString()
+  };
+  if(book.status==='reading') book.startedReading = new Date().toISOString();
+  DATA.books.push(book); DB.save(DATA);
+  closeModal();
+  if(window._sbrStatus) delete window._sbrStatus[i];
+  showToast(`"${book.title}" added.`);
+  goScreen('shelf');
+}
+
+function saveManualBook() {
+  const title = document.getElementById('manual-title').value.trim();
+  if(!title){ showToast('Please enter a title.'); return; }
+  const book = {
+    id: uid(), title,
+    author: document.getElementById('manual-author').value.trim()||'Unknown',
+    year: document.getElementById('manual-year').value.trim()||'',
+    totalPages: parseInt(document.getElementById('manual-pages').value)||0,
+    isbn: window._pendingISBN||'',
+    categories: [], status: addBookStatus_selected,
+    currentPage: 0, addedAt: new Date().toISOString()
+  };
+  if(book.status==='reading') book.startedReading = new Date().toISOString();
+  DATA.books.push(book); DB.save(DATA);
+  window._pendingISBN = null;
+  ['manual-title','manual-author','manual-pages','manual-year'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  showToast(`"${book.title}" added.`);
+  goScreen('shelf');
+}
+
 async function lookupISBNField() {
   const raw = document.getElementById('isbn-field').value.trim();
   const v = raw.replace(/[-\s]/g,'');
-  if(v.length<10){showToast('Enter a valid ISBN-10 or ISBN-13.');return;}
+  if(v.length < 10){ showToast('Enter a valid ISBN-10 or ISBN-13.'); return; }
   const el = document.getElementById('isbn-field-result');
-  const isTW = v.startsWith('9786')||v.startsWith('978626');
-  const isCN = v.startsWith('9787');
-  const srcN=['博客來','Google Books (TW)','Google Books','Open Library','NCL'];
-  let si=0;
-  el.innerHTML=`<div style="font-family:var(--ff-display);font-style:italic;font-size:15px;color:var(--ink-faint)">Checking <b style="color:var(--ink)">${srcN[0]}</b>…</div>`;
-  const tick=setInterval(()=>{si=(si+1)%srcN.length;el.innerHTML=`<div style="font-family:var(--ff-display);font-style:italic;font-size:15px;color:var(--ink-faint)">Checking <b style="color:var(--ink)">${srcN[si]}</b>…</div>`;},900);
-  function norm(o){return{id:uid(),isbn:v,title:o.title||'Unknown',author:o.author||'',year:o.year||'',totalPages:o.pages||0,thumbnail:(o.thumb||'').replace('http://','https://').replace('zoom=1','zoom=3'),categories:o.categories||[],status:'to-read',currentPage:0,addedAt:new Date().toISOString()};}
-  function parseBKFirst(html){
-    if(!html||html.length<200)return null;
-    const doc=new DOMParser().parseFromString(html,'text/html');
-    let item=null;
-    for(const sel of ['ul.searchbook > li','li[id^="item"]','.type02_bd-a','.prod-item']){item=doc.querySelector(sel);if(item)break;}
-    if(!item){const a=doc.querySelector('a[href*="/products/"]');if(a)item=a.closest('li')||a.closest('div')||a.parentElement;}
-    if(!item)return null;
-    const tEl=item.querySelector('h4 a, strong a, a[href*="/products/"]');
-    if(!tEl)return null;
-    const title=tEl.textContent.trim();if(!title||title.length<2)return null;
-    const aEl=item.querySelector('ul.msg li a, .author a');
-    const img=item.querySelector('img');
-    const thumb=(img?.getAttribute('data-original')||img?.getAttribute('data-src')||img?.getAttribute('src')||'').replace('http://','https://');
-    return{title,author:aEl?.textContent.trim()||'',thumb,isbn:v,year:'',pages:0,categories:[]};
+  el.innerHTML = '<div style="font-family:var(--ff-display);font-style:italic;font-size:13px;color:var(--ink-faint)">Searching databases…</div>';
+
+  let book = null;
+
+  // 1. Open Library — best for non-English / Asian ISBNs
+  try {
+    const res = await fetch(`https://openlibrary.org/api/books?bibkeys=ISBN:${v}&format=json&jscmd=data`);
+    const data = await res.json();
+    const d = data[`ISBN:${v}`];
+    if(d) {
+      book = {
+        id:uid(), isbn:v,
+        title: d.title||'Unknown',
+        author: (d.authors||[]).map(a=>a.name).join(', ')||'Unknown',
+        year: d.publish_date ? d.publish_date.match(/\d{4}/)?.[0]||'' : '',
+        totalPages: d.number_of_pages||0,
+        categories: d.subjects ? [d.subjects[0]?.name||''] : [],
+        thumbnail: d.cover?.medium||d.cover?.small||'',
+        status:'to-read', currentPage:0, addedAt:new Date().toISOString()
+      };
+    }
+  } catch(e){}
+
+  // 2. Google Books with isbn: prefix
+  if(!book) {
+    try {
+      const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${v}&maxResults=1`);
+      const data = await res.json();
+      if(data.items?.length) {
+        const info = data.items[0].volumeInfo;
+        book = {
+          id:uid(), isbn:v,
+          title: info.title||'Unknown',
+          author: (info.authors||[]).join(', ')||'Unknown',
+          year: info.publishedDate?.slice(0,4)||'',
+          totalPages: info.pageCount||0,
+          categories: info.categories||[],
+          thumbnail: (info.imageLinks?.thumbnail||'').replace('http:','https:'),
+          status:'to-read', currentPage:0, addedAt:new Date().toISOString()
+        };
+      }
+    } catch(e){}
   }
-  let book=null,source='';
-  // 1. 博客來 DIRECT
-  try{const r=await fetch(`https://search.books.com.tw/search/query/key/${v}/cat/BKA/`,{headers:{'Accept':'text/html,*/*','Accept-Language':'zh-TW,zh;q=0.9'},signal:AbortSignal.timeout(7000)});const html=await r.text();const hit=parseBKFirst(html);if(hit){book=norm(hit);source='博客來';}}catch(e){}
-  // 2. Google Books country=TW
-  if(!book){try{const r=await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${v}&country=TW&maxResults=1`);const d=await r.json();if(d.items?.length){const info=d.items[0].volumeInfo;book=norm({title:info.title,author:(info.authors||[]).join(', '),year:info.publishedDate?.slice(0,4),pages:info.pageCount,thumb:info.imageLinks?.thumbnail||info.imageLinks?.smallThumbnail,categories:info.categories});source='Google Books (TW)';}}catch(e){}}
-  // 3. Google Books standard
-  if(!book){try{const r=await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${v}&maxResults=1`);const d=await r.json();if(d.items?.length){const info=d.items[0].volumeInfo;book=norm({title:info.title,author:(info.authors||[]).join(', '),year:info.publishedDate?.slice(0,4),pages:info.pageCount,thumb:info.imageLinks?.thumbnail||info.imageLinks?.smallThumbnail,categories:info.categories});source='Google Books';}}catch(e){}}
-  // 4. Open Library books
-  if(!book){try{const r=await fetch(`https://openlibrary.org/api/books?bibkeys=ISBN:${v}&format=json&jscmd=data`);const d=await r.json();const entry=d[`ISBN:${v}`];if(entry){book=norm({title:entry.title,author:(entry.authors||[]).map(a=>a.name).join(', '),year:entry.publish_date?.match(/\d{4}/)?.[0],pages:entry.number_of_pages,thumb:entry.cover?.large||entry.cover?.medium||entry.cover?.small,categories:entry.subjects?[entry.subjects[0]?.name]:[]});source='Open Library';}}catch(e){}}
-  // 5. Open Library search
-  if(!book){try{const r=await fetch(`https://openlibrary.org/search.json?isbn=${v}&fields=title,author_name,number_of_pages_median,cover_i,first_publish_year`);const d=await r.json();if(d.docs?.length){const doc=d.docs[0];book=norm({title:doc.title,author:(doc.author_name||[]).join(', '),year:doc.first_publish_year?String(doc.first_publish_year):'',pages:doc.number_of_pages_median,thumb:doc.cover_i?`https://covers.openlibrary.org/b/id/${doc.cover_i}-L.jpg`:''});source='Open Library';}}catch(e){}}
-  // 6. NCL Taiwan
-  if(!book&&isTW){try{const r=await fetch(`https://apin.ncl.edu.tw/opac/servlet/Query?format=json&q=${v}&field=isbn&count=1`,{signal:AbortSignal.timeout(5000)});const d=await r.json();const rec=d?.result?.[0]||Object.values(d||{})[0];if(rec){const title=rec.title||rec.TI||'';if(title){book=norm({title,author:rec.author||rec.AU||'',year:rec.year||rec.PY||'',pages:parseInt(rec.pages||0)||0,thumb:''});source='NCL Taiwan';}}}catch(e){}}
-  // 7. Google Books plain
-  if(!book){try{const r=await fetch(`https://www.googleapis.com/books/v1/volumes?q=${v}&maxResults=5`);const d=await r.json();const match=(d.items||[]).find(item=>(item.volumeInfo.industryIdentifiers||[]).some(x=>x.identifier?.replace(/-/g,'')=== v));if(match){const info=match.volumeInfo;book=norm({title:info.title,author:(info.authors||[]).join(', '),year:info.publishedDate?.slice(0,4),pages:info.pageCount,thumb:info.imageLinks?.thumbnail||info.imageLinks?.smallThumbnail,categories:info.categories});source='Google Books';}}catch(e){}}
-  clearInterval(tick);
-  if(!book){
-    // For TW/CN ISBNs: show inline title search rather than dead end
-    const isTWCN = isTW || isCN;
-    const hint = isTW
-      ? '此台灣 ISBN 不在 Google Books 或 Open Library 資料庫中。<br>請輸入書名，讓 Jotter 搜尋並取得書封：'
-      : isCN
-      ? '找不到此大陸版 ISBN。請輸入書名搜尋：'
-      : 'Not found. Enter the book title to search:';
 
+  // 3. Google Books plain number query (catches some Asian ISBNs Google indexes differently)
+  if(!book) {
+    try {
+      const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${v}&maxResults=1`);
+      const data = await res.json();
+      if(data.items?.length) {
+        const info = data.items[0].volumeInfo;
+        // Only use if the ISBN actually matches
+        const industryIds = info.industryIdentifiers||[];
+        const isMatch = industryIds.some(x=>x.identifier?.replace(/-/g,'')=== v);
+        if(isMatch) {
+          book = {
+            id:uid(), isbn:v,
+            title: info.title||'Unknown',
+            author: (info.authors||[]).join(', ')||'Unknown',
+            year: info.publishedDate?.slice(0,4)||'',
+            totalPages: info.pageCount||0,
+            categories: info.categories||[],
+            thumbnail: (info.imageLinks?.thumbnail||'').replace('http:','https:'),
+            status:'to-read', currentPage:0, addedAt:new Date().toISOString()
+          };
+        }
+      }
+    } catch(e){}
+  }
+
+  // 4. Not found — detect likely cause and offer smart fallback
+  if(!book) {
+    // Detect Taiwan/Chinese ISBN prefix 978-626
+    const isTW = v.startsWith('978626') || v.startsWith('626');
+    const isCN = v.startsWith('9787') || v.startsWith('7');
+    const isRegional = isTW || isCN;
+    const hint = isTW ? 'This looks like a Taiwanese ISBN (978-626). These titles are not in Western databases.'
+                : isCN ? 'This looks like a Mainland Chinese ISBN (978-7). These titles are rarely in Western databases.'
+                : 'This ISBN was not found in Open Library or Google Books.';
     el.innerHTML = `
-      <div style="border-left:4px solid var(--crimson);padding:14px 16px;margin-bottom:16px">
-        <div style="font-family:var(--ff-sc);font-size:11px;color:var(--ink-faint);margin-bottom:8px">ISBN NOT FOUND</div>
-        <div style="font-family:var(--ff-body);font-size:15px;color:var(--ink);line-height:1.7">${hint}</div>
+      <div style="border-left:3px solid var(--rule);padding:12px 14px;margin-bottom:16px">
+        <div style="font-family:var(--ff-sc);font-size:9px;letter-spacing:.02em;color:var(--ink-faint);margin-bottom:6px">NOT FOUND</div>
+        <div style="font-family:var(--ff-body);font-size:13px;color:var(--ink-mid);line-height:1.5">${hint}</div>
       </div>
-      <div style="position:relative;margin-bottom:10px">
-        <input id="isbn-title-search" class="add-field" type="text" placeholder="${isTW?'輸入中文書名…':isCN?'输入书名…':'Enter book title…'}"
-          style="padding-right:80px;margin-bottom:0"
-          onkeydown="if(event.key==='Enter')searchByISBNTitle('${v}')">
-        <button onclick="searchByISBNTitle('${v}')"
-          style="position:absolute;right:0;top:0;bottom:0;padding:0 16px;background:var(--ink);
-                 color:var(--parchment);border:none;font-family:var(--ff-sc);font-size:11px;cursor:pointer">
-          搜尋</button>
-      </div>
-      <div id="isbn-title-results" style="margin-top:8px"></div>
-      <div style="margin-top:12px">
-        <button class="modal-btn" onclick="prefillManualFromISBN('${v}')" style="width:100%">手動新增 →</button>
-      </div>`;
-
-    setTimeout(()=>document.getElementById('isbn-title-search')?.focus(), 100);
+      <div style="font-family:var(--ff-sc);font-size:9px;letter-spacing:.02em;color:var(--ink-faint);margin-bottom:10px">ADD MANUALLY — ISBN SAVED</div>
+      <button class="add-btn-primary" onclick="prefillManualFromISBN('${v}')">ENTER TITLE &amp; AUTHOR →</button>`;
     return;
   }
-  window._isbnBook=book;
-  const color=spineColor(book.title);
-  const safeT=(book.title||'').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  const tH=book.thumbnail?`<img src="${book.thumbnail}" style="width:64px;height:88px;max-width:64px;max-height:88px;flex-shrink:0;object-fit:cover;display:block;border-radius:2px 4px 4px 2px;box-shadow:2px 3px 10px var(--spine-shadow)" data-color="${color}" onerror="_coverErr(this)">`:`<div style="width:64px;height:88px;flex-shrink:0;background:${color};border-radius:2px 4px 4px 2px;display:flex;align-items:center;justify-content:center;padding:4px"><span style="font-family:var(--ff-body);font-size:9px;color:rgba(255,255,255,.9);text-align:center;line-height:1.3">${safeT.slice(0,24)}</span></div>`;
-  el.innerHTML=`<div style="border:1.5px solid var(--rule);padding:18px;border-radius:4px"><div style="font-family:var(--ff-sc);font-size:11px;color:var(--ink-faint);margin-bottom:14px">FOUND · ${source.toUpperCase()}</div><div style="display:flex;gap:14px;margin-bottom:18px;align-items:flex-start">${tH}<div style="flex:1;min-width:0"><div style="font-family:var(--ff-display);font-style:italic;font-size:22px;margin-bottom:5px;line-height:1.2">${book.title}</div><div style="font-family:var(--ff-body);font-size:15px;color:var(--ink-mid);margin-bottom:4px">${book.author}</div><div style="font-family:var(--ff-sc);font-size:11px;color:var(--ink-faint)">${[book.year,book.totalPages?book.totalPages+' pp':''].filter(Boolean).join(' · ')}</div></div></div><div style="font-family:var(--ff-sc);font-size:11px;color:var(--ink-faint);margin-bottom:10px">ADD AS</div><div style="display:flex;gap:8px;margin-bottom:16px"><button class="filter-chip active" id="isbn-s-to-read" onclick="isbnStatus('to-read')">TO READ</button><button class="filter-chip" id="isbn-s-reading" onclick="isbnStatus('reading')">READING</button><button class="filter-chip" id="isbn-s-finished" onclick="isbnStatus('finished')">FINISHED</button></div><button class="add-btn-primary" onclick="saveISBNBook()">ADD TO SHELF →</button></div>`;
+
+  window._isbnBook = book;
+  const thumbHtml = book.thumbnail
+    ? `<img src="${book.thumbnail}" style="width:52px;height:72px;object-fit:cover;border-radius:2px 3px 3px 2px;box-shadow:1px 2px 6px var(--spine-shadow);flex-shrink:0">`
+    : `<div style="width:52px;height:72px;background:${spineColor(book.title)};border-radius:2px 3px 3px 2px;flex-shrink:0"></div>`;
+
+  el.innerHTML = `<div style="border:1px solid var(--rule);padding:14px;border-radius:4px">
+    <div style="display:flex;gap:12px;margin-bottom:14px;align-items:flex-start">
+      ${thumbHtml}
+      <div>
+        <div style="font-family:var(--ff-display);font-style:italic;font-size:18px;margin-bottom:3px;line-height:1.2">${book.title}</div>
+        <div style="font-family:var(--ff-body);font-size:12px;color:var(--ink-mid);margin-bottom:2px">${book.author}</div>
+        <div style="font-family:var(--ff-sc);font-size:9px;letter-spacing:.02em;color:var(--ink-faint)">${[book.year, book.totalPages?book.totalPages+'pp':''].filter(Boolean).join(' · ')}</div>
+      </div>
+    </div>
+    <div style="font-family:var(--ff-sc);font-size:9px;letter-spacing:.02em;color:var(--ink-faint);margin-bottom:8px">ADD AS</div>
+    <div style="display:flex;gap:8px;margin-bottom:14px">
+      <button class="filter-chip active" id="isbn-s-to-read" onclick="isbnStatus('to-read')">TO READ</button>
+      <button class="filter-chip" id="isbn-s-reading" onclick="isbnStatus('reading')">READING</button>
+      <button class="filter-chip" id="isbn-s-finished" onclick="isbnStatus('finished')">FINISHED</button>
+    </div>
+    <button class="add-btn-primary" onclick="saveISBNBook()">ADD TO SHELF →</button>
+  </div>`;
 }
 
 function prefillManualFromISBN(isbn) {
+  // Switch to manual tab with ISBN pre-noted in title field placeholder
   setAddTab('manual');
   const titleField = document.getElementById('manual-title');
-  if(titleField) { titleField.focus(); titleField.placeholder = 'Enter book title…'; }
+  if(titleField) {
+    titleField.focus();
+    titleField.placeholder = 'Enter book title…';
+  }
+  // Store ISBN so saveManualBook can attach it
   window._pendingISBN = isbn;
   document.getElementById('isbn-field-result').innerHTML = '';
   showToast('ISBN saved — enter title and author.');
-}
-
-async function searchByISBNTitle(isbn) {
-  const q = document.getElementById('isbn-title-search')?.value?.trim();
-  if (!q) { showToast('Please enter the book title.'); return; }
-  const el = document.getElementById('isbn-title-results');
-  if (!el) return;
-  el.innerHTML = '<div style="font-family:var(--ff-display);font-style:italic;font-size:13px;color:var(--ink-faint);padding:8px 0">Searching…</div>';
-
-  const enc = encodeURIComponent(q);
-  let results = [];
-
-  // Try 3 Google Books queries in parallel for best TW/CN coverage
-  await Promise.allSettled([
-    // intitle search with TW locale
-    fetch(`https://www.googleapis.com/books/v1/volumes?q=intitle:${enc}&country=TW&maxResults=5`)
-      .then(r=>r.json()).then(d=>{
-        (d.items||[]).forEach(item=>{
-          const info=item.volumeInfo;
-          const ids=info.industryIdentifiers||[];
-          results.push({
-            title:info.title||q, author:(info.authors||[]).join(', '),
-            year:info.publishedDate?.slice(0,4)||'', pages:info.pageCount||0,
-            thumbnail:(info.imageLinks?.thumbnail||info.imageLinks?.smallThumbnail||'').replace('http://','https://').replace('zoom=1','zoom=3'),
-            isbn:ids.find(x=>x.type==='ISBN_13')?.identifier||isbn,
-            categories:info.categories||[],
-            id:uid(), status:'to-read', currentPage:0, addedAt:new Date().toISOString()
-          });
-        });
-      }).catch(()=>{}),
-    // plain title search
-    fetch(`https://www.googleapis.com/books/v1/volumes?q=${enc}&maxResults=5`)
-      .then(r=>r.json()).then(d=>{
-        (d.items||[]).forEach(item=>{
-          const info=item.volumeInfo;
-          const title=info.title||'';
-          if(!results.some(r=>r.title===title)) {
-            const ids=info.industryIdentifiers||[];
-            results.push({
-              title, author:(info.authors||[]).join(', '),
-              year:info.publishedDate?.slice(0,4)||'', pages:info.pageCount||0,
-              thumbnail:(info.imageLinks?.thumbnail||info.imageLinks?.smallThumbnail||'').replace('http://','https://').replace('zoom=1','zoom=3'),
-              isbn:ids.find(x=>x.type==='ISBN_13')?.identifier||isbn,
-              categories:info.categories||[],
-              id:uid(), status:'to-read', currentPage:0, addedAt:new Date().toISOString()
-            });
-          }
-        });
-      }).catch(()=>{})
-  ]);
-
-  if (!results.length) {
-    el.innerHTML = `<div style="font-family:var(--ff-body);font-size:14px;color:var(--ink-faint);padding:8px 0;font-style:italic">
-      No results for "${q}". Try a shorter title or different keywords.</div>`;
-    return;
-  }
-
-  el.innerHTML = results.slice(0,6).map((book,i) => {
-    const color = spineColor(book.title);
-    const thumbHtml = book.thumbnail
-      ? `<img src="${book.thumbnail}" style="width:44px;height:60px;object-fit:cover;display:block;flex-shrink:0;border-radius:2px 3px 3px 2px;box-shadow:1px 2px 6px var(--spine-shadow)" data-color="${color}" onerror="_coverErr(this)">`
-      : `<div style="width:44px;height:60px;flex-shrink:0;background:${color};border-radius:2px 3px 3px 2px;display:flex;align-items:center;justify-content:center"><span style="font-family:var(--ff-body);font-size:7px;color:rgba(255,255,255,.9);text-align:center;padding:2px">${book.title.slice(0,12)}</span></div>`;
-    return `<div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--rule);align-items:flex-start">
-      ${thumbHtml}
-      <div style="flex:1;min-width:0">
-        <div style="font-family:var(--ff-display);font-style:italic;font-size:15px;margin-bottom:3px;line-height:1.3">${book.title}</div>
-        <div style="font-family:var(--ff-body);font-size:13px;color:var(--ink-mid);margin-bottom:6px">${book.author}</div>
-        <div style="display:flex;gap:6px">
-          <button class="filter-chip active" id="its-${i}-to-read" onclick="setITSStatus(${i},'to-read')">TO READ</button>
-          <button class="filter-chip" id="its-${i}-reading" onclick="setITSStatus(${i},'reading')">READING</button>
-        </div>
-      </div>
-      <button class="add-btn-primary" style="padding:8px 12px;flex-shrink:0;margin-top:4px;font-size:11px"
-        onclick="addISBNTitleResult(${i},'${isbn}')">ADD</button>
-    </div>`;
-  }).join('');
-
-  window._itResults = results;
-}
-
-function setITSStatus(i, s) {
-  if (!window._itsStatus) window._itsStatus = {};
-  window._itsStatus[i] = s;
-  ['to-read','reading'].forEach(x =>
-    document.getElementById(`its-${i}-${x}`)?.classList.toggle('active', x===s));
-}
-
-function addISBNTitleResult(i, originalIsbn) {
-  const results = window._itResults;
-  if (!results?.[i]) return;
-  const book = Object.assign({}, results[i], {
-    id: uid(),
-    isbn: originalIsbn || results[i].isbn,
-    status: window._itsStatus?.[i] || 'to-read',
-    addedAt: new Date().toISOString()
-  });
-  if (book.status === 'reading') book.startedReading = new Date().toISOString();
-  DATA.books.push(book);
-  DB.save(DATA);
-  showToast(`"${book.title}" added.`);
-  goScreen('shelf');
 }
 
 function isbnStatus(s) {
