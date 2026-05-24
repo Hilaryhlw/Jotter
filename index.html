@@ -513,6 +513,107 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
   color: var(--ink-faint); font-size: 20px; padding: 4px;
   -webkit-tap-highlight-color: transparent; }
 
+/* ADD BOOK SCREEN */
+#screen-add { background: var(--parchment); }
+.add-book-header { flex-shrink: 0; display: flex; align-items: center;
+  justify-content: space-between; padding: 52px 20px 14px;
+  border-bottom: 1px solid var(--rule); }
+.add-book-close { background: none; border: none; cursor: pointer;
+  color: var(--ink-faint); font-size: 22px; padding: 4px;
+  -webkit-tap-highlight-color: transparent; }
+.add-book-title { font-family: var(--ff-sc); font-size: 11px; letter-spacing: .02em; }
+.add-tabs { display: flex; border-bottom: 1px solid var(--rule); flex-shrink: 0; }
+.add-tab { flex: 1; font-family: var(--ff-sc); font-size: 10px; letter-spacing: .02em;
+  color: var(--ink-faint); padding: 12px 0; text-align: center;
+  border-bottom: 2px solid transparent; cursor: pointer;
+  background: none; border-top: none; border-left: none; border-right: none;
+  -webkit-tap-highlight-color: transparent; transition: color .15s; }
+.add-tab.active { color: var(--ink); border-bottom-color: var(--ink); }
+.add-pane { flex: 1; overflow-y: auto; padding: 20px 24px calc(20px + var(--safe-bottom)); }
+.add-field-label { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em;
+  color: var(--ink-faint); margin-bottom: 6px; }
+.add-field { width: 100%; background: none; border: none;
+  border-bottom: 1px solid var(--rule); outline: none;
+  font-family: var(--ff-body); font-size: 16px; color: var(--ink);
+  padding: 8px 0; margin-bottom: 20px; }
+.add-field:focus { border-bottom-color: var(--ink); }
+.add-field-row { display: flex; gap: 16px; }
+.add-field-row > div { flex: 1; }
+.add-search-input-wrap { position: relative; margin-bottom: 16px; }
+.add-search-field { width: 100%; background: var(--parchment-dark); border: none;
+  outline: none; font-family: var(--ff-body); font-size: 15px; color: var(--ink);
+  padding: 12px 44px 12px 16px; border-radius: 4px; }
+.add-search-go { position: absolute; right: 0; top: 0; bottom: 0;
+  background: var(--ink); color: var(--parchment); border: none; cursor: pointer;
+  font-family: var(--ff-sc); font-size: 10px; letter-spacing: .02em;
+  padding: 0 14px; border-radius: 0 4px 4px 0;
+  -webkit-tap-highlight-color: transparent; }
+.search-book-result { display: flex; gap: 12px; padding: 12px 0;
+  border-bottom: 1px solid var(--rule); cursor: pointer;
+  -webkit-tap-highlight-color: transparent; }
+.search-book-result:active { background: var(--parchment-dark); margin: 0 -24px; padding: 12px 24px; }
+.search-book-thumb { flex-shrink: 0; width: 44px; height: 60px;
+  border-radius: 2px 3px 3px 2px; box-shadow: 1px 2px 6px var(--spine-shadow);
+  display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.search-book-info-title { font-family: var(--ff-display); font-style: italic;
+  font-size: 15px; color: var(--ink); margin-bottom: 3px; line-height: 1.3; }
+.search-book-info-author { font-family: var(--ff-body); font-size: 12px; color: var(--ink-mid); }
+.search-book-info-meta { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em;
+  color: var(--ink-faint); margin-top: 3px; }
+.add-btn-primary { display: block; width: 100%; background: var(--ink);
+  color: var(--parchment); font-family: var(--ff-sc); font-size: 11px;
+  letter-spacing: .02em; border: none; padding: 16px; cursor: pointer;
+  margin-top: 8px; -webkit-tap-highlight-color: transparent; }
+.search-results-list { margin-top: 4px; }
+.searching-hint { font-family: var(--ff-display); font-style: italic;
+  font-size: 13px; color: var(--ink-faint); text-align: center;
+  padding: 32px 0; }
+
+/* QUICK-JOT CHIPS */
+.quick-chips { flex-shrink: 0; display: flex; gap: 8px; overflow-x: auto;
+  padding: 8px 20px; border-bottom: 1px solid var(--rule);
+  scrollbar-width: none; }
+.quick-chips::-webkit-scrollbar { display: none; }
+.quick-chip { flex-shrink: 0; font-family: var(--ff-sc); font-size: 9px;
+  letter-spacing: .02em; padding: 6px 12px; border-radius: 14px;
+  border: 1px solid var(--rule); background: none; color: var(--ink-mid);
+  cursor: pointer; white-space: nowrap; -webkit-tap-highlight-color: transparent;
+  transition: background .15s, color .15s; }
+.quick-chip:active { background: var(--parchment-dark); }
+
+/* SEARCH SCREEN */
+#screen-search { background: var(--parchment); }
+.search-screen-header { flex-shrink: 0; padding: 52px 20px 0; }
+.search-screen-title { font-family: var(--ff-display); font-style: italic;
+  font-size: 34px; margin-bottom: 14px; }
+.search-bar-wrap { display: flex; gap: 10px; align-items: center;
+  border-bottom: 1px solid var(--rule); padding-bottom: 14px; }
+.search-bar { flex: 1; background: none; border: none; outline: none;
+  font-family: var(--ff-body); font-size: 16px; color: var(--ink); padding: 4px 0; }
+.search-bar::placeholder { color: var(--ink-faint); }
+.search-clear { background: none; border: none; color: var(--ink-faint);
+  font-size: 18px; cursor: pointer; padding: 4px;
+  -webkit-tap-highlight-color: transparent; }
+.search-filter-row { display: flex; gap: 8px; padding: 12px 20px;
+  border-bottom: 1px solid var(--rule); overflow-x: auto;
+  scrollbar-width: none; flex-shrink: 0; }
+.search-filter-row::-webkit-scrollbar { display: none; }
+.filter-chip { flex-shrink: 0; font-family: var(--ff-sc); font-size: 9px;
+  letter-spacing: .02em; padding: 5px 12px; border-radius: 14px;
+  border: 1px solid var(--rule); background: none; color: var(--ink-mid);
+  cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.filter-chip.active { background: var(--ink); color: var(--parchment); border-color: var(--ink); }
+.search-screen-results { flex: 1; overflow-y: auto;
+  padding-bottom: calc(80px + var(--safe-bottom)); }
+.search-empty { padding: 48px 32px; text-align: center; }
+.search-empty-title { font-family: var(--ff-display); font-style: italic;
+  font-size: 20px; color: var(--ink-mid); margin-bottom: 8px; }
+.search-empty-sub { font-family: var(--ff-body); font-size: 13px;
+  color: var(--ink-faint); font-style: italic; }
+.search-result-book-header { font-family: var(--ff-sc); font-size: 9px;
+  letter-spacing: .02em; color: var(--ink-faint); padding: 12px 24px 4px;
+  background: var(--parchment-dark); }
+
 </style>
 </head>
 <body>
@@ -546,10 +647,11 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
     <button class="folio-btn" onclick="openSearch()">⌕</button>
   </div>
   <div class="scroll-content" id="shelf-content"></div>
-  <button class="fab" onclick="goScreen('capture')">+</button>
+  <button class="fab" onclick="goScreen('add')">+</button>
   <nav class="nav-bar">
     <button class="nav-item active" onclick="goScreen('shelf')"><span class="nav-icon">▤</span><span>SHELF</span><span class="nav-dot"></span></button>
-    <button class="nav-item" onclick="goScreen('capture')"><span class="nav-icon">⊙</span><span>CAPTURE</span><span class="nav-dot"></span></button>
+    <button class="nav-item" onclick="goScreen('add')"><span class="nav-icon">＋</span><span>ADD</span><span class="nav-dot"></span></button>
+    <button class="nav-item" onclick="goScreen('search')"><span class="nav-icon">⌕</span><span>SEARCH</span><span class="nav-dot"></span></button>
     <button class="nav-item" onclick="goScreen('threads')"><span class="nav-icon">✦</span><span>THREADS</span><span class="nav-dot"></span></button>
     <button class="nav-item" onclick="goScreen('pace')"><span class="nav-icon">∿</span><span>PACE</span><span class="nav-dot"></span></button>
   </nav>
@@ -565,7 +667,8 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
   <div class="scroll-content" id="book-detail-content" style="padding-bottom:20px"></div>
   <nav class="nav-bar">
     <button class="nav-item" onclick="goScreen('shelf')"><span class="nav-icon">▤</span><span>SHELF</span><span class="nav-dot"></span></button>
-    <button class="nav-item" onclick="goScreen('capture')"><span class="nav-icon">⊙</span><span>CAPTURE</span><span class="nav-dot"></span></button>
+    <button class="nav-item" onclick="goScreen('add')"><span class="nav-icon">＋</span><span>ADD</span><span class="nav-dot"></span></button>
+    <button class="nav-item" onclick="goScreen('search')"><span class="nav-icon">⌕</span><span>SEARCH</span><span class="nav-dot"></span></button>
     <button class="nav-item" onclick="goScreen('threads')"><span class="nav-icon">✦</span><span>THREADS</span><span class="nav-dot"></span></button>
     <button class="nav-item" onclick="goScreen('pace')"><span class="nav-icon">∿</span><span>PACE</span><span class="nav-dot"></span></button>
   </nav>
@@ -605,6 +708,14 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
       <input class="tag-input" id="jot-tag-input" placeholder="#tag" onkeydown="handleTagInput(event)">
     </div>
   </div>
+  <div class="quick-chips">
+    <button class="quick-chip" onclick="insertChip('highlight')">✦ Highlight</button>
+    <button class="quick-chip" onclick="insertChip('question')">? Question</button>
+    <button class="quick-chip" onclick="insertChip('reaction')">↯ Reaction</button>
+    <button class="quick-chip" onclick="insertChip('summary')">◈ Summary</button>
+    <button class="quick-chip" onclick="insertChip('quote')">❝ Quote</button>
+    <button class="quick-chip" onclick="insertChip('connection')">⇌ Connection</button>
+  </div>
   <div class="jot-toolbar">
     <button class="toolbar-btn" onclick="insertMd('**','**')"><b>B</b></button>
     <button class="toolbar-btn italic" onclick="insertMd('*','*')">I</button>
@@ -616,54 +727,68 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
   </div>
 </div>
 
-<!-- ══ CAPTURE / ISBN ══ -->
-<div id="screen-capture" class="screen">
-  <div class="camera-view">
-    <video id="camera-video" autoplay playsinline muted></video>
-    <div class="camera-overlay">
-      <div class="scan-frame">
-        <div class="scan-corner tl"></div><div class="scan-corner tr"></div>
-        <div class="scan-corner bl"></div><div class="scan-corner br"></div>
-        <div class="scan-line"></div>
-        <div class="scan-ean">
-          <span class="scan-ean-label">EAN ▶</span>
-          <span id="scan-status">scanning…</span>
-          <span class="scan-ean-num" id="scan-num"></span>
-          <span class="scan-ean-dot" id="scan-dot" style="opacity:0"></span>
-        </div>
-      </div>
+<!-- ══ ADD BOOK ══ -->
+<div id="screen-add" class="screen">
+  <div class="add-book-header">
+    <button class="add-book-close" onclick="goBack()">×</button>
+    <span class="add-book-title">ADD BOOK</span>
+    <span style="width:32px"></span>
+  </div>
+  <div class="add-tabs">
+    <button class="add-tab active" id="add-tab-search" onclick="setAddTab('search')">SEARCH</button>
+    <button class="add-tab" id="add-tab-manual" onclick="setAddTab('manual')">MANUAL</button>
+    <button class="add-tab" id="add-tab-isbn" onclick="setAddTab('isbn')">ISBN</button>
+  </div>
+
+  <!-- Search pane -->
+  <div class="add-pane" id="add-pane-search">
+    <div style="font-family:var(--ff-display);font-style:italic;font-size:13px;color:var(--ink-faint);margin-bottom:14px">Search by title or author</div>
+    <div class="add-search-input-wrap">
+      <input class="add-search-field" id="add-search-field" type="text" placeholder="e.g. Normal People, Sally Rooney…" onkeydown="if(event.key==='Enter')searchBooks()">
+      <button class="add-search-go" onclick="searchBooks()">GO</button>
+    </div>
+    <div class="search-results-list" id="book-search-results">
+      <div class="searching-hint">Type a title or author name above.</div>
     </div>
   </div>
-  <div class="capture-header">
-    <button class="capture-close" onclick="closeCapture()">×</button>
-    <span class="capture-title">LOUPE · CAPTURE</span>
-    <button class="capture-kb" onclick="showManualISBN()">⌨</button>
-  </div>
-  <div class="isbn-type-hint">or <span style="text-decoration:underline;cursor:pointer" onclick="showManualISBN()">type ISBN by hand</span></div>
-  <div class="isbn-result-sheet" id="isbn-result-sheet">
-    <div class="isbn-sheet-handle"></div>
-    <div class="isbn-found-label"><span class="isbn-found-dot"></span> ISBN FOUND · GOOGLE BOOKS</div>
-    <div class="isbn-book-row">
-      <div id="isbn-cover" class="isbn-cover"></div>
+
+  <!-- Manual pane -->
+  <div class="add-pane" id="add-pane-manual" style="display:none">
+    <div class="add-field-label">TITLE</div>
+    <input class="add-field" id="manual-title" type="text" placeholder="The Remains of the Day">
+    <div class="add-field-label">AUTHOR</div>
+    <input class="add-field" id="manual-author" type="text" placeholder="Kazuo Ishiguro">
+    <div class="add-field-row">
       <div>
-        <div id="isbn-title" class="isbn-book-title">—</div>
-        <div id="isbn-author" class="isbn-book-author">—</div>
-        <div id="isbn-isbn" class="isbn-book-isbn">—</div>
-        <div class="isbn-chips"><span id="isbn-pages-chip" class="isbn-chip">—</span><span id="isbn-genre-chip" class="isbn-chip">—</span></div>
+        <div class="add-field-label">PAGES</div>
+        <input class="add-field" id="manual-pages" type="number" inputmode="numeric" placeholder="258">
+      </div>
+      <div>
+        <div class="add-field-label">YEAR</div>
+        <input class="add-field" id="manual-year" type="number" inputmode="numeric" placeholder="1989">
       </div>
     </div>
-    <div class="isbn-actions">
-      <button class="isbn-btn" onclick="addBookStatus('to-read')">TO READ</button>
-      <button class="isbn-btn reading" onclick="addBookStatus('reading')">READING</button>
-      <button class="isbn-btn" onclick="addBookStatus('finished')">FINISHED</button>
+    <div class="add-field-label">STATUS</div>
+    <div style="display:flex;gap:8px;margin-bottom:24px">
+      <button class="filter-chip active" id="status-to-read" onclick="selectStatus('to-read')">TO READ</button>
+      <button class="filter-chip" id="status-reading" onclick="selectStatus('reading')">READING</button>
+      <button class="filter-chip" id="status-finished" onclick="selectStatus('finished')">FINISHED</button>
     </div>
+    <button class="add-btn-primary" onclick="saveManualBook()">ADD TO SHELF →</button>
   </div>
-  <div class="isbn-manual-section" id="isbn-manual-section">
-    <div class="isbn-manual-label">ENTER ISBN</div>
-    <input class="isbn-manual-input" id="isbn-manual-input" type="text" inputmode="numeric" placeholder="978-…" maxlength="17">
-    <button class="isbn-manual-go" onclick="lookupManualISBN()">LOOK UP →</button>
+
+  <!-- ISBN pane -->
+  <div class="add-pane" id="add-pane-isbn" style="display:none">
+    <div style="font-family:var(--ff-display);font-style:italic;font-size:13px;color:var(--ink-faint);margin-bottom:14px">Enter the ISBN from the back of the book or your ebook details</div>
+    <div class="add-field-label">ISBN</div>
+    <input class="add-field" id="isbn-field" type="text" inputmode="numeric" placeholder="978-0-7432-7356-5" maxlength="17">
+    <button class="add-btn-primary" onclick="lookupISBNField()">LOOK UP →</button>
+    <div id="isbn-field-result" style="margin-top:20px"></div>
   </div>
 </div>
+
+<!-- ══ CAPTURE (kept for OCR/scan flow) ══ -->
+<div id="screen-capture" class="screen" style="display:none"></div>
 
 <!-- ══ OCR ══ -->
 <div id="screen-ocr" class="screen" style="background:#1a1710">
@@ -708,7 +833,8 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
   </div>
   <nav class="nav-bar">
     <button class="nav-item" onclick="goScreen('shelf')"><span class="nav-icon">▤</span><span>SHELF</span><span class="nav-dot"></span></button>
-    <button class="nav-item" onclick="goScreen('capture')"><span class="nav-icon">⊙</span><span>CAPTURE</span><span class="nav-dot"></span></button>
+    <button class="nav-item" onclick="goScreen('add')"><span class="nav-icon">＋</span><span>ADD</span><span class="nav-dot"></span></button>
+    <button class="nav-item" onclick="goScreen('search')"><span class="nav-icon">⌕</span><span>SEARCH</span><span class="nav-dot"></span></button>
     <button class="nav-item active" onclick="goScreen('threads')"><span class="nav-icon">✦</span><span>THREADS</span><span class="nav-dot"></span></button>
     <button class="nav-item" onclick="goScreen('pace')"><span class="nav-icon">∿</span><span>PACE</span><span class="nav-dot"></span></button>
   </nav>
@@ -749,9 +875,39 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
   </div>
   <nav class="nav-bar">
     <button class="nav-item" onclick="goScreen('shelf')"><span class="nav-icon">▤</span><span>SHELF</span><span class="nav-dot"></span></button>
-    <button class="nav-item" onclick="goScreen('capture')"><span class="nav-icon">⊙</span><span>CAPTURE</span><span class="nav-dot"></span></button>
+    <button class="nav-item" onclick="goScreen('add')"><span class="nav-icon">＋</span><span>ADD</span><span class="nav-dot"></span></button>
+    <button class="nav-item" onclick="goScreen('search')"><span class="nav-icon">⌕</span><span>SEARCH</span><span class="nav-dot"></span></button>
     <button class="nav-item" onclick="goScreen('threads')"><span class="nav-icon">✦</span><span>THREADS</span><span class="nav-dot"></span></button>
     <button class="nav-item active" onclick="goScreen('pace')"><span class="nav-icon">∿</span><span>PACE</span><span class="nav-dot"></span></button>
+  </nav>
+</div>
+
+<!-- ══ SEARCH ══ -->
+<div id="screen-search" class="screen">
+  <div class="search-screen-header">
+    <div class="search-screen-title">Search</div>
+    <div class="search-bar-wrap">
+      <input class="search-bar" id="search-screen-input" placeholder="Notes, quotes, tags…" oninput="doScreenSearch(this.value)">
+      <button class="search-clear" onclick="clearScreenSearch()">×</button>
+    </div>
+  </div>
+  <div class="search-filter-row">
+    <button class="filter-chip active" data-filter="all" onclick="setSearchFilter('all',this)">ALL</button>
+    <button class="filter-chip" data-filter="quotes" onclick="setSearchFilter('quotes',this)">QUOTES</button>
+    <button class="filter-chip" data-filter="tags" onclick="setSearchFilter('tags',this)">TAGS</button>
+  </div>
+  <div class="search-screen-results" id="search-screen-results">
+    <div class="search-empty">
+      <div class="search-empty-title">Search your marginalia.</div>
+      <div class="search-empty-sub">Every note, quote, and tag across all books.</div>
+    </div>
+  </div>
+  <nav class="nav-bar">
+    <button class="nav-item" onclick="goScreen('shelf')"><span class="nav-icon">▤</span><span>SHELF</span><span class="nav-dot"></span></button>
+    <button class="nav-item" onclick="goScreen('add')"><span class="nav-icon">＋</span><span>ADD</span><span class="nav-dot"></span></button>
+    <button class="nav-item active" onclick="goScreen('search')"><span class="nav-icon">⌕</span><span>SEARCH</span><span class="nav-dot"></span></button>
+    <button class="nav-item" onclick="goScreen('threads')"><span class="nav-icon">✦</span><span>THREADS</span><span class="nav-dot"></span></button>
+    <button class="nav-item" onclick="goScreen('pace')"><span class="nav-icon">∿</span><span>PACE</span><span class="nav-dot"></span></button>
   </nav>
 </div>
 
@@ -815,8 +971,9 @@ function goScreen(id,push=true){
   if(id==='shelf')renderShelf();
   if(id==='threads')renderThreads();
   if(id==='pace')renderAlmanac();
-  if(id==='capture')startCamera();
   if(id==='ocr')startOCR();
+  if(id==='add'){setTimeout(()=>document.getElementById('add-search-field')?.focus(),200);}
+  if(id==='search'){setTimeout(()=>document.getElementById('search-screen-input')?.focus(),200);}
 }
 function goBack(){const p=screenHistory.pop()||'shelf';goScreen(p,false);}
 function beginShelf(){goScreen('shelf');}
@@ -1443,6 +1600,249 @@ document.getElementById('jot-textarea').addEventListener('input',()=>{
   if(document.getElementById('tab-both').classList.contains('active'))
     document.getElementById('jot-preview-pane').innerHTML=renderMarkdown(document.getElementById('jot-textarea').value);
 });
+
+// ── ADD BOOK ──────────────────────────────────────────────────────
+let addBookStatus_selected = 'to-read';
+
+function setAddTab(tab) {
+  ['search','manual','isbn'].forEach(t=>{
+    document.getElementById('add-tab-'+t).classList.toggle('active', t===tab);
+    document.getElementById('add-pane-'+t).style.display = t===tab ? '' : 'none';
+  });
+  if(tab==='search') setTimeout(()=>document.getElementById('add-search-field')?.focus(), 100);
+  if(tab==='manual') setTimeout(()=>document.getElementById('manual-title')?.focus(), 100);
+  if(tab==='isbn')   setTimeout(()=>document.getElementById('isbn-field')?.focus(), 100);
+}
+
+function selectStatus(s) {
+  addBookStatus_selected = s;
+  ['to-read','reading','finished'].forEach(x=>{
+    document.getElementById('status-'+x)?.classList.toggle('active', x===s);
+  });
+}
+
+async function searchBooks() {
+  const q = document.getElementById('add-search-field').value.trim();
+  if(!q) return;
+  const el = document.getElementById('book-search-results');
+  el.innerHTML = '<div class="searching-hint">Searching…</div>';
+  try {
+    const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&maxResults=8`);
+    const data = await res.json();
+    if(!data.items?.length){ el.innerHTML='<div class="searching-hint">No results found.</div>'; return; }
+    el.innerHTML = data.items.map((item,i)=>{
+      const info = item.volumeInfo;
+      const title = info.title||'Unknown';
+      const author = (info.authors||[]).join(', ')||'Unknown';
+      const pages = info.pageCount ? info.pageCount+'pp' : '';
+      const year = info.publishedDate?.slice(0,4)||'';
+      const thumb = info.imageLinks?.thumbnail||'';
+      const color = spineColor(title);
+      const thumbHtml = thumb
+        ? `<img src="${thumb}" style="width:100%;height:100%;object-fit:cover">`
+        : `<div style="width:100%;height:100%;background:${color};display:flex;align-items:center;justify-content:center"><span style="font-family:var(--ff-body);font-size:7px;color:rgba(255,255,255,.9);text-align:center;padding:2px">${title.slice(0,20)}</span></div>`;
+      return `<div class="search-book-result" onclick="confirmAddSearchBook(${i})">
+        <div class="search-book-thumb">${thumbHtml}</div>
+        <div>
+          <div class="search-book-info-title">${title}</div>
+          <div class="search-book-info-author">${author}</div>
+          <div class="search-book-info-meta">${[year,pages].filter(Boolean).join(' · ')}</div>
+        </div>
+      </div>`;
+    }).join('');
+    // Store results for confirmation
+    window._searchResults = data.items;
+  } catch(e) { el.innerHTML='<div class="searching-hint">Search failed. Check connection.</div>'; }
+}
+
+function confirmAddSearchBook(i) {
+  const item = window._searchResults?.[i]; if(!item) return;
+  const info = item.volumeInfo;
+  showModal('Add to shelf', `
+    <div style="margin-bottom:14px">
+      <div style="font-family:var(--ff-display);font-style:italic;font-size:20px;margin-bottom:4px">${info.title}</div>
+      <div style="font-family:var(--ff-body);font-size:13px;color:var(--ink-mid);margin-bottom:16px">${(info.authors||[]).join(', ')}</div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:20px">
+      <button class="filter-chip active" id="cs-to-read" onclick="csStatus('to-read')">TO READ</button>
+      <button class="filter-chip" id="cs-reading" onclick="csStatus('reading')">READING</button>
+      <button class="filter-chip" id="cs-finished" onclick="csStatus('finished')">FINISHED</button>
+    </div>
+    <div class="modal-btn-row">
+      <button class="modal-btn" onclick="closeModal()">Cancel</button>
+      <button class="modal-btn primary" onclick="doAddSearchBook(${i})">ADD TO SHELF →</button>
+    </div>`);
+  window._confirmStatus = 'to-read';
+}
+
+function csStatus(s) {
+  window._confirmStatus = s;
+  ['to-read','reading','finished'].forEach(x=>document.getElementById('cs-'+x)?.classList.toggle('active',x===s));
+}
+
+function doAddSearchBook(i) {
+  const item = window._searchResults?.[i]; if(!item) return;
+  const info = item.volumeInfo;
+  const book = {
+    id: uid(), title: info.title||'Unknown',
+    author: (info.authors||[]).join(', ')||'Unknown',
+    year: info.publishedDate?.slice(0,4)||'',
+    totalPages: info.pageCount||0,
+    categories: info.categories||[],
+    thumbnail: info.imageLinks?.thumbnail||'',
+    status: window._confirmStatus||'to-read',
+    currentPage: 0,
+    addedAt: new Date().toISOString()
+  };
+  if(book.status==='reading') book.startedReading = new Date().toISOString();
+  DATA.books.push(book); DB.save(DATA);
+  closeModal();
+  showToast(`"${book.title}" added.`);
+  goScreen('shelf');
+}
+
+function saveManualBook() {
+  const title = document.getElementById('manual-title').value.trim();
+  if(!title){ showToast('Please enter a title.'); return; }
+  const book = {
+    id: uid(), title,
+    author: document.getElementById('manual-author').value.trim()||'Unknown',
+    year: document.getElementById('manual-year').value.trim()||'',
+    totalPages: parseInt(document.getElementById('manual-pages').value)||0,
+    categories: [], status: addBookStatus_selected,
+    currentPage: 0, addedAt: new Date().toISOString()
+  };
+  if(book.status==='reading') book.startedReading = new Date().toISOString();
+  DATA.books.push(book); DB.save(DATA);
+  // Clear fields
+  ['manual-title','manual-author','manual-pages','manual-year'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  showToast(`"${book.title}" added.`);
+  goScreen('shelf');
+}
+
+async function lookupISBNField() {
+  const v = document.getElementById('isbn-field').value.replace(/-/g,'').trim();
+  if(v.length < 10){ showToast('Enter a valid ISBN.'); return; }
+  const el = document.getElementById('isbn-field-result');
+  el.innerHTML = '<div style="font-family:var(--ff-display);font-style:italic;font-size:13px;color:var(--ink-faint)">Looking up…</div>';
+  try {
+    const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${v}`);
+    const data = await res.json();
+    if(!data.items?.length){ el.innerHTML='<div style="font-family:var(--ff-body);font-size:13px;color:var(--ink-faint)">No book found for that ISBN.</div>'; return; }
+    const info = data.items[0].volumeInfo;
+    window._isbnBook = { id:uid(), isbn:v, title:info.title||'Unknown',
+      author:(info.authors||[]).join(', '), year:info.publishedDate?.slice(0,4)||'',
+      totalPages:info.pageCount||0, categories:info.categories||[],
+      thumbnail:info.imageLinks?.thumbnail||'', status:'to-read', currentPage:0,
+      addedAt:new Date().toISOString() };
+    el.innerHTML = `<div style="border:1px solid var(--rule);padding:14px;margin-bottom:12px">
+      <div style="font-family:var(--ff-display);font-style:italic;font-size:18px;margin-bottom:4px">${info.title}</div>
+      <div style="font-family:var(--ff-body);font-size:12px;color:var(--ink-mid);margin-bottom:12px">${(info.authors||[]).join(', ')} · ${info.publishedDate?.slice(0,4)||''}</div>
+      <div style="display:flex;gap:8px;margin-bottom:14px">
+        <button class="filter-chip active" id="isbn-s-to-read" onclick="isbnStatus('to-read')">TO READ</button>
+        <button class="filter-chip" id="isbn-s-reading" onclick="isbnStatus('reading')">READING</button>
+        <button class="filter-chip" id="isbn-s-finished" onclick="isbnStatus('finished')">FINISHED</button>
+      </div>
+      <button class="add-btn-primary" onclick="saveISBNBook()">ADD TO SHELF →</button>
+    </div>`;
+  } catch(e) { el.innerHTML='<div style="font-family:var(--ff-body);font-size:13px;color:var(--ink-faint)">Lookup failed.</div>'; }
+}
+
+function isbnStatus(s) {
+  if(window._isbnBook) window._isbnBook.status = s;
+  ['to-read','reading','finished'].forEach(x=>document.getElementById('isbn-s-'+x)?.classList.toggle('active',x===s));
+}
+
+function saveISBNBook() {
+  if(!window._isbnBook) return;
+  if(window._isbnBook.status==='reading') window._isbnBook.startedReading = new Date().toISOString();
+  DATA.books.push(window._isbnBook); DB.save(DATA);
+  showToast(`"${window._isbnBook.title}" added.`);
+  document.getElementById('isbn-field').value = '';
+  document.getElementById('isbn-field-result').innerHTML = '';
+  window._isbnBook = null;
+  goScreen('shelf');
+}
+
+// ── QUICK-JOT CHIPS ──────────────────────────────────────────────
+const CHIP_TEMPLATES = {
+  highlight: '**Highlight:** ',
+  question:  '**?** ',
+  reaction:  '**Reaction:** ',
+  summary:   '**Summary:** ',
+  quote:     '> ',
+  connection:'**Connection:** ',
+};
+function insertChip(type) {
+  const ta = document.getElementById('jot-textarea');
+  const prefix = CHIP_TEMPLATES[type] || '';
+  const pos = ta.selectionStart;
+  const before = ta.value.slice(0, pos);
+  const after = ta.value.slice(pos);
+  const needsNewline = before.length > 0 && !before.endsWith('\n');
+  const insert = (needsNewline ? '\n' : '') + prefix;
+  ta.value = before + insert + after;
+  ta.focus();
+  ta.selectionStart = ta.selectionEnd = pos + insert.length;
+}
+
+// ── SEARCH SCREEN ────────────────────────────────────────────────
+let searchFilter = 'all';
+
+function setSearchFilter(f, btn) {
+  searchFilter = f;
+  document.querySelectorAll('.filter-chip[data-filter]').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active');
+  doScreenSearch(document.getElementById('search-screen-input').value);
+}
+
+function clearScreenSearch() {
+  document.getElementById('search-screen-input').value = '';
+  doScreenSearch('');
+}
+
+function doScreenSearch(q) {
+  const el = document.getElementById('search-screen-results');
+  if(!q.trim()) {
+    el.innerHTML = '<div class="search-empty"><div class="search-empty-title">Search your marginalia.</div><div class="search-empty-sub">Every note, quote, and tag across all books.</div></div>';
+    return;
+  }
+  const ql = q.toLowerCase();
+  let jots = DATA.jots.filter(j => {
+    if(searchFilter==='quotes') return (j.quote||'').toLowerCase().includes(ql);
+    if(searchFilter==='tags')   return (j.tags||[]).some(t=>t.toLowerCase().includes(ql));
+    return (j.body||'').toLowerCase().includes(ql)
+        || (j.quote||'').toLowerCase().includes(ql)
+        || (j.tags||[]).some(t=>t.toLowerCase().includes(ql));
+  });
+  if(!jots.length) {
+    el.innerHTML = '<div class="search-empty"><div class="search-empty-title">No results.</div><div class="search-empty-sub">Try different words or switch filter.</div></div>';
+    return;
+  }
+  // Group by book
+  const byBook = {};
+  jots.forEach(j => { if(!byBook[j.bookId]) byBook[j.bookId]=[]; byBook[j.bookId].push(j); });
+  let html = '';
+  Object.entries(byBook).forEach(([bid, bjots]) => {
+    const b = DATA.books.find(x=>x.id===bid);
+    html += `<div class="search-result-book-header">${b?.title||'Unknown book'} — ${bjots.length} result${bjots.length>1?'s':''}</div>`;
+    bjots.forEach(j => {
+      const ds = j.createdAt ? new Date(j.createdAt).toLocaleDateString('en-GB',{day:'numeric',month:'short'}) : '';
+      const thtml = (j.tags||[]).map(t=>`<span class="tag-chip">${t}</span>`).join('');
+      // Highlight matched text
+      const bodyText = (j.body||'').slice(0,140);
+      html += `<div class="jot-card" onclick="openBook('${bid}')">
+        <div class="jot-ref"><span class="jot-page">p.${j.page||'—'}</span><span class="jot-date">${ds}</span></div>
+        ${j.quote?`<div class="jot-quote">${escHtml(j.quote)}</div>`:''}
+        ${bodyText?`<div class="jot-body">${renderMarkdown(bodyText)}${j.body?.length>140?'…':''}</div>`:''}
+        ${thtml?`<div class="jot-tags">${thtml}</div>`:''}</div>`;
+    });
+  });
+  el.innerHTML = html;
+}
+
+// patch goScreen to focus search input and handle new screens
+const _origGoScreenFn = goScreen;
 
 </script>
 </body>
