@@ -66,8 +66,8 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
   font-size: 34px; line-height: 1.1; }
 .folio-sub { font-family: var(--ff-body); font-style: italic;
   font-size: 12px; color: var(--ink-faint); margin-top: 2px; }
-.folio-stats { font-family: var(--ff-sc); font-size: 10px; letter-spacing: .02em;
-  color: var(--ink-mid); margin-top: 8px; }
+.folio-stats { font-family: var(--ff-sc); font-size: 11px; letter-spacing: .02em;
+  color: var(--ink); margin-top: 8px; }
 .folio-stats span { color: var(--crimson); }
 .folio-btn { position: absolute; top: 14px; right: 24px;
   background: none; border: none; cursor: pointer;
@@ -120,45 +120,46 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
 .shelf-section { padding: 20px 24px 0; }
 .shelf-section-header { display: flex; justify-content: space-between;
   align-items: baseline; margin-bottom: 12px; }
-.shelf-section-title { font-family: var(--ff-display); font-style: italic; font-size: 22px; }
+.shelf-section-title { font-family: var(--ff-display); font-style: italic; font-size: 24px; color: var(--ink); }
 .shelf-section-count { font-family: var(--ff-sc); font-size: 10px;
   letter-spacing: .01em; color: var(--ink-faint); }
-.spine-row { display: flex; gap: 6px; align-items: flex-end; height: 130px;
+.spine-row { display: flex; gap: 8px; align-items: flex-end; height: 150px;
   padding-bottom: 8px; overflow-x: auto; scrollbar-width: none; }
 .spine-row::-webkit-scrollbar { display: none; }
-.book-spine { flex-shrink: 0; width: 36px; height: 110px;
-  border-radius: 2px 3px 3px 2px; display: flex; align-items: center;
-  justify-content: center; cursor: pointer; position: relative;
-  box-shadow: 2px 3px 8px var(--spine-shadow);
+.book-spine { flex-shrink: 0; width: 72px; height: 104px;
+  border-radius: 3px 4px 4px 3px; overflow: hidden; cursor: pointer;
+  position: relative; box-shadow: 2px 4px 12px var(--spine-shadow);
   transition: transform .15s, box-shadow .15s;
   -webkit-tap-highlight-color: transparent; }
-.book-spine:active { transform: translateY(-4px); box-shadow: 2px 7px 14px var(--spine-shadow); }
-.book-spine-title { writing-mode: vertical-rl; text-orientation: mixed;
-  transform: rotate(180deg); font-family: var(--ff-body); font-size: 9px;
-  color: rgba(255,255,255,.9); white-space: nowrap; overflow: hidden;
-  text-overflow: ellipsis; max-height: 90px; padding: 0 4px; line-height: 1.2; }
+.book-spine:active { transform: translateY(-5px) scale(1.02); box-shadow: 2px 10px 22px var(--spine-shadow); }
+.book-spine img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.book-spine-fallback { width: 100%; height: 100%; display: flex; align-items: center;
+  justify-content: center; padding: 6px; }
+.book-spine-title { font-family: var(--ff-body); font-size: 9px;
+  color: rgba(255,255,255,.92); text-align: center; line-height: 1.3; word-break: break-word; }
 .spine-shadow-line { position: absolute; left: 0; top: 0; bottom: 0;
-  width: 4px; background: rgba(0,0,0,0.18); border-radius: 2px 0 0 2px; }
-.book-progress-bar { margin: 4px 0; height: 2px; background: var(--rule);
+  width: 3px; background: rgba(0,0,0,0.22); z-index: 2; }
+.book-progress-bar { margin: 6px 0 2px; height: 2px; background: var(--rule);
   border-radius: 1px; overflow: hidden; }
 .book-progress-fill { height: 100%; background: var(--crimson); border-radius: 1px; }
-.book-progress-label { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em;
+.book-progress-label { font-family: var(--ff-sc); font-size: 8px; letter-spacing: .02em;
   color: var(--ink-faint); display: flex; justify-content: space-between; }
-.book-progress-label em { font-family: var(--ff-display); font-style: italic;
-  color: var(--ink-mid); font-size: 10px; }
-.book-grid { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 4px;
+.book-progress-label em { font-family: var(--ff-body); color: var(--ink-mid);
+  font-size: 9px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 50px; }
+.book-grid { display: flex; gap: 14px; overflow-x: auto; padding: 4px 0 8px;
   scrollbar-width: none; }
 .book-grid::-webkit-scrollbar { display: none; }
-.book-card { flex-shrink: 0; width: 80px; cursor: pointer;
+.book-card { flex-shrink: 0; width: 90px; cursor: pointer;
   -webkit-tap-highlight-color: transparent; }
-.book-cover { width: 80px; height: 110px; border-radius: 2px 4px 4px 2px;
-  display: flex; align-items: center; justify-content: center;
-  box-shadow: 2px 3px 10px var(--spine-shadow); overflow: hidden; }
+.book-cover { width: 90px; height: 128px; border-radius: 3px 5px 5px 3px;
+  overflow: hidden; box-shadow: 2px 4px 14px var(--spine-shadow); }
+.book-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.book-cover-fallback { width: 100%; height: 100%; display: flex; align-items: center;
+  justify-content: center; padding: 8px; }
 .book-cover-title { font-family: var(--ff-body); font-size: 9px;
-  color: rgba(255,255,255,.92); text-align: center; padding: 6px;
-  line-height: 1.3; position: relative; z-index: 1; }
+  color: rgba(255,255,255,.92); text-align: center; line-height: 1.3; word-break: break-word; }
 .book-card-author { font-family: var(--ff-sc); font-size: 8px; letter-spacing: .02em;
-  color: var(--ink-faint); margin-top: 5px; text-transform: uppercase;
+  color: var(--ink-faint); margin-top: 6px;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .fab { position: fixed; bottom: calc(72px + var(--safe-bottom)); right: 20px;
   width: 52px; height: 52px; border-radius: 50%; background: var(--ink);
@@ -171,14 +172,14 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
 /* BOOK DETAIL */
 .book-detail-header { display: flex; gap: 16px; padding: 16px 24px 20px;
   border-bottom: 1px solid var(--rule); }
-.book-detail-cover { flex-shrink: 0; width: 70px; height: 95px;
-  border-radius: 2px 4px 4px 2px; box-shadow: 2px 3px 10px var(--spine-shadow);
-  display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.book-detail-cover { flex-shrink: 0; width: 80px; height: 112px;
+  border-radius: 3px 5px 5px 3px; box-shadow: 2px 4px 14px var(--spine-shadow);
+  overflow: hidden; }
 .book-detail-meta { flex: 1; padding-top: 4px; }
 .book-detail-genre { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em;
   color: var(--ink-faint); margin-bottom: 4px; }
 .book-detail-title { font-family: var(--ff-display); font-style: italic;
-  font-size: 22px; line-height: 1.15; margin-bottom: 4px; }
+  font-size: 24px; line-height: 1.15; color: var(--ink); margin-bottom: 4px; }
 .book-detail-author { font-family: var(--ff-body); font-size: 13px;
   color: var(--ink-mid); margin-bottom: 8px; }
 .status-pill { display: inline-flex; align-items: center; gap: 4px;
@@ -210,29 +211,41 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
   font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em; color: var(--ink-faint); }
 .pace-stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-top: 8px; }
 .pace-stat { text-align: center; }
-.pace-stat-val { font-family: var(--ff-display); font-style: italic; font-size: 20px; }
+.pace-stat-val { font-family: var(--ff-display); font-style: italic; font-size: 22px; color: var(--ink); }
 .pace-stat-key { font-family: var(--ff-sc); font-size: 8px; letter-spacing: .02em;
   color: var(--ink-faint); margin-top: 1px; }
 .marginalia-header { display: flex; justify-content: space-between; align-items: center;
   padding: 16px 24px 8px; }
-.marginalia-title { font-family: var(--ff-display); font-style: italic; font-size: 22px; }
+.marginalia-title { font-family: var(--ff-display); font-style: italic; font-size: 26px; color: var(--ink); }
 .btn-jot { font-family: var(--ff-sc); font-size: 10px; letter-spacing: .02em;
   background: none; border: 1px solid var(--rule); color: var(--ink);
   padding: 6px 14px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
-.jot-card { padding: 14px 24px; border-bottom: 1px solid var(--rule);
-  cursor: pointer; -webkit-tap-highlight-color: transparent; }
-.jot-card:active { background: var(--parchment-dark); }
-.jot-ref { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
-.jot-page { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .01em; color: var(--ink-mid); }
-.jot-date { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em; color: var(--ink-faint); }
-.jot-quote { font-family: var(--ff-display); font-style: italic; font-size: 15px;
-  color: var(--ink); line-height: 1.45; border-left: 2px solid var(--ink);
-  padding-left: 10px; margin-bottom: 6px; }
-.jot-body { font-family: var(--ff-body); font-size: 13px; color: var(--ink-mid); line-height: 1.55; }
-.jot-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
-.tag-chip { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em;
-  background: var(--parchment-dark); border: 1px solid var(--rule);
-  color: var(--ink-mid); padding: 3px 9px; border-radius: 12px; cursor: pointer; }
+.jot-card { padding: 18px 24px; border-bottom: 1px solid var(--rule);
+  -webkit-tap-highlight-color: transparent; }
+.jot-ref { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.jot-ref-left { display: flex; align-items: center; gap: 8px; }
+.jot-page { font-family: var(--ff-sc); font-size: 11px; letter-spacing: .02em;
+  color: var(--ink); font-weight: 500; }
+.jot-date { font-family: var(--ff-sc); font-size: 10px; letter-spacing: .02em; color: var(--ink-faint); }
+.jot-actions { display: flex; gap: 6px; align-items: center; }
+.jot-edit-btn { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em;
+  padding: 4px 10px; border: 1px solid var(--ink); background: none;
+  color: var(--ink); cursor: pointer; border-radius: 2px;
+  -webkit-tap-highlight-color: transparent; transition: background .15s; }
+.jot-edit-btn:active { background: var(--ink); color: var(--parchment); }
+.jot-discard-btn { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em;
+  padding: 4px 10px; border: 1px solid var(--crimson); background: none;
+  color: var(--crimson); cursor: pointer; border-radius: 2px;
+  -webkit-tap-highlight-color: transparent; transition: background .15s; }
+.jot-discard-btn:active { background: var(--crimson); color: var(--cream); }
+.jot-quote { font-family: var(--ff-display); font-style: italic; font-size: 17px;
+  color: var(--ink); line-height: 1.5; border-left: 3px solid var(--ink);
+  padding-left: 12px; margin-bottom: 10px; }
+.jot-body { font-family: var(--ff-body); font-size: 15px; color: var(--ink); line-height: 1.65; }
+.jot-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+.tag-chip { font-family: var(--ff-sc); font-size: 10px; letter-spacing: .02em;
+  background: var(--parchment-dark); border: 1px solid var(--ink-faint);
+  color: var(--ink); padding: 4px 11px; border-radius: 12px; cursor: pointer; }
 .tag-chip.active { background: var(--crimson); border-color: var(--crimson); color: var(--cream); }
 
 /* JOT EDITOR */
@@ -387,16 +400,41 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
 .threads-canvas-wrap { padding: 16px 24px; }
 .threads-canvas { width: 100%; aspect-ratio: 1; max-height: 260px; position: relative; }
 #threads-svg { width: 100%; height: 100%; }
-.thread-list-item { padding: 14px 24px; border-bottom: 1px solid var(--rule);
-  cursor: pointer; -webkit-tap-highlight-color: transparent; }
-.thread-list-item:active { background: var(--parchment-dark); }
-.thread-item-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
-.thread-item-tag { font-family: var(--ff-sc); font-size: 12px; letter-spacing: .02em; color: var(--crimson); }
+.thread-list-item { padding: 18px 24px; border-bottom: 1px solid var(--rule);
+  -webkit-tap-highlight-color: transparent; }
+.thread-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.thread-item-header-left { display: flex; flex-direction: column; gap: 3px; }
+.thread-item-tag { font-family: var(--ff-sc); font-size: 14px; letter-spacing: .02em; color: var(--crimson); font-weight: 500; }
 .thread-item-count { font-family: var(--ff-sc); font-size: 10px; letter-spacing: .02em; color: var(--ink-faint); }
-.thread-item-quote { font-family: var(--ff-display); font-style: italic; font-size: 13px;
-  color: var(--ink-mid); line-height: 1.45; border-left: 2px solid var(--rule);
-  padding-left: 10px; margin-bottom: 3px; }
-.thread-item-source { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em; color: var(--ink-faint); }
+.thread-item-actions { display: flex; gap: 6px; }
+.thread-add-btn { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em;
+  padding: 5px 11px; border: 1px solid var(--ink); background: var(--ink);
+  color: var(--parchment); cursor: pointer; border-radius: 2px;
+  -webkit-tap-highlight-color: transparent; }
+.thread-edit-btn { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em;
+  padding: 5px 11px; border: 1px solid var(--ink); background: none;
+  color: var(--ink); cursor: pointer; border-radius: 2px;
+  -webkit-tap-highlight-color: transparent; }
+.thread-discard-btn { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em;
+  padding: 5px 11px; border: 1px solid var(--crimson); background: none;
+  color: var(--crimson); cursor: pointer; border-radius: 2px;
+  -webkit-tap-highlight-color: transparent; }
+.thread-item-quote { font-family: var(--ff-display); font-style: italic; font-size: 15px;
+  color: var(--ink); line-height: 1.5; border-left: 3px solid var(--rule);
+  padding-left: 12px; margin-bottom: 6px; }
+.thread-item-source { font-family: var(--ff-sc); font-size: 10px; letter-spacing: .02em; color: var(--ink-faint); }
+
+/* THREAD DETAIL SCREEN */
+#screen-thread-detail { background: var(--parchment); }
+.thread-detail-tag { font-family: var(--ff-sc); font-size: 13px; letter-spacing: .02em;
+  color: var(--crimson); margin-top: 4px; }
+.thread-detail-actions { display: flex; gap: 8px; margin-top: 14px; }
+.thread-detail-btn { font-family: var(--ff-sc); font-size: 10px; letter-spacing: .02em;
+  padding: 8px 16px; border-radius: 2px; cursor: pointer;
+  -webkit-tap-highlight-color: transparent; }
+.thread-detail-btn.add { background: var(--ink); color: var(--parchment); border: 1px solid var(--ink); }
+.thread-detail-btn.edit { background: none; color: var(--ink); border: 1px solid var(--ink); }
+.thread-detail-btn.discard { background: none; color: var(--crimson); border: 1px solid var(--crimson); }
 
 /* ALMANAC */
 .almanac-stats-row { display: grid; grid-template-columns: repeat(3,1fr);
@@ -840,6 +878,25 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
   </nav>
 </div>
 
+<!-- ══ THREAD DETAIL ══ -->
+<div id="screen-thread-detail" class="screen">
+  <div class="folio-header" style="padding-bottom:0">
+    <div class="folio-label">FOLIO IV · THREAD</div>
+    <button class="back-btn" onclick="goBack()">←</button>
+    <button class="folio-btn" id="thread-detail-more-btn">···</button>
+  </div>
+  <div class="folio-header" style="padding-top:8px;border-top:none">
+    <div class="folio-title" id="thread-detail-title">—</div>
+    <div class="thread-detail-tag" id="thread-detail-tag">—</div>
+    <div class="thread-detail-actions">
+      <button class="thread-detail-btn add" onclick="addNoteToThread()">+ ADD NOTE</button>
+      <button class="thread-detail-btn edit" onclick="editThreadTag()">RENAME</button>
+      <button class="thread-detail-btn discard" onclick="discardThread()">DISCARD</button>
+    </div>
+  </div>
+  <div class="scroll-content" id="thread-detail-content" style="padding-bottom:20px"></div>
+</div>
+
 <!-- ══ PACE / ALMANAC ══ -->
 <div id="screen-pace" class="screen">
   <div class="folio-header">
@@ -939,6 +996,18 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
 
 <script>
 
+// ── COVER HELPERS ────────────────────────────────────────────────
+function coverImg(b, w, h, extraStyle='') {
+  const style = `width:${w}px;height:${h}px;${extraStyle}`;
+  if(b.thumbnail) {
+    return `<img src="${b.thumbnail}" style="${style};object-fit:cover;display:block;border-radius:inherit" onerror="this.parentNode.innerHTML=coverFallback('${b.title.replace(/'/g,"\'")}','${spineColor(b.title)}','${w}','${h}')">`;
+  }
+  return coverFallback(b.title, spineColor(b.title), w, h);
+}
+function coverFallback(title, color, w, h) {
+  return `<div style="width:${w}px;height:${h}px;background:${color};display:flex;align-items:center;justify-content:center;padding:6px"><span style="font-family:var(--ff-body);font-size:9px;color:rgba(255,255,255,.92);text-align:center;line-height:1.3;word-break:break-word">${title}</span></div>`;
+}
+
 // ── DATA ──────────────────────────────────────────────────────────
 const SPINE_COLORS = [
   '#8b2020','#2a4a7a','#2a5a3a','#6a4a2a','#4a2a6a',
@@ -974,6 +1043,7 @@ function goScreen(id,push=true){
   if(id==='ocr')startOCR();
   if(id==='add'){setTimeout(()=>document.getElementById('add-search-field')?.focus(),200);}
   if(id==='search'){setTimeout(()=>document.getElementById('search-screen-input')?.focus(),200);}
+  // thread-detail is rendered by openThreadDetail before goScreen is called
 }
 function goBack(){const p=screenHistory.pop()||'shelf';goScreen(p,false);}
 function beginShelf(){goScreen('shelf');}
@@ -1004,11 +1074,12 @@ function renderShelf(){
       <div class="spine-row">`;
     reading.forEach(b=>{
       const pct=b.totalPages?Math.round((b.currentPage||0)/b.totalPages*100):0;
-      html+=`<div><div class="book-spine" style="background:${spineColor(b.title)}" onclick="openBook('${b.id}')">
+      html+=`<div style="width:72px"><div class="book-spine" onclick="openBook('${b.id}')">
         <div class="spine-shadow-line"></div>
-        <div class="book-spine-title">${b.title}</div></div>
+        ${coverImg(b,72,104)}
+        </div>
         <div class="book-progress-bar"><div class="book-progress-fill" style="width:${pct}%"></div></div>
-        <div class="book-progress-label"><em>${b.title.slice(0,16)}${b.title.length>16?'…':''}</em><span>${b.currentPage||0}/${b.totalPages||'?'}</span></div></div>`;
+        <div class="book-progress-label"><em>${b.title.slice(0,14)}${b.title.length>14?'…':''}</em><span>${b.currentPage||0}/${b.totalPages||'?'}</span></div></div>`;
     });
     html+=`</div></div>`;
   }
@@ -1019,9 +1090,8 @@ function renderShelf(){
       <div class="book-grid">`;
     toread.forEach(b=>{
       html+=`<div class="book-card" onclick="openBook('${b.id}')">
-        <div class="book-cover" style="background:${spineColor(b.title)}">
-          <div class="book-cover-title">${b.title}</div></div>
-        <div class="book-card-author">${(b.author||'').split(' ').pop()}</div></div>`;
+        <div class="book-cover">${coverImg(b,90,128)}</div>
+        <div class="book-card-author">${b.author||''}</div></div>`;
     });
     html+=`</div></div>`;
   }
@@ -1032,9 +1102,8 @@ function renderShelf(){
       <div class="book-grid">`;
     finished.forEach(b=>{
       html+=`<div class="book-card" onclick="openBook('${b.id}')">
-        <div class="book-cover" style="background:${spineColor(b.title)};opacity:.7">
-          <div class="book-cover-title">${b.title}</div></div>
-        <div class="book-card-author">${(b.author||'').split(' ').pop()}</div></div>`;
+        <div class="book-cover" style="opacity:.8">${coverImg(b,90,128)}</div>
+        <div class="book-card-author">${b.author||''}</div></div>`;
     });
     html+=`</div></div>`;
   }
@@ -1058,8 +1127,7 @@ function openBook(id){
   const pctPos=Math.min(Math.max(pct*100,5),95);
 
   let html=`<div class="book-detail-header">
-    <div class="book-detail-cover" style="background:${color}">
-      <div style="font-family:var(--ff-body);font-size:8px;color:rgba(255,255,255,.9);text-align:center;padding:4px;line-height:1.3">${b.title}</div></div>
+    <div class="book-detail-cover" style="overflow:hidden">${coverImg(b,70,95)}</div>
     <div class="book-detail-meta">
       <div class="book-detail-genre">${(b.categories||['BOOK'])[0]?.toUpperCase()||'BOOK'} · ${b.year||'—'}</div>
       <div class="book-detail-title">${b.title}</div>
@@ -1099,8 +1167,17 @@ function openBook(id){
     [...jots].sort((a,b)=>(a.page||0)-(b.page||0)).forEach(j=>{
       const ds=j.createdAt?new Date(j.createdAt).toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'';
       const thtml=(j.tags||[]).map(t=>`<span class="tag-chip">${t}</span>`).join('');
-      html+=`<div class="jot-card" onclick="openJotEdit('${j.id}')">
-        <div class="jot-ref"><span class="jot-page">p.${j.page||'—'}</span><span class="jot-date">${ds}</span></div>
+      html+=`<div class="jot-card">
+        <div class="jot-ref">
+          <div class="jot-ref-left">
+            <span class="jot-page">p.${j.page||'—'}</span>
+            <span class="jot-date">${ds}</span>
+          </div>
+          <div class="jot-actions">
+            <button class="jot-edit-btn" onclick="openJotEdit('${j.id}')">EDIT</button>
+            <button class="jot-discard-btn" onclick="confirmDeleteJot('${j.id}','${id}')">✕</button>
+          </div>
+        </div>
         ${j.quote?`<div class="jot-quote">${escHtml(j.quote)}</div>`:''}
         <div class="jot-body">${renderMarkdown(j.body||'')}</div>
         ${thtml?`<div class="jot-tags">${thtml}</div>`:''}</div>`;
@@ -1145,6 +1222,23 @@ function deleteBook(id){
   DB.save(DATA); goScreen('shelf');
 }
 
+function confirmDeleteJot(jid, bid) {
+  showModal('Discard this note?', `
+    <div style="font-family:var(--ff-body);font-style:italic;font-size:13px;color:var(--ink-mid);margin-bottom:20px;line-height:1.55">This cannot be undone.</div>
+    <div class="modal-btn-row">
+      <button class="modal-btn" onclick="closeModal()">KEEP</button>
+      <button class="modal-btn" style="background:var(--crimson);color:var(--cream);border-color:var(--crimson)" onclick="deleteJot('${jid}','${bid}')">DISCARD</button>
+    </div>`);
+}
+
+function deleteJot(jid, bid) {
+  DATA.jots = DATA.jots.filter(x => x.id !== jid);
+  DB.save(DATA);
+  closeModal();
+  openBook(bid);
+  showToast('Note discarded.');
+}
+
 // ── JOT EDITOR ──────────────────────────────────────────────────
 let jotState={bookId:null,jotId:null,page:null,tags:[]};
 function openJotFor(bid){
@@ -1167,7 +1261,9 @@ function refreshJotBookRef(){
   if(b){
     document.getElementById('jot-book-name').textContent=b.title;
     document.getElementById('jot-book-ch').textContent=b.author||'';
-    document.getElementById('jot-thumb').style.background=spineColor(b.title);
+    const jt=document.getElementById('jot-thumb');
+    if(b.thumbnail){jt.innerHTML=`<img src="${b.thumbnail}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit">`;jt.style.background='';}
+    else{jt.innerHTML='';jt.style.background=spineColor(b.title);}
   } else {
     document.getElementById('jot-book-name').textContent='Choose a book…';
     document.getElementById('jot-book-ch').textContent='TAP TO SELECT';
@@ -1231,7 +1327,9 @@ function saveJot(){
   } else {
     DATA.jots.push({id:uid(),bookId:jotState.bookId,quote,body,page:jotState.page,tags:jotState.tags,createdAt:new Date().toISOString()});
   }
-  DB.save(DATA); showToast('Saved.'); closeJot();
+  DB.save(DATA); showToast('Saved.');
+  if(currentThread) renderThreadDetail(currentThread);
+  closeJot();
 }
 function closeJot(){if(screenHistory.length)goBack();else goScreen('shelf');}
 function showBookPicker(){
@@ -1412,17 +1510,27 @@ function renderThreads(){
   if(!tags.length){
     html=`<div class="empty-state"><div class="empty-state-icon">✦</div>
       <div class="empty-state-title">No threads yet.</div>
-      <div class="empty-state-sub">Add #tags to jots and they appear here.</div></div>`;
+      <div class="empty-state-sub">Add #tags when writing jots and they'll appear here.</div></div>`;
   } else {
     tags.forEach(([tag,d])=>{
       const j=d.jots[0];
-      const preview=j?.quote||j?.body?.slice(0,80)||'';
+      const preview=j?.quote||j?.body?.slice(0,100)||'';
       const bk=j?DATA.books.find(b=>b.id===j.bookId):null;
+      const bookCount=new Set(d.jots.map(x=>x.bookId)).size;
+      const safeTag=tag.replace(/'/g,"\'");
       html+=`<div class="thread-list-item">
         <div class="thread-item-header">
-          <span class="thread-item-tag">${tag}</span>
-          <span class="thread-item-count">${d.count} note${d.count>1?'s':''} · ${new Set(d.jots.map(x=>x.bookId)).size} book${new Set(d.jots.map(x=>x.bookId)).size>1?'s':''}</span></div>
-        ${preview?`<div class="thread-item-quote">${preview.slice(0,100)}${preview.length>100?'…':''}</div>`:''}
+          <div class="thread-item-header-left">
+            <span class="thread-item-tag" onclick="openThreadDetail('${safeTag}')" style="cursor:pointer">${tag}</span>
+            <span class="thread-item-count">${d.count} note${d.count>1?'s':''} · ${bookCount} book${bookCount>1?'s':''}</span>
+          </div>
+          <div class="thread-item-actions">
+            <button class="thread-add-btn" onclick="addNoteToThreadTag('${safeTag}')">+ ADD</button>
+            <button class="thread-edit-btn" onclick="editThreadTagInline('${safeTag}')">EDIT</button>
+            <button class="thread-discard-btn" onclick="confirmDiscardThread('${safeTag}')">✕</button>
+          </div>
+        </div>
+        ${preview?`<div class="thread-item-quote" onclick="openThreadDetail('${safeTag}')" style="cursor:pointer">${preview.slice(0,100)}${preview.length>100?'…':''}</div>`:''}
         ${bk?`<div class="thread-item-source">${bk.title} · p.${j?.page||'—'}</div>`:''}</div>`;
     });
   }
@@ -1934,10 +2042,15 @@ function doScreenSearch(q) {
     bjots.forEach(j => {
       const ds = j.createdAt ? new Date(j.createdAt).toLocaleDateString('en-GB',{day:'numeric',month:'short'}) : '';
       const thtml = (j.tags||[]).map(t=>`<span class="tag-chip">${t}</span>`).join('');
-      // Highlight matched text
       const bodyText = (j.body||'').slice(0,140);
-      html += `<div class="jot-card" onclick="openBook('${bid}')">
-        <div class="jot-ref"><span class="jot-page">p.${j.page||'—'}</span><span class="jot-date">${ds}</span></div>
+      html += `<div class="jot-card">
+        <div class="jot-ref">
+          <div class="jot-ref-left"><span class="jot-page">p.${j.page||'—'}</span><span class="jot-date">${ds}</span></div>
+          <div class="jot-actions">
+            <button class="jot-edit-btn" onclick="openJotEdit('${j.id}')">EDIT</button>
+            <button class="jot-discard-btn" onclick="confirmDeleteJot('${j.id}','${bid}')">✕</button>
+          </div>
+        </div>
         ${j.quote?`<div class="jot-quote">${escHtml(j.quote)}</div>`:''}
         ${bodyText?`<div class="jot-body">${renderMarkdown(bodyText)}${j.body?.length>140?'…':''}</div>`:''}
         ${thtml?`<div class="jot-tags">${thtml}</div>`:''}</div>`;
@@ -1945,6 +2058,178 @@ function doScreenSearch(q) {
   });
   el.innerHTML = html;
 }
+
+// ── THREAD DETAIL ─────────────────────────────────────────────────
+let currentThread = null;
+
+function openThreadDetail(tag) {
+  currentThread = tag;
+  const jots = DATA.jots.filter(j=>(j.tags||[]).includes(tag));
+  const bookCount = new Set(jots.map(j=>j.bookId)).size;
+
+  document.getElementById('thread-detail-title').textContent =
+    tag.slice(0,1).toUpperCase() + tag.slice(1);
+  document.getElementById('thread-detail-tag').textContent =
+    `${jots.length} note${jots.length!==1?'s':''} · ${bookCount} book${bookCount!==1?'s':''}`;
+
+  // More button
+  document.getElementById('thread-detail-more-btn').onclick = () =>
+    showModal('Thread options', `
+      <button class="modal-btn" style="display:block;width:100%;text-align:left;padding:12px;margin-bottom:8px" onclick="editThreadTag()">RENAME TAG</button>
+      <button class="modal-btn" style="display:block;width:100%;text-align:left;padding:12px;margin-bottom:8px;color:var(--crimson);border-color:var(--crimson)" onclick="confirmDiscardThread('${tag.replace(/'/g,"\'")}');closeModal()">DISCARD ALL NOTES IN THREAD</button>
+      <button class="modal-btn" onclick="closeModal()">CANCEL</button>`);
+
+  renderThreadDetail(tag);
+  goScreen('thread-detail');
+}
+
+function renderThreadDetail(tag) {
+  const jots = DATA.jots.filter(j=>(j.tags||[]).includes(tag));
+  const el = document.getElementById('thread-detail-content');
+  if(!jots.length) {
+    el.innerHTML = `<div class="empty-state">
+      <div class="empty-state-sub">No notes in this thread yet. Tap + ADD NOTE to begin.</div></div>`;
+    return;
+  }
+  let html = '';
+  jots.forEach(j => {
+    const b = DATA.books.find(x=>x.id===j.bookId);
+    const ds = j.createdAt ? new Date(j.createdAt).toLocaleDateString('en-GB',{day:'numeric',month:'short'}) : '';
+    const otherTags = (j.tags||[]).filter(t=>t!==tag).map(t=>`<span class="tag-chip">${t}</span>`).join('');
+    html += `<div class="jot-card">
+      <div class="jot-ref">
+        <div class="jot-ref-left">
+          <span class="jot-page">${b?b.title.slice(0,20)+(b.title.length>20?'…':''):''}</span>
+          <span class="jot-date">p.${j.page||'—'} · ${ds}</span>
+        </div>
+        <div class="jot-actions">
+          <button class="jot-edit-btn" onclick="openJotEdit('${j.id}')">EDIT</button>
+          <button class="jot-discard-btn" onclick="confirmDeleteJot('${j.id}',null)">✕</button>
+        </div>
+      </div>
+      ${j.quote?`<div class="jot-quote">${escHtml(j.quote)}</div>`:''}
+      <div class="jot-body">${renderMarkdown(j.body||'')}</div>
+      ${otherTags?`<div class="jot-tags">${otherTags}</div>`:''}</div>`;
+  });
+  el.innerHTML = html;
+}
+
+function addNoteToThread() {
+  if(!currentThread) return;
+  addNoteToThreadTag(currentThread);
+}
+
+function addNoteToThreadTag(tag) {
+  // Open jot editor pre-tagged
+  jotState = { bookId: DATA.books[0]?.id||null, jotId: null, page: null, tags: [tag] };
+  document.getElementById('jot-textarea').value = '';
+  document.getElementById('jot-preview-pane').innerHTML = '';
+  refreshJotBookRef();
+  refreshJotTags();
+  setJotTab('write');
+  goScreen('jot');
+}
+
+function editThreadTag() {
+  if(!currentThread) return;
+  editThreadTagInline(currentThread);
+}
+
+function editThreadTagInline(tag) {
+  showModal('Rename thread', `
+    <div style="font-family:var(--ff-body);font-size:13px;color:var(--ink-mid);margin-bottom:14px;font-style:italic">
+      Renaming will update the tag on all ${DATA.jots.filter(j=>(j.tags||[]).includes(tag)).length} notes.
+    </div>
+    <div class="add-field-label">NEW TAG NAME</div>
+    <input class="modal-input" id="rename-tag-input" type="text" value="${tag}" placeholder="#new-name">
+    <div class="modal-btn-row">
+      <button class="modal-btn" onclick="closeModal()">Cancel</button>
+      <button class="modal-btn primary" onclick="confirmRenameTag('${tag.replace(/'/g,"\'")}')">RENAME</button>
+    </div>`);
+  setTimeout(()=>{
+    const inp = document.getElementById('rename-tag-input');
+    if(inp){inp.focus();inp.select();}
+  },200);
+}
+
+function confirmRenameTag(oldTag) {
+  let newTag = (document.getElementById('rename-tag-input')?.value||'').trim();
+  if(!newTag){ showToast('Please enter a tag name.'); return; }
+  if(!newTag.startsWith('#')) newTag = '#' + newTag;
+  if(newTag === oldTag){ closeModal(); return; }
+  DATA.jots.forEach(j=>{
+    if((j.tags||[]).includes(oldTag)) {
+      j.tags = j.tags.map(t => t===oldTag ? newTag : t);
+    }
+  });
+  DB.save(DATA);
+  closeModal();
+  if(currentThread === oldTag) {
+    currentThread = newTag;
+    openThreadDetail(newTag);
+  } else {
+    renderThreads();
+  }
+  showToast(`Renamed to ${newTag}.`);
+}
+
+function discardThread() {
+  if(!currentThread) return;
+  confirmDiscardThread(currentThread);
+}
+
+function confirmDiscardThread(tag) {
+  const count = DATA.jots.filter(j=>(j.tags||[]).includes(tag)).length;
+  showModal('Discard thread?', `
+    <div style="font-family:var(--ff-body);font-size:14px;color:var(--ink);margin-bottom:6px"><strong>${tag}</strong></div>
+    <div style="font-family:var(--ff-body);font-size:13px;color:var(--ink-mid);margin-bottom:20px;line-height:1.55;font-style:italic">
+      This removes the tag from ${count} note${count!==1?'s':''}. The notes themselves are kept.
+    </div>
+    <div class="modal-btn-row">
+      <button class="modal-btn" onclick="closeModal()">KEEP</button>
+      <button class="modal-btn" style="background:var(--crimson);color:var(--cream);border-color:var(--crimson)" onclick="doDiscardThread('${tag.replace(/'/g,"\'")}')">DISCARD</button>
+    </div>`);
+}
+
+function doDiscardThread(tag) {
+  DATA.jots.forEach(j=>{
+    if((j.tags||[]).includes(tag)) j.tags = j.tags.filter(t=>t!==tag);
+  });
+  DB.save(DATA);
+  closeModal();
+  if(currentThread===tag) goScreen('threads');
+  renderThreads();
+  showToast(`Thread ${tag} discarded.`);
+}
+
+// patch confirmDeleteJot to handle null bookId (called from thread detail)
+const _origConfirmDeleteJot = confirmDeleteJot;
+function confirmDeleteJot(jid, bid) {
+  const resolvedBid = bid || DATA.jots.find(x=>x.id===jid)?.bookId || null;
+  showModal('Discard this note?', `
+    <div style="font-family:var(--ff-body);font-style:italic;font-size:13px;color:var(--ink-mid);margin-bottom:20px;line-height:1.55">This cannot be undone.</div>
+    <div class="modal-btn-row">
+      <button class="modal-btn" onclick="closeModal()">KEEP</button>
+      <button class="modal-btn" style="background:var(--crimson);color:var(--cream);border-color:var(--crimson)" onclick="deleteJot('${jid}','${resolvedBid}')">DISCARD</button>
+    </div>`);
+}
+
+function deleteJot(jid, bid) {
+  DATA.jots = DATA.jots.filter(x => x.id !== jid);
+  DB.save(DATA);
+  closeModal();
+  // refresh whichever screen we're on
+  if(currentScreen==='thread-detail' && currentThread) renderThreadDetail(currentThread);
+  else if(bid) openBook(bid);
+  renderThreads();
+  showToast('Note discarded.');
+}
+
+// patch openJotEdit to return to thread-detail if that's where we came from
+const _origOpenJotEdit = openJotEdit;
+
+// override saveJot to refresh thread detail if needed
+const _baseSaveJot = saveJot;
 
 // patch goScreen to focus search input and handle new screens
 const _origGoScreenFn = goScreen;
