@@ -169,21 +169,28 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
 .book-card.show-delete .book-card-delete { opacity: 1; }
 .book-cover {
   width: 100%;
-  padding-top: 148%;
-  position: relative;
+  aspect-ratio: 2 / 3;
   border-radius: 3px 5px 5px 3px;
   overflow: hidden;
   box-shadow: 2px 4px 14px var(--spine-shadow);
   background: var(--parchment-dark);
+  display: block;
 }
-.book-cover > * {
-  position: absolute !important;
-  inset: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
+.book-cover img {
+  width: 100%;
+  height: 100%;
   object-fit: cover;
+  display: block;
+  border-radius: inherit;
 }
-.book-cover img { display: block; }
+.book-cover div {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px;
+}
 .book-cover-fallback { width: 100%; height: 100%; display: flex; align-items: center;
   justify-content: center; padding: 6px; }
 .book-cover-title { font-family: var(--ff-body); font-size: 9px;
@@ -1035,13 +1042,14 @@ function coverImg(b, w, h, extraStyle='') {
   const safeT = (b.title||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   if (b.thumbnail) {
     const src = b.thumbnail.replace('http://','https://').replace('zoom=1','zoom=3');
+    // For both sized and unsized: let CSS handle all layout, img just fills parent
     const style = sized
-      ? `width:${w}px;height:${h}px;${extraStyle};object-fit:cover;display:block;border-radius:inherit`
-      : `position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;border-radius:inherit;${extraStyle}`;
+      ? `width:${w}px;height:${h}px;object-fit:cover;display:block;border-radius:inherit;${extraStyle}`
+      : `width:100%;height:100%;object-fit:cover;display:block;border-radius:inherit;${extraStyle}`;
     return `<img src="${src}" data-color="${color}" data-title="${safeT}" style="${style}" loading="lazy" onerror="_coverErr(this)">`;
   }
   if (sized) return coverFallback(b.title, color, w, h);
-  return `<div style="position:absolute;inset:0;background:${color};display:flex;align-items:center;justify-content:center;padding:5px"><span style="font-family:var(--ff-body);font-size:9px;color:rgba(255,255,255,.9);text-align:center;line-height:1.3">${safeT.slice(0,22)}</span></div>`;
+  return `<div style="width:100%;height:100%;background:${color};display:flex;align-items:center;justify-content:center;padding:5px"><span style="font-family:var(--ff-body);font-size:9px;color:rgba(255,255,255,.9);text-align:center;line-height:1.3">${safeT.slice(0,22)}</span></div>`;
 }
 function coverFallback(title, color, w, h) {
   const t = (title||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -1058,7 +1066,7 @@ window._coverErr = function(img) {
     if(!p.querySelector('.fb-div')) {
       var d = document.createElement('div');
       d.className = 'fb-div';
-      d.style.cssText = 'position:absolute;inset:0;background:'+color+';display:flex;align-items:center;justify-content:center;padding:5px;';
+      d.style.cssText = 'width:100%;height:100%;background:'+color+';display:flex;align-items:center;justify-content:center;padding:5px;';
       d.innerHTML = '<span style="font-family:var(--ff-body);font-size:9px;color:rgba(255,255,255,.9);text-align:center;line-height:1.3">'+title.slice(0,22)+'</span>';
       p.appendChild(d);
     }
