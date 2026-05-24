@@ -1809,45 +1809,100 @@ function selectStatus(s) {
 
 async function searchBooks() {
   const q = document.getElementById('add-search-field').value.trim();
-  if(!q) return;
+  if (!q) return;
   const el = document.getElementById('book-search-results');
   el.innerHTML = '<div class="searching-hint">Searching…</div>';
-  try {
-    const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&maxResults=8`);
-    const data = await res.json();
-    if(!data.items?.length){ el.innerHTML='<div class="searching-hint">No results found.</div>'; return; }
-    el.innerHTML = data.items.map((item,i)=>{
-      const info = item.volumeInfo;
-      const title = info.title||'Unknown';
-      const author = (info.authors||[]).join(', ')||'Unknown';
-      const pages = info.pageCount ? info.pageCount+'pp' : '';
-      const year = info.publishedDate?.slice(0,4)||'';
-      const thumb = info.imageLinks?.thumbnail||'';
-      const color = spineColor(title);
-      const safeThumb = thumb ? thumb.replace('http://','https://').replace('zoom=1','zoom=3') : '';
-      const thumbHtml = safeThumb
-        ? `<img src="${safeThumb}" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy" onerror="_coverErr(this)" data-color="${color}">`
-        : `<div style="width:100%;height:100%;background:${color};display:flex;align-items:center;justify-content:center"><span style="font-family:var(--ff-body);font-size:8px;color:rgba(255,255,255,.9);text-align:center;padding:4px;line-height:1.3">${title.slice(0,24)}</span></div>`;
-      return `<div class="search-book-result" id="sbr-${i}">
-        <div class="search-book-thumb" onclick="expandSearchResult(${i})">${thumbHtml}</div>
-        <div style="flex:1;min-width:0">
-          <div class="search-book-info-title" onclick="expandSearchResult(${i})">${title}</div>
-          <div class="search-book-info-author">${author}</div>
-          <div class="search-book-info-meta">${[year,pages].filter(Boolean).join(' · ')}</div>
-          <div class="search-book-add-row" id="sbr-add-${i}" style="display:none;margin-top:10px">
-            <div style="display:flex;gap:6px;margin-bottom:8px">
-              <button class="filter-chip active" id="sbr-s-${i}-to-read" onclick="setSBRStatus(${i},'to-read')">TO READ</button>
-              <button class="filter-chip" id="sbr-s-${i}-reading" onclick="setSBRStatus(${i},'reading')">READING</button>
-              <button class="filter-chip" id="sbr-s-${i}-finished" onclick="setSBRStatus(${i},'finished')">FINISHED</button>
-            </div>
-            <button class="add-btn-primary" style="padding:10px" onclick="doAddSearchBook(${i})">ADD TO SHELF →</button>
+  const enc = encodeURIComponent(q);
+
+  // Collect results from all sources, deduplicate by title
+  let books = [];
+  const seen = new Set();
+  function add(title, author, year, pages, thumb, isbn) {
+    const key = title.toLowerCase().replace(/\s/g,'').slice(0,12);
+    if (seen.has(key) || !title || title==='Unknown') return;
+    seen.add(key);
+    books.push({ title, author, year, pages, thumb, isbn });
+  }
+
+  // Run 3 sources in parallel
+  await Promise.allSettled([
+
+    // 1. Google Books global
+    fetch(`https://www.googleapis.com/books/v1/volumes?q=${enc}&maxResults=8`)
+      .then(r => r.json()).then(d => {
+        (d.items||[]).forEach(item => {
+          const info = item.volumeInfo;
+          const ids = info.industryIdentifiers||[];
+          add(info.title||'',
+              (info.authors||[]).join(', '),
+              info.publishedDate?.slice(0,4)||'',
+              info.pageCount||0,
+              (info.imageLinks?.thumbnail||info.imageLinks?.smallThumbnail||'').replace('http://','https://').replace('zoom=1','zoom=3'),
+              ids.find(x=>x.type==='ISBN_13')?.identifier || ids.find(x=>x.type==='ISBN_10')?.identifier || '');
+        });
+      }).catch(()=>{}),
+
+    // 2. Google Books country=TW — unlocks Traditional Chinese catalog
+    fetch(`https://www.googleapis.com/books/v1/volumes?q=${enc}&maxResults=8&country=TW`)
+      .then(r => r.json()).then(d => {
+        (d.items||[]).forEach(item => {
+          const info = item.volumeInfo;
+          const ids = info.industryIdentifiers||[];
+          add(info.title||'',
+              (info.authors||[]).join(', '),
+              info.publishedDate?.slice(0,4)||'',
+              info.pageCount||0,
+              (info.imageLinks?.thumbnail||info.imageLinks?.smallThumbnail||'').replace('http://','https://').replace('zoom=1','zoom=3'),
+              ids.find(x=>x.type==='ISBN_13')?.identifier || ids.find(x=>x.type==='ISBN_10')?.identifier || '');
+        });
+      }).catch(()=>{}),
+
+    // 3. Open Library — good for non-English titles
+    fetch(`https://openlibrary.org/search.json?q=${enc}&fields=title,author_name,number_of_pages_median,cover_i,first_publish_year,isbn&limit=6`)
+      .then(r => r.json()).then(d => {
+        (d.docs||[]).forEach(doc => {
+          const covId = doc.cover_i;
+          add(doc.title||'',
+              (doc.author_name||[]).join(', '),
+              doc.first_publish_year ? String(doc.first_publish_year) : '',
+              doc.number_of_pages_median||0,
+              covId ? `https://covers.openlibrary.org/b/id/${covId}-M.jpg` : '',
+              (doc.isbn||[])[0]||'');
+        });
+      }).catch(()=>{})
+
+  ]);
+
+  if (!books.length) {
+    el.innerHTML = '<div class="searching-hint">No results found. Try different keywords.</div>';
+    return;
+  }
+
+  window._searchResults = books;
+
+  el.innerHTML = books.map((book, i) => {
+    const color = spineColor(book.title);
+    const thumbHtml = book.thumb
+      ? `<img src="${book.thumb}" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy" onerror="_coverErr(this)" data-color="${color}" data-title="${book.title.replace(/"/g,'&quot;')}">`
+      : `<div style="width:100%;height:100%;background:${color};display:flex;align-items:center;justify-content:center"><span style="font-family:var(--ff-body);font-size:8px;color:rgba(255,255,255,.9);text-align:center;padding:4px;line-height:1.3">${book.title.slice(0,24)}</span></div>`;
+    const meta = [book.year, book.pages ? book.pages+'pp' : ''].filter(Boolean).join(' · ');
+    return `<div class="search-book-result" id="sbr-${i}">
+      <div class="search-book-thumb" onclick="expandSearchResult(${i})">${thumbHtml}</div>
+      <div style="flex:1;min-width:0">
+        <div class="search-book-info-title" onclick="expandSearchResult(${i})">${book.title}</div>
+        <div class="search-book-info-author">${book.author}</div>
+        <div class="search-book-info-meta">${meta}</div>
+        <div class="search-book-add-row" id="sbr-add-${i}" style="display:none;margin-top:10px">
+          <div style="display:flex;gap:6px;margin-bottom:8px">
+            <button class="filter-chip active" id="sbr-s-${i}-to-read" onclick="setSBRStatus(${i},'to-read')">TO READ</button>
+            <button class="filter-chip" id="sbr-s-${i}-reading" onclick="setSBRStatus(${i},'reading')">READING</button>
+            <button class="filter-chip" id="sbr-s-${i}-finished" onclick="setSBRStatus(${i},'finished')">FINISHED</button>
           </div>
+          <button class="add-btn-primary" style="padding:10px" onclick="doAddSearchBook(${i})">ADD TO SHELF →</button>
         </div>
-      </div>`;
-    }).join('');
-    // Store results for confirmation
-    window._searchResults = data.items;
-  } catch(e) { el.innerHTML='<div class="searching-hint">Search failed. Check connection.</div>'; }
+      </div>
+    </div>`;
+  }).join('');
 }
 
 function expandSearchResult(i) {
@@ -1879,23 +1934,25 @@ function csStatus(s) {
 }
 
 function doAddSearchBook(i) {
-  const item = window._searchResults?.[i]; if(!item) return;
-  const info = item.volumeInfo;
+  const item = window._searchResults?.[i]; if (!item) return;
+  // Results are now normalised plain objects {title,author,year,pages,thumb,isbn}
   const book = {
-    id: uid(), title: info.title||'Unknown',
-    author: (info.authors||[]).join(', ')||'Unknown',
-    year: info.publishedDate?.slice(0,4)||'',
-    totalPages: info.pageCount||0,
-    categories: info.categories||[],
-    thumbnail: httpsThumb(info.imageLinks?.thumbnail||''),
-    status: (window._sbrStatus?.[i])||window._confirmStatus||'to-read',
+    id: uid(),
+    title:      item.title      || item.volumeInfo?.title       || 'Unknown',
+    author:     item.author     || (item.volumeInfo?.authors||[]).join(', ') || 'Unknown',
+    year:       item.year       || item.volumeInfo?.publishedDate?.slice(0,4) || '',
+    totalPages: item.pages      || item.volumeInfo?.pageCount   || 0,
+    categories: item.categories || item.volumeInfo?.categories  || [],
+    thumbnail:  httpsThumb(item.thumb || item.volumeInfo?.imageLinks?.thumbnail || ''),
+    isbn:       item.isbn       || '',
+    status:     (window._sbrStatus?.[i]) || window._confirmStatus || 'to-read',
     currentPage: 0,
     addedAt: new Date().toISOString()
   };
-  if(book.status==='reading') book.startedReading = new Date().toISOString();
+  if (book.status === 'reading') book.startedReading = new Date().toISOString();
   DATA.books.push(book); DB.save(DATA);
   closeModal();
-  if(window._sbrStatus) delete window._sbrStatus[i];
+  if (window._sbrStatus) delete window._sbrStatus[i];
   showToast(`"${book.title}" added.`);
   goScreen('shelf');
 }
