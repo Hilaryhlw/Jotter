@@ -22,12 +22,12 @@
   --parchment: #f0ebe0;
   --parchment-dark: #e8e2d4;
   --ink: #1a1710;
-  --ink-mid: #4a4640;
+  --ink-mid: #2e2c28;
   --ink-faint: #9a9590;
   --crimson: #8b2020;
   --crimson-pale: #c8524a;
   --cream: #faf7f2;
-  --rule: #d4cfc4;
+  --rule: #c8c2b4;
   --spine-shadow: rgba(26,23,16,0.14);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --ff-display: 'Playfair Display', Georgia, serif;
@@ -45,28 +45,28 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
 .screen.active { opacity: 1; pointer-events: all; }
 
 .nav-bar { position: absolute; bottom: 0; left: 0; right: 0;
-  background: var(--parchment); border-top: 1px solid var(--rule);
+  background: var(--parchment); border-top: 1.5px solid var(--rule);
   display: flex; justify-content: space-around; align-items: flex-start;
   padding: 10px 0 calc(10px + var(--safe-bottom)); z-index: 100; }
 .nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px;
-  font-family: var(--ff-sc); font-size: 9px; letter-spacing: .01em;
+  font-family: var(--ff-sc); font-size: 12px; letter-spacing: .01em;
   color: var(--ink-faint); cursor: pointer; padding: 0 12px;
   transition: color .2s; background: none; border: none;
   -webkit-tap-highlight-color: transparent; }
 .nav-item.active { color: var(--ink); }
 .nav-item.active .nav-dot { background: var(--crimson); }
-.nav-dot { width: 4px; height: 4px; border-radius: 50%; background: transparent; margin-top: 2px; }
+.nav-dot { width: 5px; height: 5px; border-radius: 50%; background: transparent; margin-top: 3px; }
 .nav-icon { font-size: 18px; line-height: 1; }
 
 .folio-header { flex-shrink: 0; padding: 52px 24px 16px;
-  border-bottom: 1px solid var(--rule); position: relative; }
-.folio-label { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em;
+  border-bottom: 1.5px solid var(--rule); position: relative; }
+.folio-label { font-family: var(--ff-sc); font-size: 12px; letter-spacing: .02em;
   color: var(--ink-faint); position: absolute; top: 16px; left: 24px; }
 .folio-title { font-family: var(--ff-display); font-style: italic;
   font-size: 34px; line-height: 1.1; }
 .folio-sub { font-family: var(--ff-body); font-style: italic;
-  font-size: 12px; color: var(--ink-faint); margin-top: 2px; }
-.folio-stats { font-family: var(--ff-sc); font-size: 11px; letter-spacing: .02em;
+  font-size: 14px; color: var(--ink-faint); margin-top: 2px; }
+.folio-stats { font-family: var(--ff-sc); font-size: 13px; letter-spacing: .02em;
   color: var(--ink); margin-top: 8px; }
 .folio-stats span { color: var(--crimson); }
 .folio-btn { position: absolute; top: 14px; right: 24px;
@@ -82,7 +82,7 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
   padding-top: env(safe-area-inset-top, 0px); }
 .welcome-body { flex: 1; display: flex; flex-direction: column;
   justify-content: center; padding: 0 32px; }
-.welcome-eyebrow { font-family: var(--ff-sc); font-size: 10px; letter-spacing: .01em;
+.welcome-eyebrow { font-family: var(--ff-sc); font-size: 13px; letter-spacing: .01em;
   color: var(--ink-faint); margin-bottom: 10px; }
 .welcome-title { font-size: 70px; line-height: .9; color: var(--ink);
   margin-bottom: 14px; letter-spacing: -.01em; }
@@ -91,7 +91,7 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
 .title-otter { font-family: var(--ff-display); font-style: normal; font-weight: 600; }
 .welcome-tag { font-family: var(--ff-display); font-style: italic;
   font-size: 20px; color: var(--ink-mid); line-height: 1.4; margin-bottom: 28px; }
-.welcome-rule { border: none; border-top: 1px solid var(--rule); margin-bottom: 24px; }
+.welcome-rule { border: none; border-top: 1.5px solid var(--rule); margin-bottom: 24px; }
 .welcome-features { list-style: none; margin-bottom: 32px; }
 .welcome-features li { display: grid; grid-template-columns: 36px 1fr;
   padding: 12px 0; border-bottom: 1px dashed var(--rule); }
@@ -103,9 +103,9 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
 .feat-text em { font-family: var(--ff-display); font-style: italic;
   font-size: 13px; color: var(--ink-mid); }
 .welcome-footer { padding: 0 32px calc(32px + var(--safe-bottom));
-  border-top: 1px solid var(--rule); padding-top: 24px; }
+  border-top: 1.5px solid var(--rule); padding-top: 24px; }
 .btn-primary { display: block; width: 100%; background: var(--ink);
-  color: var(--parchment); font-family: var(--ff-sc); font-size: 12px;
+  color: var(--parchment); font-family: var(--ff-sc); font-size: 14px;
   letter-spacing: .02em; border: none; padding: 18px; cursor: pointer;
   text-align: center; transition: background .2s;
   -webkit-tap-highlight-color: transparent; }
@@ -113,7 +113,7 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
 .welcome-import { text-align: center; margin-top: 12px;
   font-family: var(--ff-display); font-style: italic; font-size: 13px; color: var(--ink-mid); }
 .welcome-import a { color: var(--crimson); text-decoration: underline; cursor: pointer; }
-.welcome-colophon { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em;
+.welcome-colophon { font-family: var(--ff-sc); font-size: 12px; letter-spacing: .02em;
   color: var(--ink-faint); text-align: center; margin-top: 16px; }
 
 /* SHELF */
@@ -121,7 +121,7 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
 .shelf-section-header { display: flex; justify-content: space-between;
   align-items: baseline; margin-bottom: 12px; }
 .shelf-section-title { font-family: var(--ff-display); font-style: italic; font-size: 24px; color: var(--ink); }
-.shelf-section-count { font-family: var(--ff-sc); font-size: 10px;
+.shelf-section-count { font-family: var(--ff-sc); font-size: 13px;
   letter-spacing: .01em; color: var(--ink-faint); }
 .spine-row { display: flex; gap: 8px; align-items: flex-end; height: 150px;
   padding-bottom: 8px; overflow-x: auto; scrollbar-width: none; }
@@ -135,17 +135,17 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
 .book-spine img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .book-spine-fallback { width: 100%; height: 100%; display: flex; align-items: center;
   justify-content: center; padding: 6px; }
-.book-spine-title { font-family: var(--ff-body); font-size: 9px;
+.book-spine-title { font-family: var(--ff-body); font-size: 12px;
   color: rgba(255,255,255,.92); text-align: center; line-height: 1.3; word-break: break-word; }
 .spine-shadow-line { position: absolute; left: 0; top: 0; bottom: 0;
   width: 3px; background: rgba(0,0,0,0.22); z-index: 2; }
-.book-progress-bar { margin: 6px 0 2px; height: 2px; background: var(--rule);
+.book-progress-bar { margin: 6px 0 2px; height: 3px; background: var(--rule);
   border-radius: 1px; overflow: hidden; }
 .book-progress-fill { height: 100%; background: var(--crimson); border-radius: 1px; }
-.book-progress-label { font-family: var(--ff-sc); font-size: 8px; letter-spacing: .02em;
+.book-progress-label { font-family: var(--ff-sc); font-size: 11px; letter-spacing: .02em;
   color: var(--ink-faint); display: flex; justify-content: space-between; }
 .book-progress-label em { font-family: var(--ff-body); color: var(--ink-mid);
-  font-size: 9px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 50px; }
+  font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 50px; }
 .book-grid { display: flex; gap: 14px; overflow-x: auto; padding: 4px 0 8px;
   scrollbar-width: none; }
 .book-grid::-webkit-scrollbar { display: none; }
@@ -156,9 +156,9 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
 .book-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .book-cover-fallback { width: 100%; height: 100%; display: flex; align-items: center;
   justify-content: center; padding: 8px; }
-.book-cover-title { font-family: var(--ff-body); font-size: 9px;
+.book-cover-title { font-family: var(--ff-body); font-size: 12px;
   color: rgba(255,255,255,.92); text-align: center; line-height: 1.3; word-break: break-word; }
-.book-card-author { font-family: var(--ff-sc); font-size: 8px; letter-spacing: .02em;
+.book-card-author { font-family: var(--ff-sc); font-size: 11px; letter-spacing: .02em;
   color: var(--ink-faint); margin-top: 6px;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .fab { position: fixed; bottom: calc(72px + var(--safe-bottom)); right: 20px;
@@ -171,30 +171,30 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
 
 /* BOOK DETAIL */
 .book-detail-header { display: flex; gap: 16px; padding: 16px 24px 20px;
-  border-bottom: 1px solid var(--rule); }
+  border-bottom: 1.5px solid var(--rule); }
 .book-detail-cover { flex-shrink: 0; width: 80px; height: 112px;
   border-radius: 3px 5px 5px 3px; box-shadow: 2px 4px 14px var(--spine-shadow);
   overflow: hidden; }
 .book-detail-meta { flex: 1; padding-top: 4px; }
-.book-detail-genre { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em;
+.book-detail-genre { font-family: var(--ff-sc); font-size: 12px; letter-spacing: .02em;
   color: var(--ink-faint); margin-bottom: 4px; }
 .book-detail-title { font-family: var(--ff-display); font-style: italic;
   font-size: 24px; line-height: 1.15; color: var(--ink); margin-bottom: 4px; }
 .book-detail-author { font-family: var(--ff-body); font-size: 13px;
   color: var(--ink-mid); margin-bottom: 8px; }
 .status-pill { display: inline-flex; align-items: center; gap: 4px;
-  font-family: var(--ff-sc); font-size: 9px; letter-spacing: .01em;
+  font-family: var(--ff-sc); font-size: 12px; letter-spacing: .01em;
   padding: 4px 10px; border-radius: 12px; background: var(--crimson);
   color: var(--cream); margin-right: 6px; }
 .pages-pill { display: inline-flex; align-items: center;
-  font-family: var(--ff-sc); font-size: 9px; letter-spacing: .01em;
+  font-family: var(--ff-sc); font-size: 12px; letter-spacing: .01em;
   padding: 4px 10px; border-radius: 12px;
-  border: 1px solid var(--rule); color: var(--ink-mid); }
-.pace-section { padding: 16px 24px; border-bottom: 1px solid var(--rule); }
+  border: 1.5px solid var(--rule); color: var(--ink-mid); }
+.pace-section { padding: 16px 24px; border-bottom: 1.5px solid var(--rule); }
 .pace-label { display: flex; justify-content: space-between; align-items: baseline;
   margin-bottom: 10px; }
 .pace-label-text { font-family: var(--ff-display); font-style: italic; font-size: 18px; }
-.pace-since { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .01em; color: var(--ink-faint); }
+.pace-since { font-family: var(--ff-sc); font-size: 12px; letter-spacing: .01em; color: var(--ink-faint); }
 .pace-ruler { position: relative; height: 28px; margin-bottom: 10px; }
 .pace-track { position: absolute; top: 50%; left: 0; right: 0; height: 1px;
   background: var(--rule); transform: translateY(-50%); }
@@ -202,48 +202,48 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
   background: var(--ink); transform: translateY(-50%); border-radius: 1px; }
 .pace-cursor { position: absolute; top: 50%; transform: translate(-50%,-50%);
   background: var(--crimson); color: var(--cream);
-  font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em;
+  font-family: var(--ff-sc); font-size: 12px; letter-spacing: .02em;
   padding: 3px 7px; border-radius: 3px; white-space: nowrap; }
 .pace-cursor::after { content: ''; position: absolute; bottom: -4px; left: 50%;
   transform: translateX(-50%); border: 4px solid transparent;
   border-top-color: var(--crimson); }
 .pace-endpoints { display: flex; justify-content: space-between;
-  font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em; color: var(--ink-faint); }
+  font-family: var(--ff-sc); font-size: 12px; letter-spacing: .02em; color: var(--ink-faint); }
 .pace-stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-top: 8px; }
 .pace-stat { text-align: center; }
 .pace-stat-val { font-family: var(--ff-display); font-style: italic; font-size: 22px; color: var(--ink); }
-.pace-stat-key { font-family: var(--ff-sc); font-size: 8px; letter-spacing: .02em;
+.pace-stat-key { font-family: var(--ff-sc); font-size: 11px; letter-spacing: .02em;
   color: var(--ink-faint); margin-top: 1px; }
 .marginalia-header { display: flex; justify-content: space-between; align-items: center;
   padding: 16px 24px 8px; }
 .marginalia-title { font-family: var(--ff-display); font-style: italic; font-size: 26px; color: var(--ink); }
-.btn-jot { font-family: var(--ff-sc); font-size: 10px; letter-spacing: .02em;
-  background: none; border: 1px solid var(--rule); color: var(--ink);
+.btn-jot { font-family: var(--ff-sc); font-size: 13px; letter-spacing: .02em;
+  background: none; border: 1.5px solid var(--rule); color: var(--ink);
   padding: 6px 14px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
-.jot-card { padding: 18px 24px; border-bottom: 1px solid var(--rule);
+.jot-card { padding: 18px 24px; border-bottom: 1.5px solid var(--rule);
   -webkit-tap-highlight-color: transparent; }
 .jot-ref { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
 .jot-ref-left { display: flex; align-items: center; gap: 8px; }
-.jot-page { font-family: var(--ff-sc); font-size: 11px; letter-spacing: .02em;
-  color: var(--ink); font-weight: 500; }
-.jot-date { font-family: var(--ff-sc); font-size: 10px; letter-spacing: .02em; color: var(--ink-faint); }
+.jot-page { font-family: var(--ff-sc); font-size: 14px; letter-spacing: .02em;
+  color: var(--ink); font-weight: 600; }
+.jot-date { font-family: var(--ff-sc); font-size: 13px; letter-spacing: .02em; color: var(--ink-faint); }
 .jot-actions { display: flex; gap: 6px; align-items: center; }
-.jot-edit-btn { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em;
+.jot-edit-btn { font-family: var(--ff-sc); font-size: 12px; letter-spacing: .02em;
   padding: 4px 10px; border: 1px solid var(--ink); background: none;
   color: var(--ink); cursor: pointer; border-radius: 2px;
   -webkit-tap-highlight-color: transparent; transition: background .15s; }
 .jot-edit-btn:active { background: var(--ink); color: var(--parchment); }
-.jot-discard-btn { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em;
+.jot-discard-btn { font-family: var(--ff-sc); font-size: 12px; letter-spacing: .02em;
   padding: 4px 10px; border: 1px solid var(--crimson); background: none;
   color: var(--crimson); cursor: pointer; border-radius: 2px;
   -webkit-tap-highlight-color: transparent; transition: background .15s; }
 .jot-discard-btn:active { background: var(--crimson); color: var(--cream); }
-.jot-quote { font-family: var(--ff-display); font-style: italic; font-size: 17px;
-  color: var(--ink); line-height: 1.5; border-left: 3px solid var(--ink);
+.jot-quote { font-family: var(--ff-display); font-style: italic; font-size: 18px;
+  color: var(--ink); line-height: 1.6; border-left: 4px solid var(--ink);
   padding-left: 12px; margin-bottom: 10px; }
 .jot-body { font-family: var(--ff-body); font-size: 15px; color: var(--ink); line-height: 1.65; }
 .jot-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
-.tag-chip { font-family: var(--ff-sc); font-size: 10px; letter-spacing: .02em;
+.tag-chip { font-family: var(--ff-sc); font-size: 13px; letter-spacing: .02em;
   background: var(--parchment-dark); border: 1px solid var(--ink-faint);
   color: var(--ink); padding: 4px 11px; border-radius: 12px; cursor: pointer; }
 .tag-chip.active { background: var(--crimson); border-color: var(--crimson); color: var(--cream); }
@@ -251,28 +251,28 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
 /* JOT EDITOR */
 #screen-jot { background: var(--cream); }
 .jot-header { flex-shrink: 0; display: flex; align-items: center; justify-content: space-between;
-  padding: 52px 20px 14px; border-bottom: 1px solid var(--rule); }
+  padding: 52px 20px 14px; border-bottom: 1.5px solid var(--rule); }
 .jot-close { background: none; border: none; cursor: pointer; color: var(--ink-faint);
   font-size: 22px; padding: 4px; -webkit-tap-highlight-color: transparent; }
 .jot-save { background: none; border: none; cursor: pointer; color: var(--crimson);
-  font-family: var(--ff-sc); font-size: 10px; letter-spacing: .02em;
+  font-family: var(--ff-sc); font-size: 13px; letter-spacing: .02em;
   padding: 4px 8px; -webkit-tap-highlight-color: transparent; }
-.jot-header-title { font-family: var(--ff-sc); font-size: 11px; letter-spacing: .02em; }
+.jot-header-title { font-family: var(--ff-sc); font-size: 13px; letter-spacing: .02em; }
 .jot-book-ref { display: flex; align-items: center; justify-content: space-between;
-  padding: 10px 20px; border-bottom: 1px solid var(--rule);
+  padding: 10px 20px; border-bottom: 1.5px solid var(--rule);
   cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .jot-book-info { display: flex; align-items: center; gap: 10px; }
 .jot-book-thumb { width: 28px; height: 38px; border-radius: 1px 2px 2px 1px;
   box-shadow: 1px 2px 6px var(--spine-shadow); flex-shrink: 0; }
 .jot-book-name { font-family: var(--ff-display); font-style: italic; font-size: 14px; }
-.jot-book-ch { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em; color: var(--ink-faint); }
-.jot-page-badge { font-family: var(--ff-sc); font-size: 10px; letter-spacing: .02em;
+.jot-book-ch { font-family: var(--ff-sc); font-size: 12px; letter-spacing: .02em; color: var(--ink-faint); }
+.jot-page-badge { font-family: var(--ff-sc); font-size: 13px; letter-spacing: .02em;
   background: var(--crimson); color: var(--cream);
   padding: 5px 10px; border-radius: 3px; cursor: pointer;
   border: none; -webkit-tap-highlight-color: transparent; }
 .jot-tabs { display: flex; align-items: center; padding: 0 20px;
-  border-bottom: 1px solid var(--rule); flex-shrink: 0; }
-.jot-tab { font-family: var(--ff-sc); font-size: 10px; letter-spacing: .02em;
+  border-bottom: 1.5px solid var(--rule); flex-shrink: 0; }
+.jot-tab { font-family: var(--ff-sc); font-size: 13px; letter-spacing: .02em;
   color: var(--ink-faint); padding: 10px 12px 8px;
   border-bottom: 2px solid transparent; cursor: pointer;
   background: none; border-top: none; border-left: none; border-right: none;
@@ -294,16 +294,16 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
   font-family: var(--ff-display); font-style: italic; font-size: 15px; margin: 8px 0; }
 .jot-preview-pane strong { font-weight: 700; }
 .jot-preview-pane em { font-style: italic; font-family: var(--ff-display); }
-.jot-preview-pane h3 { font-family: var(--ff-sc); font-size: 12px; letter-spacing: .02em; margin: 12px 0 4px; }
-.jot-threads-section { flex-shrink: 0; padding: 10px 20px; border-top: 1px solid var(--rule); }
-.jot-threads-label { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em;
+.jot-preview-pane h3 { font-family: var(--ff-sc); font-size: 14px; letter-spacing: .02em; margin: 12px 0 4px; }
+.jot-threads-section { flex-shrink: 0; padding: 10px 20px; border-top: 1.5px solid var(--rule); }
+.jot-threads-label { font-family: var(--ff-sc); font-size: 12px; letter-spacing: .02em;
   color: var(--ink-faint); margin-bottom: 8px; }
 .tag-input-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 .tag-input { background: none; border: none; outline: none;
-  font-family: var(--ff-sc); font-size: 10px; letter-spacing: .01em;
+  font-family: var(--ff-sc); font-size: 13px; letter-spacing: .01em;
   color: var(--ink); width: 80px; }
 .jot-toolbar { flex-shrink: 0; display: flex; align-items: center; gap: 2px;
-  padding: 8px 20px calc(8px + var(--safe-bottom)); border-top: 1px solid var(--rule);
+  padding: 8px 20px calc(8px + var(--safe-bottom)); border-top: 1.5px solid var(--rule);
   background: var(--parchment); }
 .toolbar-btn { background: none; border: none; cursor: pointer;
   font-family: var(--ff-body); font-size: 14px; font-weight: 700;
@@ -321,7 +321,7 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
 .capture-close { background: none; border: none; cursor: pointer;
   color: rgba(255,255,255,.7); font-size: 22px; padding: 4px;
   -webkit-tap-highlight-color: transparent; }
-.capture-title { font-family: var(--ff-sc); font-size: 10px; letter-spacing: .01em;
+.capture-title { font-family: var(--ff-sc); font-size: 13px; letter-spacing: .01em;
   color: rgba(255,255,255,.7); }
 .capture-kb { background: none; border: none; cursor: pointer;
   color: rgba(255,255,255,.7); font-size: 20px; padding: 4px;
@@ -341,8 +341,8 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
 @keyframes scan-move { 0%,100% { top: 15%; } 50% { top: 78%; } }
 .scan-ean { position: absolute; bottom: -30px; left: 0; right: 0;
   display: flex; align-items: center; gap: 8px;
-  font-family: monospace; font-size: 11px; color: rgba(255,255,255,.5); }
-.scan-ean-label { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em; }
+  font-family: monospace; font-size: 13px; color: rgba(255,255,255,.5); }
+.scan-ean-label { font-family: var(--ff-sc); font-size: 12px; letter-spacing: .02em; }
 .scan-ean-num { color: var(--crimson-pale); letter-spacing: .02em; }
 .scan-ean-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--crimson); flex-shrink: 0; }
 .isbn-result-sheet { position: absolute; bottom: 0; left: 0; right: 0;
@@ -352,29 +352,29 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
 .isbn-result-sheet.open { transform: translateY(0); }
 .isbn-sheet-handle { width: 36px; height: 4px; background: var(--rule);
   border-radius: 2px; margin: 12px auto 16px; }
-.isbn-found-label { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em;
+.isbn-found-label { font-family: var(--ff-sc); font-size: 12px; letter-spacing: .02em;
   color: var(--ink-faint); padding: 0 20px; margin-bottom: 14px;
   display: flex; align-items: center; gap: 6px; }
 .isbn-found-dot { width: 6px; height: 6px; border-radius: 50%; background: #4a8; flex-shrink: 0; }
 .isbn-book-row { display: flex; gap: 14px; padding: 0 20px 14px;
-  border-bottom: 1px solid var(--rule); }
+  border-bottom: 1.5px solid var(--rule); }
 .isbn-cover { width: 60px; height: 82px; flex-shrink: 0;
   border-radius: 2px 3px 3px 2px; box-shadow: 2px 3px 10px var(--spine-shadow);
   display: flex; align-items: center; justify-content: center; overflow: hidden; }
 .isbn-book-title { font-family: var(--ff-display); font-style: italic;
   font-size: 22px; line-height: 1.2; margin-bottom: 4px; }
 .isbn-book-author { font-family: var(--ff-body); font-size: 13px; color: var(--ink-mid); margin-bottom: 2px; }
-.isbn-book-isbn { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em; color: var(--ink-faint); margin-bottom: 8px; }
+.isbn-book-isbn { font-family: var(--ff-sc); font-size: 12px; letter-spacing: .02em; color: var(--ink-faint); margin-bottom: 8px; }
 .isbn-chips { display: flex; gap: 6px; }
-.isbn-chip { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em;
-  border: 1px solid var(--rule); color: var(--ink-mid); padding: 4px 10px; border-radius: 12px; }
+.isbn-chip { font-family: var(--ff-sc); font-size: 12px; letter-spacing: .02em;
+  border: 1.5px solid var(--rule); color: var(--ink-mid); padding: 4px 10px; border-radius: 12px; }
 .isbn-actions { display: flex; padding: 14px 20px calc(14px + var(--safe-bottom)); gap: 6px; }
 .isbn-btn { flex: 1; padding: 13px 0; text-align: center; cursor: pointer;
-  font-family: var(--ff-sc); font-size: 10px; letter-spacing: .02em;
+  font-family: var(--ff-sc); font-size: 13px; letter-spacing: .02em;
   background: var(--parchment-dark); border: none; color: var(--ink-mid);
   transition: background .15s; -webkit-tap-highlight-color: transparent; }
 .isbn-btn.reading { background: var(--ink); color: var(--parchment); }
-.isbn-type-hint { font-family: var(--ff-display); font-style: italic; font-size: 12px;
+.isbn-type-hint { font-family: var(--ff-display); font-style: italic; font-size: 14px;
   color: rgba(255,255,255,.35); text-align: center;
   position: absolute; bottom: 28px; left: 0; right: 0; }
 .isbn-manual-section { position: absolute; bottom: 0; left: 0; right: 0;
@@ -382,14 +382,14 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
   border-radius: 12px 12px 0 0; z-index: 25;
   transform: translateY(100%); transition: transform .35s ease; }
 .isbn-manual-section.open { transform: translateY(0); }
-.isbn-manual-label { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em;
+.isbn-manual-label { font-family: var(--ff-sc); font-size: 12px; letter-spacing: .02em;
   color: var(--ink-faint); margin-bottom: 10px; }
 .isbn-manual-input { width: 100%; background: none; border: none;
   border-bottom: 1px solid var(--ink); outline: none;
   font-family: var(--ff-body); font-size: 18px; color: var(--ink);
   padding: 8px 0; margin-bottom: 16px; }
 .isbn-manual-go { display: block; width: 100%; background: var(--ink);
-  color: var(--parchment); font-family: var(--ff-sc); font-size: 11px;
+  color: var(--parchment); font-family: var(--ff-sc); font-size: 13px;
   letter-spacing: .02em; border: none; padding: 14px; cursor: pointer;
   -webkit-tap-highlight-color: transparent; }
 
@@ -400,36 +400,36 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
 .threads-canvas-wrap { padding: 16px 24px; }
 .threads-canvas { width: 100%; aspect-ratio: 1; max-height: 260px; position: relative; }
 #threads-svg { width: 100%; height: 100%; }
-.thread-list-item { padding: 18px 24px; border-bottom: 1px solid var(--rule);
+.thread-list-item { padding: 18px 24px; border-bottom: 1.5px solid var(--rule);
   -webkit-tap-highlight-color: transparent; }
 .thread-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
 .thread-item-header-left { display: flex; flex-direction: column; gap: 3px; }
 .thread-item-tag { font-family: var(--ff-sc); font-size: 14px; letter-spacing: .02em; color: var(--crimson); font-weight: 500; }
-.thread-item-count { font-family: var(--ff-sc); font-size: 10px; letter-spacing: .02em; color: var(--ink-faint); }
+.thread-item-count { font-family: var(--ff-sc); font-size: 13px; letter-spacing: .02em; color: var(--ink-faint); }
 .thread-item-actions { display: flex; gap: 6px; }
-.thread-add-btn { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em;
+.thread-add-btn { font-family: var(--ff-sc); font-size: 12px; letter-spacing: .02em;
   padding: 5px 11px; border: 1px solid var(--ink); background: var(--ink);
   color: var(--parchment); cursor: pointer; border-radius: 2px;
   -webkit-tap-highlight-color: transparent; }
-.thread-edit-btn { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em;
+.thread-edit-btn { font-family: var(--ff-sc); font-size: 12px; letter-spacing: .02em;
   padding: 5px 11px; border: 1px solid var(--ink); background: none;
   color: var(--ink); cursor: pointer; border-radius: 2px;
   -webkit-tap-highlight-color: transparent; }
-.thread-discard-btn { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em;
+.thread-discard-btn { font-family: var(--ff-sc); font-size: 12px; letter-spacing: .02em;
   padding: 5px 11px; border: 1px solid var(--crimson); background: none;
   color: var(--crimson); cursor: pointer; border-radius: 2px;
   -webkit-tap-highlight-color: transparent; }
-.thread-item-quote { font-family: var(--ff-display); font-style: italic; font-size: 15px;
+.thread-item-quote { font-family: var(--ff-display); font-style: italic; font-size: 17px;
   color: var(--ink); line-height: 1.5; border-left: 3px solid var(--rule);
   padding-left: 12px; margin-bottom: 6px; }
-.thread-item-source { font-family: var(--ff-sc); font-size: 10px; letter-spacing: .02em; color: var(--ink-faint); }
+.thread-item-source { font-family: var(--ff-sc); font-size: 13px; letter-spacing: .02em; color: var(--ink-faint); }
 
 /* THREAD DETAIL SCREEN */
 #screen-thread-detail { background: var(--parchment); }
 .thread-detail-tag { font-family: var(--ff-sc); font-size: 13px; letter-spacing: .02em;
   color: var(--crimson); margin-top: 4px; }
 .thread-detail-actions { display: flex; gap: 8px; margin-top: 14px; }
-.thread-detail-btn { font-family: var(--ff-sc); font-size: 10px; letter-spacing: .02em;
+.thread-detail-btn { font-family: var(--ff-sc); font-size: 13px; letter-spacing: .02em;
   padding: 8px 16px; border-radius: 2px; cursor: pointer;
   -webkit-tap-highlight-color: transparent; }
 .thread-detail-btn.add { background: var(--ink); color: var(--parchment); border: 1px solid var(--ink); }
@@ -438,51 +438,51 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
 
 /* ALMANAC */
 .almanac-stats-row { display: grid; grid-template-columns: repeat(3,1fr);
-  gap: 1px; background: var(--rule); border-bottom: 1px solid var(--rule); }
+  gap: 1px; background: var(--rule); border-bottom: 1.5px solid var(--rule); }
 .almanac-stat-cell { background: var(--parchment); padding: 18px 16px; }
 .almanac-stat-num { font-family: var(--ff-display); font-style: italic;
   font-size: 32px; line-height: 1; }
-.almanac-stat-label { font-family: var(--ff-sc); font-size: 8px; letter-spacing: .01em;
+.almanac-stat-label { font-family: var(--ff-sc); font-size: 11px; letter-spacing: .01em;
   color: var(--ink-faint); margin-top: 4px; }
-.almanac-section { padding: 20px 24px; border-bottom: 1px solid var(--rule); }
+.almanac-section { padding: 20px 24px; border-bottom: 1.5px solid var(--rule); }
 .almanac-section-header { display: flex; justify-content: space-between;
   align-items: baseline; margin-bottom: 14px; }
 .almanac-section-title { font-family: var(--ff-display); font-style: italic; font-size: 20px; }
-.almanac-section-sub { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .01em; color: var(--ink-faint); }
+.almanac-section-sub { font-family: var(--ff-sc); font-size: 12px; letter-spacing: .01em; color: var(--ink-faint); }
 .bar-chart { display: flex; align-items: flex-end; gap: 3px; height: 80px; }
 .bar-day { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; }
 .bar-fill { width: 100%; background: var(--rule); border-radius: 2px 2px 0 0; min-height: 2px; }
 .bar-fill.today { background: var(--crimson); }
-.bar-label { font-family: var(--ff-sc); font-size: 7px; letter-spacing: .02em; color: var(--ink-faint); }
-.bar-val { font-family: var(--ff-sc); font-size: 7px; letter-spacing: .01em; color: var(--ink-mid); }
+.bar-label { font-family: var(--ff-sc); font-size: 11px; letter-spacing: .02em; color: var(--ink-faint); }
+.bar-val { font-family: var(--ff-sc); font-size: 11px; letter-spacing: .01em; color: var(--ink-mid); }
 .heat-grid { display: grid; grid-template-columns: repeat(12,1fr); gap: 4px; }
-.heat-month-label { font-family: var(--ff-sc); font-size: 7px; letter-spacing: .02em;
+.heat-month-label { font-family: var(--ff-sc); font-size: 11px; letter-spacing: .02em;
   color: var(--ink-faint); text-align: center; margin-bottom: 3px; }
 .heat-cell { aspect-ratio: 1; border-radius: 2px; background: var(--parchment-dark); }
 .heat-cell.h1 { background: #d4a8a8; }
 .heat-cell.h2 { background: #bf7878; }
 .heat-cell.h3 { background: #a85050; }
 .heat-cell.h4 { background: var(--crimson); }
-.almanac-insight { padding: 20px 24px; border-bottom: 1px solid var(--rule); }
+.almanac-insight { padding: 20px 24px; border-bottom: 1.5px solid var(--rule); }
 .almanac-insight-num { font-family: var(--ff-display); font-style: italic;
   font-size: 28px; margin-bottom: 4px; }
 .almanac-insight-text { font-family: var(--ff-body); font-size: 13px;
   color: var(--ink-mid); line-height: 1.55; }
 .almanac-insight-text em { font-style: italic; }
-.io-section { padding: 20px 24px; border-bottom: 1px solid var(--rule); }
+.io-section { padding: 20px 24px; border-bottom: 1.5px solid var(--rule); }
 .io-title { font-family: var(--ff-display); font-style: italic; font-size: 20px; margin-bottom: 14px; }
 .io-btn { display: flex; align-items: center; justify-content: space-between;
-  width: 100%; background: none; border: 1px solid var(--rule);
+  width: 100%; background: none; border: 1.5px solid var(--rule);
   padding: 14px 16px; margin-bottom: 8px; cursor: pointer;
   -webkit-tap-highlight-color: transparent; transition: background .15s; }
 .io-btn:active { background: var(--parchment-dark); }
-.io-btn-label { font-family: var(--ff-sc); font-size: 11px; letter-spacing: .02em; }
-.io-btn-sub { font-family: var(--ff-body); font-style: italic; font-size: 11px; color: var(--ink-faint); margin-top: 1px; }
+.io-btn-label { font-family: var(--ff-sc); font-size: 13px; letter-spacing: .02em; }
+.io-btn-sub { font-family: var(--ff-body); font-style: italic; font-size: 13px; color: var(--ink-faint); margin-top: 1px; }
 .io-btn-icon { font-size: 18px; color: var(--ink-faint); }
 .io-upload-area { border: 1px dashed var(--rule); padding: 20px; text-align: center;
   margin-bottom: 8px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .io-upload-area:active { background: var(--parchment-dark); }
-.io-upload-text { font-family: var(--ff-sc); font-size: 10px; letter-spacing: .02em; color: var(--ink-faint); }
+.io-upload-text { font-family: var(--ff-sc); font-size: 13px; letter-spacing: .02em; color: var(--ink-faint); }
 
 /* EMPTY STATES */
 .empty-state { padding: 48px 32px; text-align: center; }
@@ -506,8 +506,8 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
   font-family: var(--ff-body); font-size: 16px; color: var(--ink);
   padding: 8px 0; margin-bottom: 20px; }
 .modal-btn-row { display: flex; gap: 10px; }
-.modal-btn { flex: 1; padding: 14px; font-family: var(--ff-sc); font-size: 11px;
-  letter-spacing: .02em; border: 1px solid var(--rule); cursor: pointer;
+.modal-btn { flex: 1; padding: 14px; font-family: var(--ff-sc); font-size: 13px;
+  letter-spacing: .02em; border: 1.5px solid var(--rule); cursor: pointer;
   background: none; color: var(--ink); -webkit-tap-highlight-color: transparent; }
 .modal-btn.primary { background: var(--ink); color: var(--parchment); border-color: var(--ink); }
 
@@ -529,7 +529,7 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
   z-index: 150; transform: translateY(-100%); transition: transform .3s ease;
   display: flex; flex-direction: column; }
 .search-overlay.open { transform: translateY(0); }
-.search-header { padding: 52px 20px 14px; border-bottom: 1px solid var(--rule);
+.search-header { padding: 52px 20px 14px; border-bottom: 1.5px solid var(--rule);
   display: flex; gap: 12px; align-items: center; }
 .search-input { flex: 1; background: none; border: none;
   border-bottom: 1px solid var(--ink); outline: none;
@@ -541,7 +541,7 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
 /* TOAST */
 .toast { position: fixed; bottom: calc(90px + var(--safe-bottom)); left: 20px; right: 20px;
   background: var(--ink); color: var(--parchment); font-family: var(--ff-sc);
-  font-size: 10px; letter-spacing: .02em; padding: 14px 18px; z-index: 300;
+  font-size: 13px; letter-spacing: .02em; padding: 14px 18px; z-index: 300;
   opacity: 0; transition: opacity .2s; pointer-events: none; }
 .toast.show { opacity: 1; }
 
@@ -555,23 +555,23 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
 #screen-add { background: var(--parchment); }
 .add-book-header { flex-shrink: 0; display: flex; align-items: center;
   justify-content: space-between; padding: 52px 20px 14px;
-  border-bottom: 1px solid var(--rule); }
+  border-bottom: 1.5px solid var(--rule); }
 .add-book-close { background: none; border: none; cursor: pointer;
   color: var(--ink-faint); font-size: 22px; padding: 4px;
   -webkit-tap-highlight-color: transparent; }
-.add-book-title { font-family: var(--ff-sc); font-size: 11px; letter-spacing: .02em; }
-.add-tabs { display: flex; border-bottom: 1px solid var(--rule); flex-shrink: 0; }
-.add-tab { flex: 1; font-family: var(--ff-sc); font-size: 10px; letter-spacing: .02em;
+.add-book-title { font-family: var(--ff-sc); font-size: 13px; letter-spacing: .02em; }
+.add-tabs { display: flex; border-bottom: 1.5px solid var(--rule); flex-shrink: 0; }
+.add-tab { flex: 1; font-family: var(--ff-sc); font-size: 13px; letter-spacing: .02em;
   color: var(--ink-faint); padding: 12px 0; text-align: center;
   border-bottom: 2px solid transparent; cursor: pointer;
   background: none; border-top: none; border-left: none; border-right: none;
   -webkit-tap-highlight-color: transparent; transition: color .15s; }
 .add-tab.active { color: var(--ink); border-bottom-color: var(--ink); }
 .add-pane { flex: 1; overflow-y: auto; padding: 20px 24px calc(20px + var(--safe-bottom)); }
-.add-field-label { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em;
+.add-field-label { font-family: var(--ff-sc); font-size: 12px; letter-spacing: .02em;
   color: var(--ink-faint); margin-bottom: 6px; }
 .add-field { width: 100%; background: none; border: none;
-  border-bottom: 1px solid var(--rule); outline: none;
+  border-bottom: 1.5px solid var(--rule); outline: none;
   font-family: var(--ff-body); font-size: 16px; color: var(--ink);
   padding: 8px 0; margin-bottom: 20px; }
 .add-field:focus { border-bottom-color: var(--ink); }
@@ -583,11 +583,11 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
   padding: 12px 44px 12px 16px; border-radius: 4px; }
 .add-search-go { position: absolute; right: 0; top: 0; bottom: 0;
   background: var(--ink); color: var(--parchment); border: none; cursor: pointer;
-  font-family: var(--ff-sc); font-size: 10px; letter-spacing: .02em;
+  font-family: var(--ff-sc); font-size: 13px; letter-spacing: .02em;
   padding: 0 14px; border-radius: 0 4px 4px 0;
   -webkit-tap-highlight-color: transparent; }
 .search-book-result { display: flex; gap: 12px; padding: 12px 0;
-  border-bottom: 1px solid var(--rule); cursor: pointer;
+  border-bottom: 1.5px solid var(--rule); cursor: pointer;
   -webkit-tap-highlight-color: transparent; }
 .search-book-result:active { background: var(--parchment-dark); margin: 0 -24px; padding: 12px 24px; }
 .search-book-thumb { flex-shrink: 0; width: 44px; height: 60px;
@@ -595,11 +595,11 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
   display: flex; align-items: center; justify-content: center; overflow: hidden; }
 .search-book-info-title { font-family: var(--ff-display); font-style: italic;
   font-size: 15px; color: var(--ink); margin-bottom: 3px; line-height: 1.3; }
-.search-book-info-author { font-family: var(--ff-body); font-size: 12px; color: var(--ink-mid); }
-.search-book-info-meta { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em;
+.search-book-info-author { font-family: var(--ff-body); font-size: 14px; color: var(--ink-mid); }
+.search-book-info-meta { font-family: var(--ff-sc); font-size: 12px; letter-spacing: .02em;
   color: var(--ink-faint); margin-top: 3px; }
 .add-btn-primary { display: block; width: 100%; background: var(--ink);
-  color: var(--parchment); font-family: var(--ff-sc); font-size: 11px;
+  color: var(--parchment); font-family: var(--ff-sc); font-size: 13px;
   letter-spacing: .02em; border: none; padding: 16px; cursor: pointer;
   margin-top: 8px; -webkit-tap-highlight-color: transparent; }
 .search-results-list { margin-top: 4px; }
@@ -609,12 +609,12 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
 
 /* QUICK-JOT CHIPS */
 .quick-chips { flex-shrink: 0; display: flex; gap: 8px; overflow-x: auto;
-  padding: 8px 20px; border-bottom: 1px solid var(--rule);
+  padding: 8px 20px; border-bottom: 1.5px solid var(--rule);
   scrollbar-width: none; }
 .quick-chips::-webkit-scrollbar { display: none; }
-.quick-chip { flex-shrink: 0; font-family: var(--ff-sc); font-size: 9px;
+.quick-chip { flex-shrink: 0; font-family: var(--ff-sc); font-size: 12px;
   letter-spacing: .02em; padding: 6px 12px; border-radius: 14px;
-  border: 1px solid var(--rule); background: none; color: var(--ink-mid);
+  border: 1.5px solid var(--rule); background: none; color: var(--ink-mid);
   cursor: pointer; white-space: nowrap; -webkit-tap-highlight-color: transparent;
   transition: background .15s, color .15s; }
 .quick-chip:active { background: var(--parchment-dark); }
@@ -625,7 +625,7 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
 .search-screen-title { font-family: var(--ff-display); font-style: italic;
   font-size: 34px; margin-bottom: 14px; }
 .search-bar-wrap { display: flex; gap: 10px; align-items: center;
-  border-bottom: 1px solid var(--rule); padding-bottom: 14px; }
+  border-bottom: 1.5px solid var(--rule); padding-bottom: 14px; }
 .search-bar { flex: 1; background: none; border: none; outline: none;
   font-family: var(--ff-body); font-size: 16px; color: var(--ink); padding: 4px 0; }
 .search-bar::placeholder { color: var(--ink-faint); }
@@ -633,12 +633,12 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
   font-size: 18px; cursor: pointer; padding: 4px;
   -webkit-tap-highlight-color: transparent; }
 .search-filter-row { display: flex; gap: 8px; padding: 12px 20px;
-  border-bottom: 1px solid var(--rule); overflow-x: auto;
+  border-bottom: 1.5px solid var(--rule); overflow-x: auto;
   scrollbar-width: none; flex-shrink: 0; }
 .search-filter-row::-webkit-scrollbar { display: none; }
-.filter-chip { flex-shrink: 0; font-family: var(--ff-sc); font-size: 9px;
+.filter-chip { flex-shrink: 0; font-family: var(--ff-sc); font-size: 12px;
   letter-spacing: .02em; padding: 5px 12px; border-radius: 14px;
-  border: 1px solid var(--rule); background: none; color: var(--ink-mid);
+  border: 1.5px solid var(--rule); background: none; color: var(--ink-mid);
   cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .filter-chip.active { background: var(--ink); color: var(--parchment); border-color: var(--ink); }
 .search-screen-results { flex: 1; overflow-y: auto;
@@ -648,7 +648,7 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
   font-size: 20px; color: var(--ink-mid); margin-bottom: 8px; }
 .search-empty-sub { font-family: var(--ff-body); font-size: 13px;
   color: var(--ink-faint); font-style: italic; }
-.search-result-book-header { font-family: var(--ff-sc); font-size: 9px;
+.search-result-book-header { font-family: var(--ff-sc); font-size: 12px;
   letter-spacing: .02em; color: var(--ink-faint); padding: 12px 24px 4px;
   background: var(--parchment-dark); }
 
@@ -1733,104 +1733,208 @@ async function searchBooks() {
   const q = document.getElementById('add-search-field').value.trim();
   if(!q) return;
   const el = document.getElementById('book-search-results');
-  el.innerHTML = '<div class="searching-hint">Searching Google Books &amp; Open Library…</div>';
+  el.innerHTML = '<div class="searching-hint">Searching…</div>';
+
+  const enc = encodeURIComponent(q);
+  const isCJK = /[\u3400-\u9fff\uf900-\ufaff]/.test(q);
+
+  // ── helper: normalise any book object into our internal format ──
+  function norm(title, author, year, pages, thumb, isbn, categories) {
+    return {
+      id: uid(),
+      title: title || 'Unknown',
+      author: author || '',
+      year: year || '',
+      totalPages: pages || 0,
+      thumbnail: (thumb || '').replace('http://', 'https://').replace('zoom=1','zoom=3'),
+      isbn: isbn || '',
+      categories: categories || [],
+      status: 'to-read', currentPage: 0,
+      addedAt: new Date().toISOString()
+    };
+  }
+
+  // ── allorigins proxy — wraps any URL, adds CORS headers ──
+  function proxy(url) {
+    return `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+  }
+
+  let results = [];
+
+  // ── Source A: Google Books (direct, works from browser) ─────────
   try {
-    // Query both sources in parallel for maximum coverage (TW, CN, EN, JP)
-    const [gbRes, olRes] = await Promise.allSettled([
-      fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&maxResults=8`),
-      fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(q)}&fields=title,author_name,number_of_pages_median,cover_i,first_publish_year,isbn&limit=5`)
-    ]);
-
-    let allItems = [];
-
-    // Google Books results
-    if(gbRes.status==='fulfilled') {
-      const data = await gbRes.value.json();
-      (data.items||[]).forEach(item => {
-        const info = item.volumeInfo;
-        allItems.push({
-          title: info.title||'Unknown',
-          author: (info.authors||[]).join(', ')||'',
-          year: info.publishedDate?.slice(0,4)||'',
-          pages: info.pageCount||0,
-          thumb: (info.imageLinks?.thumbnail||info.imageLinks?.smallThumbnail||'')
-                   .replace('http:','https:').replace('zoom=1','zoom=3'),
-          categories: info.categories||[],
-          isbn: (info.industryIdentifiers||[]).find(x=>x.type==='ISBN_13')?.identifier||
-                (info.industryIdentifiers||[]).find(x=>x.type==='ISBN_10')?.identifier||'',
-          src: 'gb', _raw: item
-        });
-      });
-    }
-
-    // Open Library results — deduplicate by title
-    if(olRes.status==='fulfilled') {
-      const data = await olRes.value.json();
-      (data.docs||[]).forEach(d => {
-        const title = d.title||'Unknown';
-        // Skip if already in list from Google Books
-        const dup = allItems.some(x => x.title.toLowerCase()===title.toLowerCase());
-        if(!dup) {
-          const coverId = d.cover_i;
-          allItems.push({
-            title,
-            author: (d.author_name||[]).join(', ')||'',
-            year: d.first_publish_year ? String(d.first_publish_year) : '',
-            pages: d.number_of_pages_median||0,
-            thumb: coverId ? `https://covers.openlibrary.org/b/id/${coverId}-M.jpg` : '',
-            categories: [],
-            isbn: (d.isbn||[])[0]||'',
-            src: 'ol', _raw: d
-          });
-        }
-      });
-    }
-
-    if(!allItems.length){ el.innerHTML='<div class="searching-hint">No results found. Try different words.</div>'; return; }
-
-    // Store for use by doAddSearchBook
-    window._searchResults = allItems.map(item => {
-      if(item.src==='gb') return item._raw; // keep GB format
-      // Wrap OL into GB-compatible format
-      return { volumeInfo: {
-        title: item.title,
-        authors: item.author ? [item.author] : [],
-        publishedDate: item.year,
-        pageCount: item.pages,
-        imageLinks: item.thumb ? { thumbnail: item.thumb } : undefined,
-        industryIdentifiers: item.isbn ? [{type:'ISBN_13',identifier:item.isbn}] : [],
-        categories: item.categories
-      }, _olThumb: item.thumb };
-    });
-
-    const data = { items: window._searchResults };
-    if(!data.items?.length){ el.innerHTML='<div class="searching-hint">No results found.</div>'; return; }
-    el.innerHTML = data.items.map((item,i)=>{
+    // Use broader maxResults and no langRestrict so CJK titles appear
+    const url = `https://www.googleapis.com/books/v1/volumes?q=${enc}&maxResults=10&printType=books`;
+    const r = await fetch(url);
+    const d = await r.json();
+    (d.items || []).forEach(item => {
       const info = item.volumeInfo;
-      const title = info.title||'Unknown';
-      const author = (info.authors||[]).join(', ')||'Unknown';
-      const pages = info.pageCount ? info.pageCount+'pp' : '';
-      const year = info.publishedDate?.slice(0,4)||'';
-      // Support both Google Books and Open Library cover images
-      const rawThumb = item._olThumb || info.imageLinks?.thumbnail || info.imageLinks?.smallThumbnail || '';
-      const safeThumb = rawThumb ? rawThumb.replace('http://','https://').replace('zoom=1','zoom=3') : '';
-      const color = spineColor(title);
-      const thumbHtml = safeThumb
-        ? `<img src="${safeThumb}" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy" onerror="this.parentNode.style.background='${color}';this.remove()">`
-        : `<div style="width:100%;height:100%;background:${color};display:flex;align-items:center;justify-content:center;padding:4px"><span style="font-family:var(--ff-body);font-size:9px;color:rgba(255,255,255,.9);text-align:center;line-height:1.3">${title.slice(0,24)}</span></div>`;
-      return `<div class="search-book-result" onclick="confirmAddSearchBook(${i})">
-        <div class="search-book-thumb">${thumbHtml}</div>
-        <div>
-          <div class="search-book-info-title">${title}</div>
-          <div class="search-book-info-author">${author}</div>
-          <div class="search-book-info-meta">${[year,pages].filter(Boolean).join(' · ')}</div>
+      const ids = info.industryIdentifiers || [];
+      const isbn = ids.find(x => x.type === 'ISBN_13')?.identifier ||
+                   ids.find(x => x.type === 'ISBN_10')?.identifier || '';
+      results.push(norm(
+        info.title,
+        (info.authors || []).join(', '),
+        info.publishedDate?.slice(0,4),
+        info.pageCount,
+        info.imageLinks?.thumbnail || info.imageLinks?.smallThumbnail,
+        isbn,
+        info.categories
+      ));
+    });
+  } catch(e) {}
+
+  // ── Source B: Open Library search (direct, has CORS *) ──────────
+  try {
+    const url = `https://openlibrary.org/search.json?q=${enc}&fields=title,author_name,number_of_pages_median,cover_i,first_publish_year,isbn&limit=6`;
+    const r = await fetch(url);
+    const d = await r.json();
+    (d.docs || []).forEach(doc => {
+      const title = doc.title || '';
+      if (!title) return;
+      // skip if GB already returned same title
+      if (results.some(x => x.title.toLowerCase() === title.toLowerCase())) return;
+      const coverId = doc.cover_i;
+      results.push(norm(
+        title,
+        (doc.author_name || []).join(', '),
+        doc.first_publish_year ? String(doc.first_publish_year) : '',
+        doc.number_of_pages_median,
+        coverId ? `https://covers.openlibrary.org/b/id/${coverId}-M.jpg` : '',
+        (doc.isbn || [])[0] || '',
+        []
+      ));
+    });
+  } catch(e) {}
+
+  // ── Source C: 博客來 via allorigins proxy (TW/CJK books) ─────────
+  if (isCJK || results.length < 3) {
+    try {
+      const bkUrl = `https://search.books.com.tw/search/query/key/${enc}/cat/BKA/`;
+      const r = await fetch(proxy(bkUrl));
+      const d = await r.json();
+      const html = d.contents || '';
+      // Parse the HTML response — 博客來 returns product cards
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      const cards = doc.querySelectorAll('.item');
+      cards.forEach(card => {
+        const titleEl = card.querySelector('.title a, h4 a, .books_title a');
+        const authorEl = card.querySelector('.author a');
+        const imgEl = card.querySelector('img');
+        const title = titleEl?.textContent?.trim() || '';
+        if (!title) return;
+        if (results.some(x => x.title === title)) return;
+        const author = authorEl?.textContent?.trim() || '';
+        // Extract ISBN from the link URL e.g. /products/0010948547.htm
+        const href = titleEl?.getAttribute('href') || '';
+        const isbnMatch = href.match(/\/(\d{10,13})\./);
+        const isbn = isbnMatch ? isbnMatch[1] : '';
+        let thumb = imgEl?.getAttribute('data-original') || imgEl?.getAttribute('src') || '';
+        thumb = thumb.replace('http://','https://');
+        results.push(norm(title, author, '', 0, thumb, isbn, []));
+      });
+    } catch(e) {}
+  }
+
+  // ── Source D: 博客來 ISBN direct lookup via proxy ─────────────────
+  // (when query looks like an ISBN number)
+  const looksLikeISBN = /^\d{10,13}$/.test(q.replace(/-/g,''));
+  if (looksLikeISBN && results.length === 0) {
+    try {
+      const cleanISBN = q.replace(/-/g,'');
+      const bkUrl = `https://www.books.com.tw/products/${cleanISBN}`;
+      const r = await fetch(proxy(bkUrl));
+      const d = await r.json();
+      const html = d.contents || '';
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      const title = doc.querySelector('h1.mod_b')?.textContent?.trim() ||
+                    doc.querySelector('.main_title')?.textContent?.trim() || '';
+      if (title) {
+        const author = doc.querySelector('.author a')?.textContent?.trim() || '';
+        const thumb = doc.querySelector('.cover-img img')?.getAttribute('src') ||
+                      doc.querySelector('#M201105_1 img')?.getAttribute('src') || '';
+        results.push(norm(title, author, '', 0, thumb, cleanISBN, []));
+      }
+    } catch(e) {}
+  }
+
+  if (!results.length) {
+    el.innerHTML = '<div class="searching-hint">No results found. Try title or author in Chinese or English.</div>';
+    return;
+  }
+
+  // Remove duplicates by title similarity
+  const seen = new Set();
+  results = results.filter(b => {
+    const key = b.title.toLowerCase().replace(/\s+/g,'').slice(0,10);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+
+  window._searchResults = results;
+
+  el.innerHTML = results.map((book, i) => {
+    const color = spineColor(book.title);
+    const thumbHtml = book.thumbnail
+      ? `<img src="${book.thumbnail}" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy" onerror="this.parentNode.style.background='${color}';this.remove()">`
+      : `<div style="width:100%;height:100%;background:${color};display:flex;align-items:center;justify-content:center;padding:4px"><span style="font-family:var(--ff-body);font-size:10px;color:rgba(255,255,255,.9);text-align:center;line-height:1.3">${book.title.slice(0,20)}</span></div>`;
+    const meta = [book.year, book.totalPages ? book.totalPages+'pp' : ''].filter(Boolean).join(' · ');
+    return `<div class="search-book-result" id="sbr-${i}">
+      <div class="search-book-thumb" onclick="expandSearchResult(${i})">${thumbHtml}</div>
+      <div style="flex:1;min-width:0">
+        <div class="search-book-info-title" onclick="expandSearchResult(${i})">${book.title}</div>
+        <div class="search-book-info-author">${book.author}</div>
+        ${meta ? `<div class="search-book-info-meta">${meta}</div>` : ''}
+        <div class="search-book-add-row" id="sbr-add-${i}" style="display:none;margin-top:10px">
+          <div style="display:flex;gap:6px;margin-bottom:8px">
+            <button class="filter-chip active" id="sbr-s-${i}-to-read" onclick="setSBRStatus(${i},'to-read')">TO READ</button>
+            <button class="filter-chip" id="sbr-s-${i}-reading" onclick="setSBRStatus(${i},'reading')">READING</button>
+            <button class="filter-chip" id="sbr-s-${i}-finished" onclick="setSBRStatus(${i},'finished')">FINISHED</button>
+          </div>
+          <button class="add-btn-primary" style="padding:10px" onclick="doAddSearchBookDirect(${i})">ADD TO SHELF →</button>
         </div>
-      </div>`;
-    }).join('');
-    // Store results for confirmation
-    window._searchResults = data.items;
-  } catch(e) { el.innerHTML='<div class="searching-hint">Search failed. Check connection.</div>'; }
+      </div>
+    </div>`;
+  }).join('');
 }
+
+
+function doAddSearchBookDirect(i) {
+  const book = window._searchResults?.[i];
+  if (!book) return;
+  const status = (window._sbrStatus?.[i]) || 'to-read';
+  const b = Object.assign({}, book, {
+    id: uid(),
+    status,
+    addedAt: new Date().toISOString()
+  });
+  if (b.status === 'reading') b.startedReading = new Date().toISOString();
+  DATA.books.push(b);
+  DB.save(DATA);
+  if (window._sbrStatus) delete window._sbrStatus[i];
+  showToast(`"${b.title}" added.`);
+  goScreen('shelf');
+}
+
+function expandSearchResult(i) {
+  document.querySelectorAll('.search-book-add-row').forEach((el, idx) => {
+    el.style.display = (idx === i) ? (el.style.display === 'none' ? '' : 'none') : 'none';
+  });
+  if (!window._sbrStatus) window._sbrStatus = {};
+  window._sbrStatus[i] = window._sbrStatus[i] || 'to-read';
+}
+
+function setSBRStatus(i, s) {
+  if (!window._sbrStatus) window._sbrStatus = {};
+  window._sbrStatus[i] = s;
+  ['to-read','reading','finished'].forEach(x =>
+    document.getElementById(`sbr-s-${i}-${x}`)?.classList.toggle('active', x === s)
+  );
+}
+
 
 function confirmAddSearchBook(i) {
   const item = window._searchResults?.[i]; if(!item) return;
@@ -1919,157 +2023,201 @@ function makeBookFromGB(info, isbn) {
 
 async function lookupISBNField() {
   const raw = document.getElementById('isbn-field').value.trim();
-  const v = raw.replace(/[-\s]/g,'');
-  if(v.length < 10){ showToast('Enter a valid ISBN-10 or ISBN-13.'); return; }
+  const v = raw.replace(/[-\s]/g, '');
+  if (v.length < 10) { showToast('Enter a valid ISBN-10 or ISBN-13.'); return; }
+
   const el = document.getElementById('isbn-field-result');
+  const isTW = v.startsWith('978626') || v.startsWith('9786');
+  const isCN = v.startsWith('9787');
 
-  // Progress indicator with source names
-  const sources = ['Google Books','Open Library','Open Library Search','WorldCat','Regional search'];
-  let sourceIdx = 0;
-  const tick = setInterval(()=>{
-    sourceIdx = (sourceIdx+1) % sources.length;
-    el.innerHTML = `<div style="font-family:var(--ff-display);font-style:italic;font-size:14px;color:var(--ink-faint)">
-      Checking ${sources[sourceIdx]}…</div>`;
-  }, 900);
+  const steps = [
+    isTW || isCN ? '博客來 (Taiwan)' : 'Google Books',
+    'Open Library',
+    'Open Library Search',
+    isTW ? 'Regional (zh-TW)' : 'Google Books (extended)',
+    '博客來 direct',
+    'WorldCat'
+  ];
+  let stepIdx = 0;
+  const tick = setInterval(() => {
+    el.innerHTML = `<div style="font-family:var(--ff-display);font-style:italic;font-size:15px;color:var(--ink-faint)">
+      Checking <strong style="color:var(--ink)">${steps[stepIdx % steps.length]}</strong>…</div>`;
+    stepIdx++;
+  }, 800);
 
-  el.innerHTML = `<div style="font-family:var(--ff-display);font-style:italic;font-size:14px;color:var(--ink-faint)">Checking Google Books…</div>`;
+  el.innerHTML = `<div style="font-family:var(--ff-display);font-style:italic;font-size:15px;color:var(--ink-faint)">Looking up ISBN ${v}…</div>`;
+
+  function fix(url) { return (url||'').replace('http://','https://').replace('zoom=1','zoom=3').replace('&edge=curl',''); }
+  function proxy(url) { return `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`; }
 
   let book = null;
   let source = '';
 
-  // ── Source 1: Google Books isbn: query ──────────────────────────
+  // ── 1. 博客來 via proxy (best for TW/CN ISBNs) ──────────────────
   try {
-    const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${v}&maxResults=1`);
-    const data = await res.json();
-    if(data.items?.length) {
-      book = makeBookFromGB(data.items[0].volumeInfo, v);
-      source = 'Google Books';
+    const bkUrl = `https://www.books.com.tw/products/${v}`;
+    const r = await fetch(proxy(bkUrl));
+    const d = await r.json();
+    const html = d.contents || '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    // 博客來 product page selectors
+    const title = doc.querySelector('h1.mod_b')?.textContent?.trim() ||
+                  doc.querySelector('.main_title h1')?.textContent?.trim() ||
+                  doc.querySelector('h1')?.textContent?.trim() || '';
+    if (title && title.length > 1) {
+      const author = [...doc.querySelectorAll('.mod_b .au a, .author a')].map(a=>a.textContent.trim()).join(', ') || '';
+      const publisher = doc.querySelector('.publisher a')?.textContent?.trim() || '';
+      const pages = parseInt(doc.querySelector('.page')?.textContent?.replace(/\D/g,'')) || 0;
+      const pubDate = doc.querySelector('.date')?.textContent?.match(/\d{4}/)?.[0] || '';
+      const thumb = fix(
+        doc.querySelector('img#M201105_1')?.getAttribute('src') ||
+        doc.querySelector('.cover-img img')?.getAttribute('src') ||
+        doc.querySelector('.prod-cover img')?.getAttribute('src') || ''
+      );
+      book = { id:uid(), isbn:v, title, author, year:pubDate, totalPages:pages,
+               thumbnail:thumb, categories:publisher?[publisher]:[], status:'to-read',
+               currentPage:0, addedAt:new Date().toISOString() };
+      source = '博客來';
     }
-  } catch(e){}
+  } catch(e) {}
 
-  // ── Source 2: Open Library books API ───────────────────────────
-  if(!book) {
+  // ── 2. Google Books isbn: query ────────────────────────────────
+  if (!book) {
     try {
-      const res = await fetch(`https://openlibrary.org/api/books?bibkeys=ISBN:${v}&format=json&jscmd=data`);
-      const data = await res.json();
-      const d = data[`ISBN:${v}`];
-      if(d) {
-        book = {
-          id:uid(), isbn:v,
-          title: d.title||'Unknown',
-          author: (d.authors||[]).map(a=>a.name).join(', ')||'Unknown',
-          year: d.publish_date ? d.publish_date.match(/\d{4}/)?.[0]||'' : '',
-          totalPages: d.number_of_pages||0,
-          categories: d.subjects ? [d.subjects[0]?.name||''] : [],
-          thumbnail: isbnThumb(d.cover?.large||d.cover?.medium||d.cover?.small||''),
-          status:'to-read', currentPage:0, addedAt:new Date().toISOString()
-        };
+      const r = await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${v}&maxResults=1`);
+      const d = await r.json();
+      if (d.items?.length) {
+        const info = d.items[0].volumeInfo;
+        book = { id:uid(), isbn:v, title:info.title||'Unknown',
+          author:(info.authors||[]).join(', ')||'Unknown',
+          year:info.publishedDate?.slice(0,4)||'',
+          totalPages:info.pageCount||0, categories:info.categories||[],
+          thumbnail:fix(info.imageLinks?.thumbnail||info.imageLinks?.smallThumbnail||''),
+          status:'to-read', currentPage:0, addedAt:new Date().toISOString() };
+        source = 'Google Books';
+      }
+    } catch(e) {}
+  }
+
+  // ── 3. Open Library books API ──────────────────────────────────
+  if (!book) {
+    try {
+      const r = await fetch(`https://openlibrary.org/api/books?bibkeys=ISBN:${v}&format=json&jscmd=data`);
+      const d = await r.json();
+      const entry = d[`ISBN:${v}`];
+      if (entry) {
+        book = { id:uid(), isbn:v, title:entry.title||'Unknown',
+          author:(entry.authors||[]).map(a=>a.name).join(', ')||'Unknown',
+          year:entry.publish_date?.match(/\d{4}/)?.[0]||'',
+          totalPages:entry.number_of_pages||0,
+          categories:entry.subjects?[entry.subjects[0]?.name||'']:[],
+          thumbnail:fix(entry.cover?.large||entry.cover?.medium||entry.cover?.small||''),
+          status:'to-read', currentPage:0, addedAt:new Date().toISOString() };
         source = 'Open Library';
       }
-    } catch(e){}
+    } catch(e) {}
   }
 
-  // ── Source 3: Open Library search endpoint (broader coverage) ──
-  if(!book) {
+  // ── 4. Open Library search endpoint ───────────────────────────
+  if (!book) {
     try {
-      const res = await fetch(`https://openlibrary.org/search.json?isbn=${v}&fields=title,author_name,number_of_pages_median,cover_i,first_publish_year,subject`);
-      const data = await res.json();
-      if(data.docs?.length) {
-        const d = data.docs[0];
-        const coverId = d.cover_i;
-        const thumb = coverId ? `https://covers.openlibrary.org/b/id/${coverId}-M.jpg` : '';
-        book = {
-          id:uid(), isbn:v,
-          title: d.title||'Unknown',
-          author: (d.author_name||[]).join(', ')||'Unknown',
-          year: d.first_publish_year ? String(d.first_publish_year) : '',
-          totalPages: d.number_of_pages_median||0,
-          categories: d.subject ? [d.subject[0]] : [],
-          thumbnail: thumb,
-          status:'to-read', currentPage:0, addedAt:new Date().toISOString()
-        };
+      const r = await fetch(`https://openlibrary.org/search.json?isbn=${v}&fields=title,author_name,number_of_pages_median,cover_i,first_publish_year,subject`);
+      const d = await r.json();
+      if (d.docs?.length) {
+        const doc = d.docs[0];
+        const covId = doc.cover_i;
+        book = { id:uid(), isbn:v, title:doc.title||'Unknown',
+          author:(doc.author_name||[]).join(', ')||'Unknown',
+          year:doc.first_publish_year?String(doc.first_publish_year):'',
+          totalPages:doc.number_of_pages_median||0,
+          categories:doc.subject?[doc.subject[0]]:[],
+          thumbnail:covId?`https://covers.openlibrary.org/b/id/${covId}-L.jpg`:'',
+          status:'to-read', currentPage:0, addedAt:new Date().toISOString() };
         source = 'Open Library';
       }
-    } catch(e){}
+    } catch(e) {}
   }
 
-  // ── Source 4: Google Books plain query (TW books indexed differently) ──
-  if(!book) {
+  // ── 5. Google Books plain query (TW books indexed differently) ──
+  if (!book) {
     try {
-      const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${v}&maxResults=3`);
-      const data = await res.json();
-      if(data.items?.length) {
-        // Accept if any result has a matching ISBN
-        const match = data.items.find(item => {
-          const ids = item.volumeInfo.industryIdentifiers||[];
-          return ids.some(x => x.identifier?.replace(/-/g,'') === v);
-        });
-        if(match) {
-          book = makeBookFromGB(match.volumeInfo, v);
-          source = 'Google Books';
+      const r = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${v}&maxResults=5`);
+      const d = await r.json();
+      const match = (d.items||[]).find(item =>
+        (item.volumeInfo.industryIdentifiers||[]).some(x => x.identifier?.replace(/-/g,'') === v)
+      );
+      if (match) {
+        const info = match.volumeInfo;
+        book = { id:uid(), isbn:v, title:info.title||'Unknown',
+          author:(info.authors||[]).join(', ')||'Unknown',
+          year:info.publishedDate?.slice(0,4)||'',
+          totalPages:info.pageCount||0, categories:info.categories||[],
+          thumbnail:fix(info.imageLinks?.thumbnail||info.imageLinks?.smallThumbnail||''),
+          status:'to-read', currentPage:0, addedAt:new Date().toISOString() };
+        source = 'Google Books';
+      }
+    } catch(e) {}
+  }
+
+  // ── 6. 博客來 search by ISBN as keyword ─────────────────────────
+  if (!book) {
+    try {
+      const bkSearchUrl = `https://search.books.com.tw/search/query/key/${v}/cat/BKA/`;
+      const r = await fetch(proxy(bkSearchUrl));
+      const d = await r.json();
+      const html = d.contents || '';
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      const first = doc.querySelector('.item');
+      if (first) {
+        const title = first.querySelector('.title a, h4 a')?.textContent?.trim() || '';
+        const author = first.querySelector('.author a')?.textContent?.trim() || '';
+        const thumb = fix(first.querySelector('img')?.getAttribute('data-original') || first.querySelector('img')?.getAttribute('src') || '');
+        if (title) {
+          book = { id:uid(), isbn:v, title, author, year:'', totalPages:0,
+                   thumbnail:thumb, categories:[], status:'to-read',
+                   currentPage:0, addedAt:new Date().toISOString() };
+          source = '博客來';
         }
       }
-    } catch(e){}
-  }
-
-  // ── Source 5: Regional fallback — Google Books intitle search ──
-  // For TW (978-626) and CN (978-7) books not indexed by ISBN,
-  // try fetching the WorldCat permalink which embeds metadata in the page
-  if(!book) {
-    const isTW = v.startsWith('978626') || v.startsWith('9786');
-    const isCN = v.startsWith('9787');
-    if(isTW || isCN) {
-      try {
-        // Try Google Books with the ISBN as a general search — sometimes TW books
-        // are indexed under their title but linked to the ISBN in the description
-        const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${v}+isbn&maxResults=5&langRestrict=zh-TW`);
-        const data = await res.json();
-        if(data.items?.length) {
-          // Take the first result — it's likely the right book given the specific ISBN
-          book = makeBookFromGB(data.items[0].volumeInfo, v);
-          source = 'Google Books (regional)';
-        }
-      } catch(e){}
-    }
+    } catch(e) {}
   }
 
   clearInterval(tick);
 
-  // ── All sources exhausted ────────────────────────────────────────
-  if(!book) {
-    const isTW = v.startsWith('978626') || v.startsWith('9786');
-    const isCN = v.startsWith('9787');
+  // ── Not found ──────────────────────────────────────────────────
+  if (!book) {
     const hint = isTW
-      ? 'This is a Taiwanese ISBN (978-626). It was checked across Google Books, Open Library, and regional databases — not found. Try searching by title in the Search tab instead.'
+      ? '在 Google Books、Open Library 及博客來均找不到此 ISBN (978-626)。請改用書名搜尋，或手動輸入書籍資訊。'
       : isCN
-      ? 'This is a Mainland Chinese ISBN (978-7). Try searching by title in the Search tab instead.'
-      : 'Not found in Google Books or Open Library. Try the Search tab or enter details manually.';
-
+      ? '在資料庫中找不到此大陸版 ISBN (978-7)。請改用書名搜尋，或手動輸入。'
+      : 'Not found across all 6 databases. Try the Search tab or add manually.';
     el.innerHTML = `
-      <div style="border-left:3px solid var(--rule);padding:14px;margin-bottom:16px">
-        <div style="font-family:var(--ff-sc);font-size:11px;letter-spacing:.02em;color:var(--ink-faint);margin-bottom:8px">NOT FOUND · 5 SOURCES CHECKED</div>
-        <div style="font-family:var(--ff-body);font-size:14px;color:var(--ink);line-height:1.6;margin-bottom:12px">${hint}</div>
+      <div style="border-left:3px solid var(--rule);padding:14px 16px;margin-bottom:16px">
+        <div style="font-family:var(--ff-sc);font-size:11px;letter-spacing:.02em;color:var(--ink-faint);margin-bottom:8px">NOT FOUND · 6 SOURCES CHECKED</div>
+        <div style="font-family:var(--ff-body);font-size:15px;color:var(--ink);line-height:1.6">${hint}</div>
       </div>
       <div style="display:flex;gap:8px">
-        <button class="modal-btn" style="flex:1" onclick="setAddTab('search');document.getElementById('isbn-field-result').innerHTML=''">SEARCH BY TITLE →</button>
-        <button class="modal-btn primary" style="flex:1" onclick="prefillManualFromISBN('${v}')">ADD MANUALLY →</button>
+        <button class="modal-btn" style="flex:1" onclick="setAddTab('search');document.getElementById('isbn-field-result').innerHTML=''">搜尋書名 →</button>
+        <button class="modal-btn primary" style="flex:1" onclick="prefillManualFromISBN('${v}')">手動新增 →</button>
       </div>`;
     return;
   }
 
-  // ── Found — show result card ────────────────────────────────────
+  // ── Found ──────────────────────────────────────────────────────
   window._isbnBook = book;
   const thumbHtml = book.thumbnail
-    ? `<img src="${book.thumbnail}" style="width:60px;height:84px;object-fit:cover;border-radius:2px 4px 4px 2px;box-shadow:2px 3px 10px var(--spine-shadow);flex-shrink:0" onerror="this.style.display='none'">`
-    : `<div style="width:60px;height:84px;background:${spineColor(book.title)};border-radius:2px 4px 4px 2px;flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:4px"><span style="font-family:var(--ff-body);font-size:8px;color:rgba(255,255,255,.9);text-align:center;line-height:1.3">${book.title.slice(0,30)}</span></div>`;
+    ? `<img src="${book.thumbnail}" style="width:64px;height:88px;object-fit:cover;border-radius:2px 4px 4px 2px;box-shadow:2px 3px 10px var(--spine-shadow);flex-shrink:0" onerror="this.style.display='none'">`
+    : `<div style="width:64px;height:88px;background:${spineColor(book.title)};border-radius:2px 4px 4px 2px;flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:4px"><span style="font-family:var(--ff-body);font-size:9px;color:rgba(255,255,255,.9);text-align:center;line-height:1.3">${book.title.slice(0,24)}</span></div>`;
 
-  el.innerHTML = `<div style="border:1px solid var(--rule);padding:16px;border-radius:4px">
-    <div style="font-family:var(--ff-sc);font-size:10px;letter-spacing:.02em;color:var(--ink-faint);margin-bottom:12px">FOUND · ${source.toUpperCase()}</div>
-    <div style="display:flex;gap:14px;margin-bottom:16px;align-items:flex-start">
+  el.innerHTML = `<div style="border:1px solid var(--rule);padding:18px;border-radius:4px">
+    <div style="font-family:var(--ff-sc);font-size:11px;letter-spacing:.02em;color:var(--ink-faint);margin-bottom:14px">FOUND · ${source.toUpperCase()}</div>
+    <div style="display:flex;gap:14px;margin-bottom:18px;align-items:flex-start">
       ${thumbHtml}
       <div style="flex:1;min-width:0">
-        <div style="font-family:var(--ff-display);font-style:italic;font-size:20px;margin-bottom:4px;line-height:1.2">${book.title}</div>
-        <div style="font-family:var(--ff-body);font-size:14px;color:var(--ink-mid);margin-bottom:4px">${book.author}</div>
+        <div style="font-family:var(--ff-display);font-style:italic;font-size:22px;margin-bottom:5px;line-height:1.2">${book.title}</div>
+        <div style="font-family:var(--ff-body);font-size:15px;color:var(--ink-mid);margin-bottom:4px">${book.author}</div>
         <div style="font-family:var(--ff-sc);font-size:11px;letter-spacing:.02em;color:var(--ink-faint)">${[book.year, book.totalPages?book.totalPages+' pp':''].filter(Boolean).join(' · ')}</div>
       </div>
     </div>
