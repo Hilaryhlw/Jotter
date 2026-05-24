@@ -779,9 +779,9 @@ html, body { height: 100%; background: var(--parchment); color: var(--ink);
 
   <!-- ISBN pane -->
   <div class="add-pane" id="add-pane-isbn" style="display:none">
-    <div style="font-family:var(--ff-display);font-style:italic;font-size:13px;color:var(--ink-faint);margin-bottom:14px">Enter the ISBN from the back of the book or your ebook details</div>
-    <div class="add-field-label">ISBN</div>
-    <input class="add-field" id="isbn-field" type="text" inputmode="numeric" placeholder="978-0-7432-7356-5" maxlength="17">
+    <div style="font-family:var(--ff-display);font-style:italic;font-size:13px;color:var(--ink-faint);margin-bottom:14px">Find the ISBN in your ebook app under Book Details, or on the copyright page of the ebook file</div>
+    <div class="add-field-label">ISBN-13 or ISBN-10</div>
+    <input class="add-field" id="isbn-field" type="text" inputmode="numeric" placeholder="e.g. 9780525433338" maxlength="20" onkeydown="if(event.key==='Enter')lookupISBNField()">
     <button class="add-btn-primary" onclick="lookupISBNField()">LOOK UP →</button>
     <div id="isbn-field-result" style="margin-top:20px"></div>
   </div>
@@ -1721,31 +1721,90 @@ function saveManualBook() {
 }
 
 async function lookupISBNField() {
-  const v = document.getElementById('isbn-field').value.replace(/-/g,'').trim();
-  if(v.length < 10){ showToast('Enter a valid ISBN.'); return; }
+  const raw = document.getElementById('isbn-field').value.trim();
+  const v = raw.replace(/[-\s]/g,'');
+  if(v.length < 10){ showToast('Enter a valid ISBN-10 or ISBN-13.'); return; }
   const el = document.getElementById('isbn-field-result');
   el.innerHTML = '<div style="font-family:var(--ff-display);font-style:italic;font-size:13px;color:var(--ink-faint)">Looking up…</div>';
+
+  let book = null;
+
+  // ── 1. Open Library (no API key, works everywhere) ──
   try {
-    const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${v}`);
+    const res = await fetch(`https://openlibrary.org/api/books?bibkeys=ISBN:${v}&format=json&jscmd=data`);
     const data = await res.json();
-    if(!data.items?.length){ el.innerHTML='<div style="font-family:var(--ff-body);font-size:13px;color:var(--ink-faint)">No book found for that ISBN.</div>'; return; }
-    const info = data.items[0].volumeInfo;
-    window._isbnBook = { id:uid(), isbn:v, title:info.title||'Unknown',
-      author:(info.authors||[]).join(', '), year:info.publishedDate?.slice(0,4)||'',
-      totalPages:info.pageCount||0, categories:info.categories||[],
-      thumbnail:info.imageLinks?.thumbnail||'', status:'to-read', currentPage:0,
-      addedAt:new Date().toISOString() };
-    el.innerHTML = `<div style="border:1px solid var(--rule);padding:14px;margin-bottom:12px">
-      <div style="font-family:var(--ff-display);font-style:italic;font-size:18px;margin-bottom:4px">${info.title}</div>
-      <div style="font-family:var(--ff-body);font-size:12px;color:var(--ink-mid);margin-bottom:12px">${(info.authors||[]).join(', ')} · ${info.publishedDate?.slice(0,4)||''}</div>
-      <div style="display:flex;gap:8px;margin-bottom:14px">
-        <button class="filter-chip active" id="isbn-s-to-read" onclick="isbnStatus('to-read')">TO READ</button>
-        <button class="filter-chip" id="isbn-s-reading" onclick="isbnStatus('reading')">READING</button>
-        <button class="filter-chip" id="isbn-s-finished" onclick="isbnStatus('finished')">FINISHED</button>
-      </div>
-      <button class="add-btn-primary" onclick="saveISBNBook()">ADD TO SHELF →</button>
+    const key = `ISBN:${v}`;
+    if(data[key]) {
+      const d = data[key];
+      const authors = (d.authors||[]).map(a=>a.name).join(', ');
+      const pages = d.number_of_pages||0;
+      const year = d.publish_date ? d.publish_date.slice(-4) : '';
+      const thumb = d.cover?.medium || d.cover?.small || '';
+      book = { id:uid(), isbn:v,
+        title: d.title||'Unknown',
+        author: authors||'Unknown',
+        year, totalPages: pages,
+        categories: d.subjects ? [d.subjects[0]?.name||''] : [],
+        thumbnail: thumb,
+        status:'to-read', currentPage:0,
+        addedAt: new Date().toISOString() };
+    }
+  } catch(e) {}
+
+  // ── 2. Google Books fallback (works when online with CORS) ──
+  if(!book) {
+    try {
+      const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${v}&maxResults=1`);
+      const data = await res.json();
+      if(data.items?.length) {
+        const info = data.items[0].volumeInfo;
+        book = { id:uid(), isbn:v,
+          title: info.title||'Unknown',
+          author: (info.authors||[]).join(', ')||'Unknown',
+          year: info.publishedDate?.slice(0,4)||'',
+          totalPages: info.pageCount||0,
+          categories: info.categories||[],
+          thumbnail: info.imageLinks?.thumbnail?.replace('http:','https:')||'',
+          status:'to-read', currentPage:0,
+          addedAt: new Date().toISOString() };
+      }
+    } catch(e) {}
+  }
+
+  // ── 3. Nothing found ──
+  if(!book) {
+    el.innerHTML = `<div style="font-family:var(--ff-body);font-size:13px;color:var(--ink-faint);margin-bottom:16px">
+      Couldn't find ISBN <strong>${raw}</strong> in any database.
+    </div>
+    <div style="font-family:var(--ff-sc);font-size:9px;letter-spacing:.02em;color:var(--ink-faint);margin-bottom:8px">ADD MANUALLY INSTEAD</div>
+    <div style="display:flex;gap:10px">
+      <button class="modal-btn primary" onclick="setAddTab('manual');document.getElementById('isbn-field-result').innerHTML=''">ENTER DETAILS →</button>
     </div>`;
-  } catch(e) { el.innerHTML='<div style="font-family:var(--ff-body);font-size:13px;color:var(--ink-faint)">Lookup failed.</div>'; }
+    return;
+  }
+
+  window._isbnBook = book;
+  const thumbHtml = book.thumbnail
+    ? `<img src="${book.thumbnail}" style="width:52px;height:72px;object-fit:cover;border-radius:2px 3px 3px 2px;box-shadow:1px 2px 6px var(--spine-shadow);flex-shrink:0">`
+    : `<div style="width:52px;height:72px;background:${spineColor(book.title)};border-radius:2px 3px 3px 2px;flex-shrink:0;display:flex;align-items:center;justify-content:center"><span style="font-family:var(--ff-body);font-size:7px;color:rgba(255,255,255,.9);text-align:center;padding:2px;writing-mode:vertical-rl;transform:rotate(180deg)">${book.title.slice(0,20)}</span></div>`;
+
+  el.innerHTML = `<div style="border:1px solid var(--rule);padding:14px;border-radius:4px">
+    <div style="display:flex;gap:12px;margin-bottom:14px">
+      ${thumbHtml}
+      <div>
+        <div style="font-family:var(--ff-display);font-style:italic;font-size:18px;margin-bottom:3px;line-height:1.2">${book.title}</div>
+        <div style="font-family:var(--ff-body);font-size:12px;color:var(--ink-mid);margin-bottom:2px">${book.author}</div>
+        <div style="font-family:var(--ff-sc);font-size:9px;letter-spacing:.02em;color:var(--ink-faint)">${[book.year, book.totalPages?book.totalPages+'pp':''].filter(Boolean).join(' · ')}</div>
+      </div>
+    </div>
+    <div style="font-family:var(--ff-sc);font-size:9px;letter-spacing:.02em;color:var(--ink-faint);margin-bottom:8px">ADD AS</div>
+    <div style="display:flex;gap:8px;margin-bottom:14px">
+      <button class="filter-chip active" id="isbn-s-to-read" onclick="isbnStatus('to-read')">TO READ</button>
+      <button class="filter-chip" id="isbn-s-reading" onclick="isbnStatus('reading')">READING</button>
+      <button class="filter-chip" id="isbn-s-finished" onclick="isbnStatus('finished')">FINISHED</button>
+    </div>
+    <button class="add-btn-primary" onclick="saveISBNBook()">ADD TO SHELF →</button>
+  </div>`;
 }
 
 function isbnStatus(s) {
