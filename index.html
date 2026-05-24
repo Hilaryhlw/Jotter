@@ -1033,16 +1033,19 @@ function coverImg(b, w, h, extraStyle='') {
   const sized = !!(w && h);
   const color = spineColor(b.title);
   const safeT = (b.title||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  const fb = `<div style="position:absolute;inset:0;background:${color};display:flex;align-items:center;justify-content:center;padding:5px"><span style="font-family:var(--ff-body);font-size:9px;color:rgba(255,255,255,.9);text-align:center;line-height:1.3">${safeT.slice(0,22)}</span></div>`;
   if (b.thumbnail) {
     const src = b.thumbnail.replace('http://','https://').replace('zoom=1','zoom=3');
-    const style = sized ? `width:${w}px;height:${h}px;${extraStyle}` : `position:absolute;inset:0;width:100%;height:100%;object-fit:cover;${extraStyle}`;
-    return `<img src="${src}" data-color="${color}" data-title="${safeT}" style="${style};display:block;border-radius:inherit" loading="lazy" onerror="this.style.display='none';this.insertAdjacentHTML('afterend',this.parentNode.querySelector(':scope>.fb-div')?'':'<div class=\"fb-div\" style=\"position:absolute;inset:0;background:'+this.dataset.color+';display:flex;align-items:center;justify-content:center;padding:5px\"><span style=\"font-family:var(--ff-body);font-size:9px;color:rgba(255,255,255,.9);text-align:center;line-height:1.3\">' + this.dataset.title + '</span></div>')">`;
+    const style = sized
+      ? `width:${w}px;height:${h}px;${extraStyle};object-fit:cover;display:block;border-radius:inherit`
+      : `position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;border-radius:inherit;${extraStyle}`;
+    return `<img src="${src}" data-color="${color}" data-title="${safeT}" style="${style}" loading="lazy" onerror="_coverErr(this)">`;
   }
-  return sized ? coverFallback(b.title, color, w, h) : fb;
+  if (sized) return coverFallback(b.title, color, w, h);
+  return `<div style="position:absolute;inset:0;background:${color};display:flex;align-items:center;justify-content:center;padding:5px"><span style="font-family:var(--ff-body);font-size:9px;color:rgba(255,255,255,.9);text-align:center;line-height:1.3">${safeT.slice(0,22)}</span></div>`;
 }
 function coverFallback(title, color, w, h) {
-  return `<div style="width:${w}px;height:${h}px;background:${color};display:flex;align-items:center;justify-content:center;padding:6px;border-radius:inherit"><span style="font-family:var(--ff-body);font-size:9px;color:rgba(255,255,255,.92);text-align:center;line-height:1.3;word-break:break-word">${title}</span></div>`;
+  const t = (title||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return `<div style="width:${w}px;height:${h}px;background:${color};display:flex;align-items:center;justify-content:center;padding:6px;border-radius:inherit;overflow:hidden"><span style="font-family:var(--ff-body);font-size:9px;color:rgba(255,255,255,.92);text-align:center;line-height:1.3;word-break:break-word">${t}</span></div>`;
 }
 
 // Global cover image error handler
