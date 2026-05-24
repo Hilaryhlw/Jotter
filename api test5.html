@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>TW Book API Test</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, sans-serif; padding: 16px; font-size: 14px; background: #f9f7f2; }
+h2 { font-size: 20px; margin-bottom: 8px; }
+.proto { padding: 10px 14px; border-radius: 8px; margin: 10px 0; font-weight: bold; }
+.ok  { background: #d4edda; color: #155724; }
+.bad { background: #f8d7da; color: #721c24; }
+button { display: block; width: 100%; padding: 14px; background: #1a1710;
+  color: #f0ebe0; border: none; border-radius: 8px; font-size: 16px; margin: 12px 0; }
+.card { background: #fff; border-radius: 8px; border: 1px solid #e0ddd8;
+  padding: 12px; margin: 6px 0; font-size: 13px; }
+.card b { font-size: 13px; }
+.detail { color: #555; margin-top: 6px; word-break: break-all; font-size: 11px; line-height: 1.5; }
+.cover { width: 48px; height: 68px; object-fit: cover; border-radius: 3px;
+  float: right; margin-left: 10px; box-shadow: 1px 2px 6px rgba(0,0,0,.2); }
+</style>
+</head>
+<body>
+<h2>Taiwan Book API Test</h2>
+<p style="font-size:12px;color:#888;margin:4px 0 12px">Open from https://hilaryhlw.github.io/Jotter/api_test5.html</p>
+<div id="proto" class="proto bad">Checking…</div>
+<button onclick="runAll()">▶ Run All Tests</button>
+<div id="out"></div>
+
+<script>
+const P = location.protocol;
+const pd = document.getElementById('proto');
+pd.className = 'proto ' + (P==='https:' ? 'ok' : 'bad');
+pd.textContent = P==='https:' ? '✓ https:// — ready' : `✗ Protocol is "${P}" — open from GitHub Pages`;
+
+const isbn1 = "9786267752111";  // 金剛經白話講座
+const isbn2 = "9786267045213";  // second book
+const title = "金剛經白話講座";
+const enc = encodeURIComponent(title);
+const enc2 = encodeURIComponent("放下的人生修行");
+
+function log(id, ok, msg, detail, thumbUrl) {
+  const img = thumbUrl ? `<img class="cover" src="${thumbUrl}" onerror="this.style.display='none'">` : '';
+  document.getElementById('out').innerHTML +=
+    `<div class="card">${img}<b class="${ok?'ok':'bad'}">${ok?'✓':'✗'} ${id}</b>
+     <div class="detail">${msg}${detail ? '<br>'+detail : ''}</div></div>`;
+}
+
+async function t(id, url, parse) {
+  try {
+    const r = await fetch(url, {headers:{'Accept':'application/json,text/html,*/*','Accept-Language':'zh-TW,zh;q=0.9'}});
+    const ct = r.headers.get('Content-Type')||'';
+    if (ct.includes('json')) {
+      const d = await r.json();
+      parse(id, d, url);
+    } else {
+      const html = await r.text();
+      parse(id, html, url);
+    }
+  } catch(e) { log(id, false, e.message, url); }
+}
+
+function gbParse(id, d, url) {
+  const items = d.items||[];
+  if (!items.length) { log(id, false, `0 results (total=${d.totalItems||0})`, url); return; }
+  const info = items[0].volumeInfo;
+  const thumb = (info.imageLinks?.thumbnail||'').replace('http:','https:');
+  log(id, true, `${items.length} results — "${info.title}" by ${(info.authors||[]).join(', ')}`,
+    `Year: ${info.publishedDate||'?'} | Pages: ${info.pageCount||'?'} | ISBN: ${(info.industryIdentifiers||[]).find(x=>x.type==='ISBN_13')?.identifier||'?'}`,
+    thumb||null);
+}
+
+function olParse(id, d, url) {
+  const docs = d.docs||[];
+  if (!docs.length) { log(id, false, `0 results`, url); return; }
+  const doc = docs[0];
+  const thumb = doc.cover_i ? `https://covers.openlibrary.org/b/id/${doc.cover_i}-M.jpg` : '';
+  log(id, true, `${docs.length} results — "${doc.title}" by ${(doc.author_name||[]).join(', ')}`,
+    `Year: ${doc.first_publish_year||'?'}`, thumb||null);
+}
+
+async function runAll() {
+  document.getElementById('out').innerHTML = '<div class="card"><b>Running…</b></div>';
+
+  // === Google Books ===
+  await t('GB global isbn1',  `https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn1}`, gbParse);
+  await t('GB global isbn2',  `https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn2}`, gbParse);
+  await t('GB TW isbn1',      `https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn1}&country=TW`, gbParse);
+  await t('GB TW isbn2',      `https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn2}&country=TW`, gbParse);
+  await t('GB TW title',      `https://www.googleapis.com/books/v1/volumes?q=${enc}&country=TW&maxResults=5`, gbParse);
+  await t('GB TW title2',     `https://www.googleapis.com/books/v1/volumes?q=${enc2}&country=TW&maxResults=5`, gbParse);
+
+  // === Open Library ===
+  await t('OL isbn1',  `https://openlibrary.org/search.json?isbn=${isbn1}`, olParse);
+  await t('OL isbn2',  `https://openlibrary.org/search.json?isbn=${isbn2}`, olParse);
+  await t('OL title',  `https://openlibrary.org/search.json?q=${enc}&limit=5`, olParse);
+
+  // === Taiwan-specific: NCL (國家圖書館) ===
+  await t('NCL isbn1', `https://apin.ncl.edu.tw/opac/servlet/Query?format=json&q=${isbn1}&field=isbn&count=3`,
+    (id,d,url) => {
+      const recs = d?.result||d?.records||Object.values(d||{}).find(v=>Array.isArray(v))||[];
+      if (!recs.length) { log(id, false, `No results. Keys: ${JSON.stringify(Object.keys(d||{})).slice(0,80)}`, url); return; }
+      const r = recs[0];
+      log(id, true, `Found: "${r.title||r.TI||JSON.stringify(r).slice(0,60)}"`, JSON.stringify(r).slice(0,120));
+    });
+
+  // === Taiwan-specific: Readmoo (讀墨) ===
+  await t('Readmoo isbn1', `https://readmoo.com/api/search?q=${isbn1}`,
+    (id,d,url) => {
+      const items = d?.data||d?.items||d?.results||[];
+      if (!items.length) { log(id, false, `No results. Keys: ${JSON.stringify(Object.keys(d||{})).slice(0,60)}`, url); return; }
+      log(id, true, `Found: ${JSON.stringify(items[0]).slice(0,100)}`);
+    });
+
+  // === 博客來 direct ===
+  await t('BK search isbn1', `https://search.books.com.tw/search/query/key/${isbn1}/cat/BKA/`,
+    (id,html,url) => {
+      if (typeof html !== 'string') { log(id, false, 'Not HTML', url); return; }
+      const has = html.includes('金剛') || html.includes(isbn1);
+      const titleMatch = html.match(/<h4[^>]*><a[^>]*>([^<]{2,60})</);
+      log(id, has, has ? `Has content. Title: ${titleMatch?.[1]||'parsing needed'}` : 'No content / CORS blocked', `Length: ${html.length}`);
+    });
+
+  // === Taaze (讀冊) ===
+  await t('Taaze isbn1', `https://www.taaze.tw/api/searchResult.json?type=1&keyword=${isbn1}`,
+    (id,d,url) => {
+      const items = d?.data||d?.list||d?.result||d?.items||[];
+      if (!items?.length && typeof d === 'object') {
+        log(id, false, `Keys: ${JSON.stringify(Object.keys(d)).slice(0,80)}`, url);
+      } else {
+        log(id, true, `Found ${items.length} items: ${JSON.stringify(items[0]||{}).slice(0,100)}`);
+      }
+    });
+
+  document.getElementById('out').innerHTML =
+    document.getElementById('out').innerHTML.replace('<div class="card"><b>Running…</b></div>','');
+}
+</script>
+</body>
+</html>
