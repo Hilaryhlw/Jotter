@@ -1,0 +1,1449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Jotter">
+<meta name="theme-color" content="#f0ebe0">
+<title>Jotter</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="favicon.ico" sizes="16x16 32x32 48x48" type="image/x-icon">
+<link rel="icon" href="icon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300;1,9..40,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+
+:root {
+  --parchment: #f0ebe0;
+  --parchment-dark: #e8e2d4;
+  --ink: #1a1710;
+  --ink-mid: #4a4640;
+  --ink-faint: #9a9590;
+  --crimson: #8b2020;
+  --crimson-pale: #c8524a;
+  --cream: #faf7f2;
+  --rule: #d4cfc4;
+  --spine-shadow: rgba(26,23,16,0.14);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --ff-display: 'Playfair Display', Georgia, serif;
+  --ff-sc: 'DM Mono', 'Courier New', monospace;
+  --ff-body: 'DM Sans', system-ui, sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; background: var(--parchment); color: var(--ink);
+  font-family: var(--ff-body); font-size: 15px; font-weight: 400; -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none; }
+
+.screen { position: fixed; inset: 0; background: var(--parchment);
+  display: flex; flex-direction: column; opacity: 0; pointer-events: none;
+  transition: opacity .22s ease; overflow: hidden; }
+.screen.active { opacity: 1; pointer-events: all; }
+
+.nav-bar { position: absolute; bottom: 0; left: 0; right: 0;
+  background: var(--parchment); border-top: 1px solid var(--rule);
+  display: flex; justify-content: space-around; align-items: flex-start;
+  padding: 10px 0 calc(10px + var(--safe-bottom)); z-index: 100; }
+.nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px;
+  font-family: var(--ff-sc); font-size: 9px; letter-spacing: .01em;
+  color: var(--ink-faint); cursor: pointer; padding: 0 12px;
+  transition: color .2s; background: none; border: none;
+  -webkit-tap-highlight-color: transparent; }
+.nav-item.active { color: var(--ink); }
+.nav-item.active .nav-dot { background: var(--crimson); }
+.nav-dot { width: 4px; height: 4px; border-radius: 50%; background: transparent; margin-top: 2px; }
+.nav-icon { font-size: 18px; line-height: 1; }
+
+.folio-header { flex-shrink: 0; padding: 52px 24px 16px;
+  border-bottom: 1px solid var(--rule); position: relative; }
+.folio-label { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em;
+  color: var(--ink-faint); position: absolute; top: 16px; left: 24px; }
+.folio-title { font-family: var(--ff-display); font-style: italic;
+  font-size: 34px; line-height: 1.1; }
+.folio-sub { font-family: var(--ff-body); font-style: italic;
+  font-size: 12px; color: var(--ink-faint); margin-top: 2px; }
+.folio-stats { font-family: var(--ff-sc); font-size: 10px; letter-spacing: .02em;
+  color: var(--ink-mid); margin-top: 8px; }
+.folio-stats span { color: var(--crimson); }
+.folio-btn { position: absolute; top: 14px; right: 24px;
+  background: none; border: none; cursor: pointer;
+  color: var(--ink-faint); font-size: 20px; padding: 4px;
+  -webkit-tap-highlight-color: transparent; }
+
+.scroll-content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  padding-bottom: calc(80px + var(--safe-bottom)); }
+
+/* WELCOME */
+#screen-welcome { justify-content: space-between;
+  padding-top: env(safe-area-inset-top, 0px); }
+.welcome-body { flex: 1; display: flex; flex-direction: column;
+  justify-content: center; padding: 0 32px; }
+.welcome-eyebrow { font-family: var(--ff-sc); font-size: 10px; letter-spacing: .01em;
+  color: var(--ink-faint); margin-bottom: 10px; }
+.welcome-title { font-size: 70px; line-height: .9; color: var(--ink);
+  margin-bottom: 14px; letter-spacing: -.01em; }
+.title-J { font-family: var(--ff-display); font-style: normal; font-weight: 600;
+  letter-spacing: .02em; }
+.title-otter { font-family: var(--ff-display); font-style: normal; font-weight: 600; }
+.welcome-tag { font-family: var(--ff-display); font-style: italic;
+  font-size: 20px; color: var(--ink-mid); line-height: 1.4; margin-bottom: 28px; }
+.welcome-rule { border: none; border-top: 1px solid var(--rule); margin-bottom: 24px; }
+.welcome-features { list-style: none; margin-bottom: 32px; }
+.welcome-features li { display: grid; grid-template-columns: 36px 1fr;
+  padding: 12px 0; border-bottom: 1px dashed var(--rule); }
+.welcome-features li:first-child { border-top: 1px dashed var(--rule); }
+.feat-num { font-family: var(--ff-display); font-style: italic;
+  font-size: 14px; color: var(--crimson); padding-top: 2px; }
+.feat-text strong { font-family: var(--ff-body); font-weight: 700; font-size: 14px;
+  display: block; margin-bottom: 2px; }
+.feat-text em { font-family: var(--ff-display); font-style: italic;
+  font-size: 13px; color: var(--ink-mid); }
+.welcome-footer { padding: 0 32px calc(32px + var(--safe-bottom));
+  border-top: 1px solid var(--rule); padding-top: 24px; }
+.btn-primary { display: block; width: 100%; background: var(--ink);
+  color: var(--parchment); font-family: var(--ff-sc); font-size: 12px;
+  letter-spacing: .02em; border: none; padding: 18px; cursor: pointer;
+  text-align: center; transition: background .2s;
+  -webkit-tap-highlight-color: transparent; }
+.btn-primary:active { background: #333; }
+.welcome-import { text-align: center; margin-top: 12px;
+  font-family: var(--ff-display); font-style: italic; font-size: 13px; color: var(--ink-mid); }
+.welcome-import a { color: var(--crimson); text-decoration: underline; cursor: pointer; }
+.welcome-colophon { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em;
+  color: var(--ink-faint); text-align: center; margin-top: 16px; }
+
+/* SHELF */
+.shelf-section { padding: 20px 24px 0; }
+.shelf-section-header { display: flex; justify-content: space-between;
+  align-items: baseline; margin-bottom: 12px; }
+.shelf-section-title { font-family: var(--ff-display); font-style: italic; font-size: 22px; }
+.shelf-section-count { font-family: var(--ff-sc); font-size: 10px;
+  letter-spacing: .01em; color: var(--ink-faint); }
+.spine-row { display: flex; gap: 6px; align-items: flex-end; height: 130px;
+  padding-bottom: 8px; overflow-x: auto; scrollbar-width: none; }
+.spine-row::-webkit-scrollbar { display: none; }
+.book-spine { flex-shrink: 0; width: 36px; height: 110px;
+  border-radius: 2px 3px 3px 2px; display: flex; align-items: center;
+  justify-content: center; cursor: pointer; position: relative;
+  box-shadow: 2px 3px 8px var(--spine-shadow);
+  transition: transform .15s, box-shadow .15s;
+  -webkit-tap-highlight-color: transparent; }
+.book-spine:active { transform: translateY(-4px); box-shadow: 2px 7px 14px var(--spine-shadow); }
+.book-spine-title { writing-mode: vertical-rl; text-orientation: mixed;
+  transform: rotate(180deg); font-family: var(--ff-body); font-size: 9px;
+  color: rgba(255,255,255,.9); white-space: nowrap; overflow: hidden;
+  text-overflow: ellipsis; max-height: 90px; padding: 0 4px; line-height: 1.2; }
+.spine-shadow-line { position: absolute; left: 0; top: 0; bottom: 0;
+  width: 4px; background: rgba(0,0,0,0.18); border-radius: 2px 0 0 2px; }
+.book-progress-bar { margin: 4px 0; height: 2px; background: var(--rule);
+  border-radius: 1px; overflow: hidden; }
+.book-progress-fill { height: 100%; background: var(--crimson); border-radius: 1px; }
+.book-progress-label { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em;
+  color: var(--ink-faint); display: flex; justify-content: space-between; }
+.book-progress-label em { font-family: var(--ff-display); font-style: italic;
+  color: var(--ink-mid); font-size: 10px; }
+.book-grid { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 4px;
+  scrollbar-width: none; }
+.book-grid::-webkit-scrollbar { display: none; }
+.book-card { flex-shrink: 0; width: 80px; cursor: pointer;
+  -webkit-tap-highlight-color: transparent; }
+.book-cover { width: 80px; height: 110px; border-radius: 2px 4px 4px 2px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 2px 3px 10px var(--spine-shadow); overflow: hidden; }
+.book-cover-title { font-family: var(--ff-body); font-size: 9px;
+  color: rgba(255,255,255,.92); text-align: center; padding: 6px;
+  line-height: 1.3; position: relative; z-index: 1; }
+.book-card-author { font-family: var(--ff-sc); font-size: 8px; letter-spacing: .02em;
+  color: var(--ink-faint); margin-top: 5px; text-transform: uppercase;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fab { position: fixed; bottom: calc(72px + var(--safe-bottom)); right: 20px;
+  width: 52px; height: 52px; border-radius: 50%; background: var(--ink);
+  color: var(--parchment); display: flex; align-items: center; justify-content: center;
+  font-size: 26px; cursor: pointer; z-index: 90;
+  box-shadow: 0 4px 16px rgba(26,23,16,.25); border: none;
+  -webkit-tap-highlight-color: transparent; transition: transform .15s; }
+.fab:active { transform: scale(.93); }
+
+/* BOOK DETAIL */
+.book-detail-header { display: flex; gap: 16px; padding: 16px 24px 20px;
+  border-bottom: 1px solid var(--rule); }
+.book-detail-cover { flex-shrink: 0; width: 70px; height: 95px;
+  border-radius: 2px 4px 4px 2px; box-shadow: 2px 3px 10px var(--spine-shadow);
+  display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.book-detail-meta { flex: 1; padding-top: 4px; }
+.book-detail-genre { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em;
+  color: var(--ink-faint); margin-bottom: 4px; }
+.book-detail-title { font-family: var(--ff-display); font-style: italic;
+  font-size: 22px; line-height: 1.15; margin-bottom: 4px; }
+.book-detail-author { font-family: var(--ff-body); font-size: 13px;
+  color: var(--ink-mid); margin-bottom: 8px; }
+.status-pill { display: inline-flex; align-items: center; gap: 4px;
+  font-family: var(--ff-sc); font-size: 9px; letter-spacing: .01em;
+  padding: 4px 10px; border-radius: 12px; background: var(--crimson);
+  color: var(--cream); margin-right: 6px; }
+.pages-pill { display: inline-flex; align-items: center;
+  font-family: var(--ff-sc); font-size: 9px; letter-spacing: .01em;
+  padding: 4px 10px; border-radius: 12px;
+  border: 1px solid var(--rule); color: var(--ink-mid); }
+.pace-section { padding: 16px 24px; border-bottom: 1px solid var(--rule); }
+.pace-label { display: flex; justify-content: space-between; align-items: baseline;
+  margin-bottom: 10px; }
+.pace-label-text { font-family: var(--ff-display); font-style: italic; font-size: 18px; }
+.pace-since { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .01em; color: var(--ink-faint); }
+.pace-ruler { position: relative; height: 28px; margin-bottom: 10px; }
+.pace-track { position: absolute; top: 50%; left: 0; right: 0; height: 1px;
+  background: var(--rule); transform: translateY(-50%); }
+.pace-fill { position: absolute; top: 50%; left: 0; height: 2px;
+  background: var(--ink); transform: translateY(-50%); border-radius: 1px; }
+.pace-cursor { position: absolute; top: 50%; transform: translate(-50%,-50%);
+  background: var(--crimson); color: var(--cream);
+  font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em;
+  padding: 3px 7px; border-radius: 3px; white-space: nowrap; }
+.pace-cursor::after { content: ''; position: absolute; bottom: -4px; left: 50%;
+  transform: translateX(-50%); border: 4px solid transparent;
+  border-top-color: var(--crimson); }
+.pace-endpoints { display: flex; justify-content: space-between;
+  font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em; color: var(--ink-faint); }
+.pace-stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-top: 8px; }
+.pace-stat { text-align: center; }
+.pace-stat-val { font-family: var(--ff-display); font-style: italic; font-size: 20px; }
+.pace-stat-key { font-family: var(--ff-sc); font-size: 8px; letter-spacing: .02em;
+  color: var(--ink-faint); margin-top: 1px; }
+.marginalia-header { display: flex; justify-content: space-between; align-items: center;
+  padding: 16px 24px 8px; }
+.marginalia-title { font-family: var(--ff-display); font-style: italic; font-size: 22px; }
+.btn-jot { font-family: var(--ff-sc); font-size: 10px; letter-spacing: .02em;
+  background: none; border: 1px solid var(--rule); color: var(--ink);
+  padding: 6px 14px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.jot-card { padding: 14px 24px; border-bottom: 1px solid var(--rule);
+  cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.jot-card:active { background: var(--parchment-dark); }
+.jot-ref { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+.jot-page { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .01em; color: var(--ink-mid); }
+.jot-date { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em; color: var(--ink-faint); }
+.jot-quote { font-family: var(--ff-display); font-style: italic; font-size: 15px;
+  color: var(--ink); line-height: 1.45; border-left: 2px solid var(--ink);
+  padding-left: 10px; margin-bottom: 6px; }
+.jot-body { font-family: var(--ff-body); font-size: 13px; color: var(--ink-mid); line-height: 1.55; }
+.jot-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+.tag-chip { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em;
+  background: var(--parchment-dark); border: 1px solid var(--rule);
+  color: var(--ink-mid); padding: 3px 9px; border-radius: 12px; cursor: pointer; }
+.tag-chip.active { background: var(--crimson); border-color: var(--crimson); color: var(--cream); }
+
+/* JOT EDITOR */
+#screen-jot { background: var(--cream); }
+.jot-header { flex-shrink: 0; display: flex; align-items: center; justify-content: space-between;
+  padding: 52px 20px 14px; border-bottom: 1px solid var(--rule); }
+.jot-close { background: none; border: none; cursor: pointer; color: var(--ink-faint);
+  font-size: 22px; padding: 4px; -webkit-tap-highlight-color: transparent; }
+.jot-save { background: none; border: none; cursor: pointer; color: var(--crimson);
+  font-family: var(--ff-sc); font-size: 10px; letter-spacing: .02em;
+  padding: 4px 8px; -webkit-tap-highlight-color: transparent; }
+.jot-header-title { font-family: var(--ff-sc); font-size: 11px; letter-spacing: .02em; }
+.jot-book-ref { display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 20px; border-bottom: 1px solid var(--rule);
+  cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.jot-book-info { display: flex; align-items: center; gap: 10px; }
+.jot-book-thumb { width: 28px; height: 38px; border-radius: 1px 2px 2px 1px;
+  box-shadow: 1px 2px 6px var(--spine-shadow); flex-shrink: 0; }
+.jot-book-name { font-family: var(--ff-display); font-style: italic; font-size: 14px; }
+.jot-book-ch { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em; color: var(--ink-faint); }
+.jot-page-badge { font-family: var(--ff-sc); font-size: 10px; letter-spacing: .02em;
+  background: var(--crimson); color: var(--cream);
+  padding: 5px 10px; border-radius: 3px; cursor: pointer;
+  border: none; -webkit-tap-highlight-color: transparent; }
+.jot-tabs { display: flex; align-items: center; padding: 0 20px;
+  border-bottom: 1px solid var(--rule); flex-shrink: 0; }
+.jot-tab { font-family: var(--ff-sc); font-size: 10px; letter-spacing: .02em;
+  color: var(--ink-faint); padding: 10px 12px 8px;
+  border-bottom: 2px solid transparent; cursor: pointer;
+  background: none; border-top: none; border-left: none; border-right: none;
+  -webkit-tap-highlight-color: transparent; transition: color .15s; }
+.jot-tab.active { color: var(--ink); border-bottom-color: var(--ink); }
+.jot-both-dot { margin-left: auto; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--rule); cursor: pointer; border: none;
+  -webkit-tap-highlight-color: transparent; }
+.jot-both-dot.active { background: var(--crimson); }
+.jot-editor-area { display: flex; flex: 1; overflow: hidden; min-height: 0; }
+.jot-write-pane { flex: 1; padding: 16px 20px; overflow-y: auto; }
+.jot-write-pane textarea { width: 100%; height: 100%; min-height: 200px;
+  background: transparent; border: none; outline: none; resize: none;
+  font-family: var(--ff-body); font-size: 14px; line-height: 1.7; color: var(--ink); }
+.jot-preview-pane { flex: 1; padding: 16px 20px; overflow-y: auto;
+  border-left: 1px solid var(--rule);
+  font-family: var(--ff-body); font-size: 14px; line-height: 1.7; }
+.jot-preview-pane blockquote { border-left: 2px solid var(--ink); padding-left: 10px;
+  font-family: var(--ff-display); font-style: italic; font-size: 15px; margin: 8px 0; }
+.jot-preview-pane strong { font-weight: 700; }
+.jot-preview-pane em { font-style: italic; font-family: var(--ff-display); }
+.jot-preview-pane h3 { font-family: var(--ff-sc); font-size: 12px; letter-spacing: .02em; margin: 12px 0 4px; }
+.jot-threads-section { flex-shrink: 0; padding: 10px 20px; border-top: 1px solid var(--rule); }
+.jot-threads-label { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em;
+  color: var(--ink-faint); margin-bottom: 8px; }
+.tag-input-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.tag-input { background: none; border: none; outline: none;
+  font-family: var(--ff-sc); font-size: 10px; letter-spacing: .01em;
+  color: var(--ink); width: 80px; }
+.jot-toolbar { flex-shrink: 0; display: flex; align-items: center; gap: 2px;
+  padding: 8px 20px calc(8px + var(--safe-bottom)); border-top: 1px solid var(--rule);
+  background: var(--parchment); }
+.toolbar-btn { background: none; border: none; cursor: pointer;
+  font-family: var(--ff-body); font-size: 14px; font-weight: 700;
+  color: var(--ink); padding: 8px 10px; border-radius: 4px;
+  -webkit-tap-highlight-color: transparent; transition: background .1s; }
+.toolbar-btn:active { background: var(--parchment-dark); }
+.toolbar-btn.italic { font-style: italic; font-weight: 400; }
+.toolbar-btn.quote { font-family: var(--ff-display); font-style: italic; font-size: 17px; }
+
+/* CAPTURE / ISBN */
+#screen-capture { background: #000; }
+.capture-header { position: absolute; top: 0; left: 0; right: 0;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 52px 20px 14px; z-index: 20; }
+.capture-close { background: none; border: none; cursor: pointer;
+  color: rgba(255,255,255,.7); font-size: 22px; padding: 4px;
+  -webkit-tap-highlight-color: transparent; }
+.capture-title { font-family: var(--ff-sc); font-size: 10px; letter-spacing: .01em;
+  color: rgba(255,255,255,.7); }
+.capture-kb { background: none; border: none; cursor: pointer;
+  color: rgba(255,255,255,.7); font-size: 20px; padding: 4px;
+  -webkit-tap-highlight-color: transparent; }
+.camera-view { position: absolute; inset: 0; overflow: hidden; }
+.camera-view video { width: 100%; height: 100%; object-fit: cover; }
+.camera-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+.scan-frame { width: 280px; height: 180px; position: relative; }
+.scan-corner { position: absolute; width: 20px; height: 20px; border-color: rgba(255,255,255,.8); border-style: solid; }
+.scan-corner.tl { top: 0; left: 0; border-width: 2px 0 0 2px; }
+.scan-corner.tr { top: 0; right: 0; border-width: 2px 2px 0 0; }
+.scan-corner.bl { bottom: 0; left: 0; border-width: 0 0 2px 2px; }
+.scan-corner.br { bottom: 0; right: 0; border-width: 0 2px 2px 0; }
+.scan-line { position: absolute; left: 10px; right: 10px; height: 1px;
+  background: var(--crimson); box-shadow: 0 0 6px var(--crimson-pale);
+  animation: scan-move 2s ease-in-out infinite; }
+@keyframes scan-move { 0%,100% { top: 15%; } 50% { top: 78%; } }
+.scan-ean { position: absolute; bottom: -30px; left: 0; right: 0;
+  display: flex; align-items: center; gap: 8px;
+  font-family: monospace; font-size: 11px; color: rgba(255,255,255,.5); }
+.scan-ean-label { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em; }
+.scan-ean-num { color: var(--crimson-pale); letter-spacing: .02em; }
+.scan-ean-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--crimson); flex-shrink: 0; }
+.isbn-result-sheet { position: absolute; bottom: 0; left: 0; right: 0;
+  background: var(--parchment); border-radius: 12px 12px 0 0; overflow: hidden;
+  z-index: 30; transform: translateY(100%);
+  transition: transform .4s cubic-bezier(.25,.46,.45,.94); }
+.isbn-result-sheet.open { transform: translateY(0); }
+.isbn-sheet-handle { width: 36px; height: 4px; background: var(--rule);
+  border-radius: 2px; margin: 12px auto 16px; }
+.isbn-found-label { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em;
+  color: var(--ink-faint); padding: 0 20px; margin-bottom: 14px;
+  display: flex; align-items: center; gap: 6px; }
+.isbn-found-dot { width: 6px; height: 6px; border-radius: 50%; background: #4a8; flex-shrink: 0; }
+.isbn-book-row { display: flex; gap: 14px; padding: 0 20px 14px;
+  border-bottom: 1px solid var(--rule); }
+.isbn-cover { width: 60px; height: 82px; flex-shrink: 0;
+  border-radius: 2px 3px 3px 2px; box-shadow: 2px 3px 10px var(--spine-shadow);
+  display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.isbn-book-title { font-family: var(--ff-display); font-style: italic;
+  font-size: 22px; line-height: 1.2; margin-bottom: 4px; }
+.isbn-book-author { font-family: var(--ff-body); font-size: 13px; color: var(--ink-mid); margin-bottom: 2px; }
+.isbn-book-isbn { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em; color: var(--ink-faint); margin-bottom: 8px; }
+.isbn-chips { display: flex; gap: 6px; }
+.isbn-chip { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em;
+  border: 1px solid var(--rule); color: var(--ink-mid); padding: 4px 10px; border-radius: 12px; }
+.isbn-actions { display: flex; padding: 14px 20px calc(14px + var(--safe-bottom)); gap: 6px; }
+.isbn-btn { flex: 1; padding: 13px 0; text-align: center; cursor: pointer;
+  font-family: var(--ff-sc); font-size: 10px; letter-spacing: .02em;
+  background: var(--parchment-dark); border: none; color: var(--ink-mid);
+  transition: background .15s; -webkit-tap-highlight-color: transparent; }
+.isbn-btn.reading { background: var(--ink); color: var(--parchment); }
+.isbn-type-hint { font-family: var(--ff-display); font-style: italic; font-size: 12px;
+  color: rgba(255,255,255,.35); text-align: center;
+  position: absolute; bottom: 28px; left: 0; right: 0; }
+.isbn-manual-section { position: absolute; bottom: 0; left: 0; right: 0;
+  background: var(--parchment); padding: 20px 20px calc(20px + var(--safe-bottom));
+  border-radius: 12px 12px 0 0; z-index: 25;
+  transform: translateY(100%); transition: transform .35s ease; }
+.isbn-manual-section.open { transform: translateY(0); }
+.isbn-manual-label { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em;
+  color: var(--ink-faint); margin-bottom: 10px; }
+.isbn-manual-input { width: 100%; background: none; border: none;
+  border-bottom: 1px solid var(--ink); outline: none;
+  font-family: var(--ff-body); font-size: 18px; color: var(--ink);
+  padding: 8px 0; margin-bottom: 16px; }
+.isbn-manual-go { display: block; width: 100%; background: var(--ink);
+  color: var(--parchment); font-family: var(--ff-sc); font-size: 11px;
+  letter-spacing: .02em; border: none; padding: 14px; cursor: pointer;
+  -webkit-tap-highlight-color: transparent; }
+
+/* OCR */
+#screen-ocr { background: #1a1710; }
+
+/* THREADS */
+.threads-canvas-wrap { padding: 16px 24px; }
+.threads-canvas { width: 100%; aspect-ratio: 1; max-height: 260px; position: relative; }
+#threads-svg { width: 100%; height: 100%; }
+.thread-list-item { padding: 14px 24px; border-bottom: 1px solid var(--rule);
+  cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.thread-list-item:active { background: var(--parchment-dark); }
+.thread-item-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+.thread-item-tag { font-family: var(--ff-sc); font-size: 12px; letter-spacing: .02em; color: var(--crimson); }
+.thread-item-count { font-family: var(--ff-sc); font-size: 10px; letter-spacing: .02em; color: var(--ink-faint); }
+.thread-item-quote { font-family: var(--ff-display); font-style: italic; font-size: 13px;
+  color: var(--ink-mid); line-height: 1.45; border-left: 2px solid var(--rule);
+  padding-left: 10px; margin-bottom: 3px; }
+.thread-item-source { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .02em; color: var(--ink-faint); }
+
+/* ALMANAC */
+.almanac-stats-row { display: grid; grid-template-columns: repeat(3,1fr);
+  gap: 1px; background: var(--rule); border-bottom: 1px solid var(--rule); }
+.almanac-stat-cell { background: var(--parchment); padding: 18px 16px; }
+.almanac-stat-num { font-family: var(--ff-display); font-style: italic;
+  font-size: 32px; line-height: 1; }
+.almanac-stat-label { font-family: var(--ff-sc); font-size: 8px; letter-spacing: .01em;
+  color: var(--ink-faint); margin-top: 4px; }
+.almanac-section { padding: 20px 24px; border-bottom: 1px solid var(--rule); }
+.almanac-section-header { display: flex; justify-content: space-between;
+  align-items: baseline; margin-bottom: 14px; }
+.almanac-section-title { font-family: var(--ff-display); font-style: italic; font-size: 20px; }
+.almanac-section-sub { font-family: var(--ff-sc); font-size: 9px; letter-spacing: .01em; color: var(--ink-faint); }
+.bar-chart { display: flex; align-items: flex-end; gap: 3px; height: 80px; }
+.bar-day { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.bar-fill { width: 100%; background: var(--rule); border-radius: 2px 2px 0 0; min-height: 2px; }
+.bar-fill.today { background: var(--crimson); }
+.bar-label { font-family: var(--ff-sc); font-size: 7px; letter-spacing: .02em; color: var(--ink-faint); }
+.bar-val { font-family: var(--ff-sc); font-size: 7px; letter-spacing: .01em; color: var(--ink-mid); }
+.heat-grid { display: grid; grid-template-columns: repeat(12,1fr); gap: 4px; }
+.heat-month-label { font-family: var(--ff-sc); font-size: 7px; letter-spacing: .02em;
+  color: var(--ink-faint); text-align: center; margin-bottom: 3px; }
+.heat-cell { aspect-ratio: 1; border-radius: 2px; background: var(--parchment-dark); }
+.heat-cell.h1 { background: #d4a8a8; }
+.heat-cell.h2 { background: #bf7878; }
+.heat-cell.h3 { background: #a85050; }
+.heat-cell.h4 { background: var(--crimson); }
+.almanac-insight { padding: 20px 24px; border-bottom: 1px solid var(--rule); }
+.almanac-insight-num { font-family: var(--ff-display); font-style: italic;
+  font-size: 28px; margin-bottom: 4px; }
+.almanac-insight-text { font-family: var(--ff-body); font-size: 13px;
+  color: var(--ink-mid); line-height: 1.55; }
+.almanac-insight-text em { font-style: italic; }
+.io-section { padding: 20px 24px; border-bottom: 1px solid var(--rule); }
+.io-title { font-family: var(--ff-display); font-style: italic; font-size: 20px; margin-bottom: 14px; }
+.io-btn { display: flex; align-items: center; justify-content: space-between;
+  width: 100%; background: none; border: 1px solid var(--rule);
+  padding: 14px 16px; margin-bottom: 8px; cursor: pointer;
+  -webkit-tap-highlight-color: transparent; transition: background .15s; }
+.io-btn:active { background: var(--parchment-dark); }
+.io-btn-label { font-family: var(--ff-sc); font-size: 11px; letter-spacing: .02em; }
+.io-btn-sub { font-family: var(--ff-body); font-style: italic; font-size: 11px; color: var(--ink-faint); margin-top: 1px; }
+.io-btn-icon { font-size: 18px; color: var(--ink-faint); }
+.io-upload-area { border: 1px dashed var(--rule); padding: 20px; text-align: center;
+  margin-bottom: 8px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.io-upload-area:active { background: var(--parchment-dark); }
+.io-upload-text { font-family: var(--ff-sc); font-size: 10px; letter-spacing: .02em; color: var(--ink-faint); }
+
+/* EMPTY STATES */
+.empty-state { padding: 48px 32px; text-align: center; }
+.empty-state-icon { font-size: 40px; margin-bottom: 16px; opacity: .4; }
+.empty-state-title { font-family: var(--ff-display); font-style: italic; font-size: 22px; color: var(--ink-mid); margin-bottom: 8px; }
+.empty-state-sub { font-family: var(--ff-body); font-style: italic; font-size: 13px; color: var(--ink-faint); line-height: 1.55; }
+
+/* MODAL */
+.modal-overlay { position: fixed; inset: 0; background: rgba(26,23,16,.5);
+  z-index: 200; display: flex; align-items: flex-end;
+  opacity: 0; pointer-events: none; transition: opacity .2s; }
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal-sheet { background: var(--parchment); width: 100%;
+  padding: 20px 24px calc(24px + var(--safe-bottom));
+  max-height: 80vh; overflow-y: auto; border-radius: 12px 12px 0 0;
+  transform: translateY(20px); transition: transform .25s ease; }
+.modal-overlay.open .modal-sheet { transform: translateY(0); }
+.modal-title { font-family: var(--ff-display); font-style: italic; font-size: 24px; margin-bottom: 16px; }
+.modal-input { width: 100%; background: none; border: none;
+  border-bottom: 1px solid var(--ink); outline: none;
+  font-family: var(--ff-body); font-size: 16px; color: var(--ink);
+  padding: 8px 0; margin-bottom: 20px; }
+.modal-btn-row { display: flex; gap: 10px; }
+.modal-btn { flex: 1; padding: 14px; font-family: var(--ff-sc); font-size: 11px;
+  letter-spacing: .02em; border: 1px solid var(--rule); cursor: pointer;
+  background: none; color: var(--ink); -webkit-tap-highlight-color: transparent; }
+.modal-btn.primary { background: var(--ink); color: var(--parchment); border-color: var(--ink); }
+
+/* PAGE INPUT */
+.page-input-overlay { position: fixed; inset: 0; background: rgba(26,23,16,.5);
+  z-index: 200; display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none; transition: opacity .2s; }
+.page-input-overlay.open { opacity: 1; pointer-events: all; }
+.page-input-box { background: var(--parchment); width: calc(100% - 48px);
+  padding: 24px; border-radius: 4px; }
+.page-input-title { font-family: var(--ff-display); font-style: italic; font-size: 20px; margin-bottom: 12px; }
+.page-input-field { width: 100%; background: none; border: none;
+  border-bottom: 1px solid var(--ink); outline: none;
+  font-family: var(--ff-body); font-size: 22px; color: var(--ink);
+  padding: 8px 0; margin-bottom: 16px; text-align: center; }
+
+/* SEARCH */
+.search-overlay { position: fixed; inset: 0; background: var(--parchment);
+  z-index: 150; transform: translateY(-100%); transition: transform .3s ease;
+  display: flex; flex-direction: column; }
+.search-overlay.open { transform: translateY(0); }
+.search-header { padding: 52px 20px 14px; border-bottom: 1px solid var(--rule);
+  display: flex; gap: 12px; align-items: center; }
+.search-input { flex: 1; background: none; border: none;
+  border-bottom: 1px solid var(--ink); outline: none;
+  font-family: var(--ff-body); font-size: 18px; color: var(--ink); padding: 6px 0; }
+.search-close { background: none; border: none; cursor: pointer; font-size: 20px;
+  color: var(--ink-faint); -webkit-tap-highlight-color: transparent; }
+.search-results { flex: 1; overflow-y: auto; }
+
+/* TOAST */
+.toast { position: fixed; bottom: calc(90px + var(--safe-bottom)); left: 20px; right: 20px;
+  background: var(--ink); color: var(--parchment); font-family: var(--ff-sc);
+  font-size: 10px; letter-spacing: .02em; padding: 14px 18px; z-index: 300;
+  opacity: 0; transition: opacity .2s; pointer-events: none; }
+.toast.show { opacity: 1; }
+
+/* BACK BTN */
+.back-btn { position: absolute; top: 14px; left: 24px;
+  background: none; border: none; cursor: pointer;
+  color: var(--ink-faint); font-size: 20px; padding: 4px;
+  -webkit-tap-highlight-color: transparent; }
+
+</style>
+</head>
+<body>
+
+<!-- ══ WELCOME ══ -->
+<div id="screen-welcome" class="screen active">
+  <div class="welcome-body">
+    <div class="welcome-eyebrow">WELCOME TO</div>
+    <div class="welcome-title"><span class="title-J">J</span><span class="title-otter">otter</span></div>
+    <div class="welcome-tag">A quiet place to keep<br>what books say to you.</div>
+    <hr class="welcome-rule">
+    <ul class="welcome-features">
+      <li><span class="feat-num">i.</span><span class="feat-text"><strong>Scan a spine</strong><em>and the book finds itself.</em></span></li>
+      <li><span class="feat-num">ii.</span><span class="feat-text"><strong>Mark a page</strong><em>with your own words.</em></span></li>
+      <li><span class="feat-num">iii.</span><span class="feat-text"><strong>Pull a thread</strong><em>tags weave across volumes.</em></span></li>
+    </ul>
+  </div>
+  <div class="welcome-footer">
+    <button class="btn-primary" onclick="beginShelf()">BEGIN A SHELF →</button>
+    <div class="welcome-import">or <a onclick="showImportModal()">import from Goodreads</a></div>
+    <div class="welcome-colophon" style="margin-top:20px">PRESS Nº 1 · QUARTO EDITION · MMXXVI</div>
+  </div>
+</div>
+
+<!-- ══ SHELF ══ -->
+<div id="screen-shelf" class="screen">
+  <div class="folio-header">
+    <div class="folio-label">FOLIO II</div>
+    <div class="folio-title">Shelf</div>
+    <div class="folio-stats"><span id="stat-volumes">0</span> VOLUMES · <span id="stat-marginalia">0</span> MARGINALIA · <span id="stat-streak">0</span> DAY STREAK</div>
+    <button class="folio-btn" onclick="openSearch()">⌕</button>
+  </div>
+  <div class="scroll-content" id="shelf-content"></div>
+  <button class="fab" onclick="goScreen('capture')">+</button>
+  <nav class="nav-bar">
+    <button class="nav-item active" onclick="goScreen('shelf')"><span class="nav-icon">▤</span><span>SHELF</span><span class="nav-dot"></span></button>
+    <button class="nav-item" onclick="goScreen('capture')"><span class="nav-icon">⊙</span><span>CAPTURE</span><span class="nav-dot"></span></button>
+    <button class="nav-item" onclick="goScreen('threads')"><span class="nav-icon">✦</span><span>THREADS</span><span class="nav-dot"></span></button>
+    <button class="nav-item" onclick="goScreen('pace')"><span class="nav-icon">∿</span><span>PACE</span><span class="nav-dot"></span></button>
+  </nav>
+</div>
+
+<!-- ══ BOOK DETAIL ══ -->
+<div id="screen-book" class="screen">
+  <div class="folio-header" style="padding-bottom:0">
+    <div class="folio-label">FOLIO II · §1</div>
+    <button class="back-btn" onclick="goBack()">←</button>
+    <button class="folio-btn" id="book-more-btn">···</button>
+  </div>
+  <div class="scroll-content" id="book-detail-content" style="padding-bottom:20px"></div>
+  <nav class="nav-bar">
+    <button class="nav-item" onclick="goScreen('shelf')"><span class="nav-icon">▤</span><span>SHELF</span><span class="nav-dot"></span></button>
+    <button class="nav-item" onclick="goScreen('capture')"><span class="nav-icon">⊙</span><span>CAPTURE</span><span class="nav-dot"></span></button>
+    <button class="nav-item" onclick="goScreen('threads')"><span class="nav-icon">✦</span><span>THREADS</span><span class="nav-dot"></span></button>
+    <button class="nav-item" onclick="goScreen('pace')"><span class="nav-icon">∿</span><span>PACE</span><span class="nav-dot"></span></button>
+  </nav>
+</div>
+
+<!-- ══ JOT EDITOR ══ -->
+<div id="screen-jot" class="screen">
+  <div class="jot-header">
+    <button class="jot-close" onclick="closeJot()">×</button>
+    <span class="jot-header-title">JOT</span>
+    <button class="jot-save" onclick="saveJot()">SAVE</button>
+  </div>
+  <div class="jot-book-ref" onclick="showBookPicker()">
+    <div class="jot-book-info">
+      <div id="jot-thumb" class="jot-book-thumb"></div>
+      <div>
+        <div id="jot-book-name" class="jot-book-name">Choose a book…</div>
+        <div id="jot-book-ch" class="jot-book-ch">TAP TO SELECT</div>
+      </div>
+    </div>
+    <button class="jot-page-badge" id="jot-page-badge" onclick="openPageInput(event)">p. –</button>
+  </div>
+  <div class="jot-tabs">
+    <button class="jot-tab active" id="tab-write" onclick="setJotTab('write')">WRITE</button>
+    <button class="jot-tab" id="tab-preview" onclick="setJotTab('preview')">PREVIEW</button>
+    <button class="jot-both-dot" id="tab-both" onclick="setJotTab('both')" title="BOTH"></button>
+  </div>
+  <div class="jot-editor-area" id="jot-editor-area">
+    <div class="jot-write-pane" id="jot-write-pane">
+      <textarea id="jot-textarea" placeholder="Mark this page…&#10;&#10;&gt; Use &gt; for a blockquote&#10;**Bold** and *italic* work too."></textarea>
+    </div>
+    <div class="jot-preview-pane" id="jot-preview-pane" style="display:none"></div>
+  </div>
+  <div class="jot-threads-section">
+    <div class="jot-threads-label">THREADS</div>
+    <div class="tag-input-row" id="jot-tags-row">
+      <input class="tag-input" id="jot-tag-input" placeholder="#tag" onkeydown="handleTagInput(event)">
+    </div>
+  </div>
+  <div class="jot-toolbar">
+    <button class="toolbar-btn" onclick="insertMd('**','**')"><b>B</b></button>
+    <button class="toolbar-btn italic" onclick="insertMd('*','*')">I</button>
+    <button class="toolbar-btn quote" onclick="insertMd('\n> ','')">❝</button>
+    <button class="toolbar-btn" onclick="insertMd('\n• ','')">•</button>
+    <button class="toolbar-btn" onclick="insertMd('\n### ','')">H</button>
+    <button class="toolbar-btn" onclick="insertMd('\n---\n','')">—</button>
+    <button class="toolbar-btn" style="margin-left:auto;font-size:18px" onclick="goScreen('ocr')">⌖</button>
+  </div>
+</div>
+
+<!-- ══ CAPTURE / ISBN ══ -->
+<div id="screen-capture" class="screen">
+  <div class="camera-view">
+    <video id="camera-video" autoplay playsinline muted></video>
+    <div class="camera-overlay">
+      <div class="scan-frame">
+        <div class="scan-corner tl"></div><div class="scan-corner tr"></div>
+        <div class="scan-corner bl"></div><div class="scan-corner br"></div>
+        <div class="scan-line"></div>
+        <div class="scan-ean">
+          <span class="scan-ean-label">EAN ▶</span>
+          <span id="scan-status">scanning…</span>
+          <span class="scan-ean-num" id="scan-num"></span>
+          <span class="scan-ean-dot" id="scan-dot" style="opacity:0"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="capture-header">
+    <button class="capture-close" onclick="closeCapture()">×</button>
+    <span class="capture-title">LOUPE · CAPTURE</span>
+    <button class="capture-kb" onclick="showManualISBN()">⌨</button>
+  </div>
+  <div class="isbn-type-hint">or <span style="text-decoration:underline;cursor:pointer" onclick="showManualISBN()">type ISBN by hand</span></div>
+  <div class="isbn-result-sheet" id="isbn-result-sheet">
+    <div class="isbn-sheet-handle"></div>
+    <div class="isbn-found-label"><span class="isbn-found-dot"></span> ISBN FOUND · GOOGLE BOOKS</div>
+    <div class="isbn-book-row">
+      <div id="isbn-cover" class="isbn-cover"></div>
+      <div>
+        <div id="isbn-title" class="isbn-book-title">—</div>
+        <div id="isbn-author" class="isbn-book-author">—</div>
+        <div id="isbn-isbn" class="isbn-book-isbn">—</div>
+        <div class="isbn-chips"><span id="isbn-pages-chip" class="isbn-chip">—</span><span id="isbn-genre-chip" class="isbn-chip">—</span></div>
+      </div>
+    </div>
+    <div class="isbn-actions">
+      <button class="isbn-btn" onclick="addBookStatus('to-read')">TO READ</button>
+      <button class="isbn-btn reading" onclick="addBookStatus('reading')">READING</button>
+      <button class="isbn-btn" onclick="addBookStatus('finished')">FINISHED</button>
+    </div>
+  </div>
+  <div class="isbn-manual-section" id="isbn-manual-section">
+    <div class="isbn-manual-label">ENTER ISBN</div>
+    <input class="isbn-manual-input" id="isbn-manual-input" type="text" inputmode="numeric" placeholder="978-…" maxlength="17">
+    <button class="isbn-manual-go" onclick="lookupManualISBN()">LOOK UP →</button>
+  </div>
+</div>
+
+<!-- ══ OCR ══ -->
+<div id="screen-ocr" class="screen" style="background:#1a1710">
+  <div style="position:absolute;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:52px 20px 14px;z-index:20">
+    <button style="background:none;border:none;color:rgba(255,255,255,.7);font-size:22px;cursor:pointer" onclick="closeOCR()">×</button>
+    <span style="font-family:var(--ff-sc);font-size:10px;letter-spacing:.2em;color:rgba(255,255,255,.7)">LIFT TEXT</span>
+    <button style="background:none;border:none;color:var(--crimson-pale);font-family:var(--ff-sc);font-size:10px;letter-spacing:.1em;cursor:pointer" onclick="retakeOCR()">RE-SHOOT</button>
+  </div>
+  <div style="position:absolute;top:80px;left:0;right:0;bottom:0;display:flex;flex-direction:column">
+    <div id="ocr-camera-area" style="flex:1;position:relative;background:#2a2520;display:flex;align-items:center;justify-content:center;overflow:hidden">
+      <video id="ocr-video" autoplay playsinline muted style="width:100%;height:100%;object-fit:cover"></video>
+      <canvas id="ocr-canvas" style="display:none"></canvas>
+      <button id="ocr-capture-btn" style="position:absolute;bottom:20px;left:50%;transform:translateX(-50%);background:var(--crimson);color:var(--cream);border:none;font-family:var(--ff-sc);font-size:11px;letter-spacing:.12em;padding:12px 28px;cursor:pointer" onclick="captureOCR()">CAPTURE PAGE</button>
+      <div id="ocr-progress-bar" style="position:absolute;bottom:0;left:0;height:2px;background:var(--crimson);width:0%;transition:width .3s"></div>
+    </div>
+    <div id="ocr-result" style="background:#1a1710;padding:20px;display:none">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px">
+        <span style="font-family:var(--ff-display);font-style:italic;font-size:22px;color:var(--parchment)">Lifted</span>
+        <span style="font-family:var(--ff-sc);font-size:9px;letter-spacing:.1em;color:#4a8">· CONFIDENT</span>
+      </div>
+      <div id="ocr-lifted-text" style="font-family:var(--ff-display);font-style:italic;font-size:15px;color:var(--parchment);line-height:1.55;border-left:2px solid var(--crimson);padding-left:12px;margin-bottom:16px"></div>
+      <div id="ocr-source-attr" style="font-family:var(--ff-sc);font-size:9px;letter-spacing:.06em;color:rgba(255,255,255,.4);margin-bottom:20px"></div>
+      <div style="display:flex;gap:10px">
+        <button style="flex:1;padding:13px;background:transparent;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.7);font-family:var(--ff-sc);font-size:10px;letter-spacing:.1em;cursor:pointer" onclick="copyOCR()">COPY</button>
+        <button style="flex:2;padding:13px;background:var(--crimson);color:var(--cream);border:none;font-family:var(--ff-sc);font-size:10px;letter-spacing:.1em;cursor:pointer" onclick="useOCRAsJot()">QUOTE IN NEW JOT →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ THREADS ══ -->
+<div id="screen-threads" class="screen">
+  <div class="folio-header">
+    <div class="folio-label">FOLIO IV</div>
+    <div class="folio-title">Threads</div>
+    <div class="folio-stats"><span id="threads-count">0</span> THREADS</div>
+    <button class="folio-btn" onclick="openSearch()">⌕</button>
+  </div>
+  <div class="scroll-content">
+    <div class="threads-canvas-wrap"><div class="threads-canvas"><svg id="threads-svg" viewBox="0 0 300 300"></svg></div></div>
+    <div id="threads-list"></div>
+  </div>
+  <nav class="nav-bar">
+    <button class="nav-item" onclick="goScreen('shelf')"><span class="nav-icon">▤</span><span>SHELF</span><span class="nav-dot"></span></button>
+    <button class="nav-item" onclick="goScreen('capture')"><span class="nav-icon">⊙</span><span>CAPTURE</span><span class="nav-dot"></span></button>
+    <button class="nav-item active" onclick="goScreen('threads')"><span class="nav-icon">✦</span><span>THREADS</span><span class="nav-dot"></span></button>
+    <button class="nav-item" onclick="goScreen('pace')"><span class="nav-icon">∿</span><span>PACE</span><span class="nav-dot"></span></button>
+  </nav>
+</div>
+
+<!-- ══ PACE / ALMANAC ══ -->
+<div id="screen-pace" class="screen">
+  <div class="folio-header">
+    <div class="folio-label">FOLIO V</div>
+    <div class="folio-title">Almanac</div>
+    <div class="folio-sub">the year so far, in pages.</div>
+  </div>
+  <div class="scroll-content">
+    <div class="almanac-stats-row">
+      <div class="almanac-stat-cell"><div class="almanac-stat-num" id="alm-books">0</div><div class="almanac-stat-label">BOOKS FINISHED</div></div>
+      <div class="almanac-stat-cell"><div class="almanac-stat-num" id="alm-pages">0</div><div class="almanac-stat-label">PAGES TURNED</div></div>
+      <div class="almanac-stat-cell"><div class="almanac-stat-num" id="alm-streak">0</div><div class="almanac-stat-label">DAY STREAK</div></div>
+    </div>
+    <div class="almanac-section">
+      <div class="almanac-section-header"><div class="almanac-section-title">Last fortnight</div><div class="almanac-section-sub">PP / DAY</div></div>
+      <div class="bar-chart" id="fortnight-chart"></div>
+    </div>
+    <div class="almanac-section">
+      <div class="almanac-section-header"><div class="almanac-section-title">The year</div><div class="almanac-section-sub" id="alm-year">2026</div></div>
+      <div class="heat-grid" id="heat-grid"></div>
+    </div>
+    <div class="almanac-insight" id="almanac-insight"></div>
+    <div class="io-section">
+      <div class="io-title">Import &amp; Export</div>
+      <button class="io-btn" onclick="exportJSON()"><div><div class="io-btn-label">EXPORT JSON</div><div class="io-btn-sub">Full library backup</div></div><span class="io-btn-icon">↓</span></button>
+      <button class="io-btn" onclick="exportCSV()"><div><div class="io-btn-label">EXPORT CSV</div><div class="io-btn-sub">Goodreads-compatible</div></div><span class="io-btn-icon">↓</span></button>
+      <button class="io-btn" onclick="exportMarkdown()"><div><div class="io-btn-label">EXPORT MARKDOWN</div><div class="io-btn-sub">All marginalia as .md</div></div><span class="io-btn-icon">↓</span></button>
+      <div class="io-upload-area" onclick="document.getElementById('import-file').click()">
+        <div class="io-upload-text">TAP TO IMPORT JSON / CSV</div>
+        <input type="file" id="import-file" accept=".json,.csv" style="display:none" onchange="importFile(event)">
+      </div>
+    </div>
+  </div>
+  <nav class="nav-bar">
+    <button class="nav-item" onclick="goScreen('shelf')"><span class="nav-icon">▤</span><span>SHELF</span><span class="nav-dot"></span></button>
+    <button class="nav-item" onclick="goScreen('capture')"><span class="nav-icon">⊙</span><span>CAPTURE</span><span class="nav-dot"></span></button>
+    <button class="nav-item" onclick="goScreen('threads')"><span class="nav-icon">✦</span><span>THREADS</span><span class="nav-dot"></span></button>
+    <button class="nav-item active" onclick="goScreen('pace')"><span class="nav-icon">∿</span><span>PACE</span><span class="nav-dot"></span></button>
+  </nav>
+</div>
+
+<!-- ══ OVERLAYS ══ -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal-sheet">
+    <div class="modal-title" id="modal-title">—</div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+<div class="page-input-overlay" id="page-input-overlay" onclick="closePageInput(event)">
+  <div class="page-input-box">
+    <div class="page-input-title">Which page?</div>
+    <input class="page-input-field" id="page-input-field" type="number" inputmode="numeric" placeholder="142" onkeydown="if(event.key==='Enter')confirmPageInput()">
+    <div style="display:flex;gap:10px">
+      <button class="modal-btn" onclick="document.getElementById('page-input-overlay').classList.remove('open')">Cancel</button>
+      <button class="modal-btn primary" onclick="confirmPageInput()">Set Page</button>
+    </div>
+  </div>
+</div>
+<div class="search-overlay" id="search-overlay">
+  <div class="search-header">
+    <input class="search-input" id="search-input" placeholder="Search marginalia…" oninput="doSearch(this.value)">
+    <button class="search-close" onclick="closeSearch()">×</button>
+  </div>
+  <div class="search-results" id="search-results"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+
+// ── DATA ──────────────────────────────────────────────────────────
+const SPINE_COLORS = [
+  '#8b2020','#2a4a7a','#2a5a3a','#6a4a2a','#4a2a6a',
+  '#5a3a1a','#1a4a5a','#7a3a2a','#3a5a2a','#5a2a4a',
+  '#2a3a6a','#6a5a2a','#3a4a5a','#7a2a3a','#2a6a5a'
+];
+function spineColor(t){let h=0;for(let i=0;i<t.length;i++)h=(h*31+t.charCodeAt(i))&0x7fffffff;return SPINE_COLORS[h%SPINE_COLORS.length];}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+function today(){return new Date().toISOString().slice(0,10);}
+
+const DB={
+  load(){try{return JSON.parse(localStorage.getItem('jotter-v1')||'null')||{books:[],jots:[],paceLog:{},started:today()};}catch{return{books:[],jots:[],paceLog:{},started:today()};}},
+  save(d){localStorage.setItem('jotter-v1',JSON.stringify(d));}
+};
+let DATA=DB.load();
+function logPace(p){if(!p)return;DATA.paceLog[today()]=(DATA.paceLog[today()]||0)+p;DB.save(DATA);}
+
+// ── NAVIGATION ───────────────────────────────────────────────────
+let currentScreen='welcome', screenHistory=[];
+function goScreen(id,push=true){
+  if(push&&currentScreen!==id)screenHistory.push(currentScreen);
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+  currentScreen=id;
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>{
+    const t=n.querySelector('span:not(.nav-icon):not(.nav-dot)')?.textContent?.toLowerCase();
+    if(t===id)n.classList.add('active');
+  });
+  if(id==='shelf')renderShelf();
+  if(id==='threads')renderThreads();
+  if(id==='pace')renderAlmanac();
+  if(id==='capture')startCamera();
+  if(id==='ocr')startOCR();
+}
+function goBack(){const p=screenHistory.pop()||'shelf';goScreen(p,false);}
+function beginShelf(){goScreen('shelf');}
+
+// ── SHELF ────────────────────────────────────────────────────────
+function renderShelf(){
+  const el=document.getElementById('shelf-content');
+  const streak=calcStreak();
+  document.getElementById('stat-volumes').textContent=DATA.books.length;
+  document.getElementById('stat-marginalia').textContent=DATA.jots.length;
+  document.getElementById('stat-streak').textContent=streak;
+
+  if(DATA.books.length===0){
+    el.innerHTML=`<div class="empty-state"><div class="empty-state-icon">📚</div>
+      <div class="empty-state-title">Your shelf awaits.</div>
+      <div class="empty-state-sub">Tap + to scan a spine or type an ISBN.</div></div>`;
+    return;
+  }
+  const reading=DATA.books.filter(b=>b.status==='reading');
+  const toread=DATA.books.filter(b=>b.status==='to-read');
+  const finished=DATA.books.filter(b=>b.status==='finished');
+  let html='';
+
+  if(reading.length){
+    html+=`<div class="shelf-section"><div class="shelf-section-header">
+      <div class="shelf-section-title"><em>i.</em> Currently reading</div>
+      <div class="shelf-section-count">${reading.length} VOLS.</div></div>
+      <div class="spine-row">`;
+    reading.forEach(b=>{
+      const pct=b.totalPages?Math.round((b.currentPage||0)/b.totalPages*100):0;
+      html+=`<div><div class="book-spine" style="background:${spineColor(b.title)}" onclick="openBook('${b.id}')">
+        <div class="spine-shadow-line"></div>
+        <div class="book-spine-title">${b.title}</div></div>
+        <div class="book-progress-bar"><div class="book-progress-fill" style="width:${pct}%"></div></div>
+        <div class="book-progress-label"><em>${b.title.slice(0,16)}${b.title.length>16?'…':''}</em><span>${b.currentPage||0}/${b.totalPages||'?'}</span></div></div>`;
+    });
+    html+=`</div></div>`;
+  }
+  if(toread.length){
+    html+=`<div class="shelf-section" style="margin-top:20px"><div class="shelf-section-header">
+      <div class="shelf-section-title"><em>ii.</em> Up next</div>
+      <div class="shelf-section-count">${toread.length}</div></div>
+      <div class="book-grid">`;
+    toread.forEach(b=>{
+      html+=`<div class="book-card" onclick="openBook('${b.id}')">
+        <div class="book-cover" style="background:${spineColor(b.title)}">
+          <div class="book-cover-title">${b.title}</div></div>
+        <div class="book-card-author">${(b.author||'').split(' ').pop()}</div></div>`;
+    });
+    html+=`</div></div>`;
+  }
+  if(finished.length){
+    html+=`<div class="shelf-section" style="margin-top:20px"><div class="shelf-section-header">
+      <div class="shelf-section-title"><em>iii.</em> Read</div>
+      <div class="shelf-section-count">${finished.length}</div></div>
+      <div class="book-grid">`;
+    finished.forEach(b=>{
+      html+=`<div class="book-card" onclick="openBook('${b.id}')">
+        <div class="book-cover" style="background:${spineColor(b.title)};opacity:.7">
+          <div class="book-cover-title">${b.title}</div></div>
+        <div class="book-card-author">${(b.author||'').split(' ').pop()}</div></div>`;
+    });
+    html+=`</div></div>`;
+  }
+  el.innerHTML=html;
+}
+
+// ── BOOK DETAIL ──────────────────────────────────────────────────
+let currentBookId=null;
+function openBook(id){
+  currentBookId=id;
+  const b=DATA.books.find(x=>x.id===id); if(!b)return;
+  const jots=DATA.jots.filter(j=>j.bookId===id);
+  const color=spineColor(b.title);
+  const pct=b.totalPages?(b.currentPage||0)/b.totalPages:0;
+  const daysReading=b.startedReading?Math.max(1,Math.ceil((Date.now()-new Date(b.startedReading))/(864e5))):1;
+  const pagesRead=b.currentPage||0;
+  const ppDay=daysReading>0?(pagesRead/daysReading).toFixed(1):0;
+  const remaining=b.totalPages?b.totalPages-pagesRead:0;
+  const daysLeft=ppDay>0?Math.ceil(remaining/ppDay):'—';
+  const finishDate=ppDay>0&&remaining>0?new Date(Date.now()+daysLeft*864e5).toLocaleDateString('en-GB',{month:'short',day:'numeric'}):'—';
+  const pctPos=Math.min(Math.max(pct*100,5),95);
+
+  let html=`<div class="book-detail-header">
+    <div class="book-detail-cover" style="background:${color}">
+      <div style="font-family:var(--ff-body);font-size:8px;color:rgba(255,255,255,.9);text-align:center;padding:4px;line-height:1.3">${b.title}</div></div>
+    <div class="book-detail-meta">
+      <div class="book-detail-genre">${(b.categories||['BOOK'])[0]?.toUpperCase()||'BOOK'} · ${b.year||'—'}</div>
+      <div class="book-detail-title">${b.title}</div>
+      <div class="book-detail-author">by ${b.author||'Unknown'}</div>
+      <div><span class="status-pill">${b.status.replace('-',' ').toUpperCase()}</span>
+      <span class="pages-pill">${b.totalPages||'?'} PP</span></div>
+    </div></div>`;
+
+  if(b.status==='reading'){
+    html+=`<div class="pace-section">
+      <div class="pace-label">
+        <div class="pace-label-text">Pacing</div>
+        <div class="pace-since">SINCE ${b.startedReading?new Date(b.startedReading).toLocaleDateString('en-GB',{month:'short',day:'numeric'}).toUpperCase():'—'}</div></div>
+      <div class="pace-ruler">
+        <div class="pace-track"></div>
+        <div class="pace-fill" style="width:${pctPos}%"></div>
+        <div class="pace-cursor" style="left:${pctPos}%">p. ${pagesRead}</div></div>
+      <div class="pace-endpoints"><span>0</span><span>${Math.round((b.totalPages||200)/2)}</span><span>${b.totalPages||'?'}</span></div>
+      <div class="pace-stats">
+        <div class="pace-stat"><div class="pace-stat-val">${daysReading}d</div><div class="pace-stat-key">READING</div></div>
+        <div class="pace-stat"><div class="pace-stat-val">${ppDay}</div><div class="pace-stat-key">PP/DAY</div></div>
+        <div class="pace-stat"><div class="pace-stat-val">~${daysLeft}d</div><div class="pace-stat-key">LEFT</div></div>
+        <div class="pace-stat"><div class="pace-stat-val">${finishDate}</div><div class="pace-stat-key">FINISH</div></div></div>
+      <div style="margin-top:12px;display:flex;gap:8px">
+        <button class="modal-btn" style="flex:1" onclick="updatePage('${id}')">UPDATE PAGE</button>
+        <button class="modal-btn primary" style="flex:1" onclick="finishBook('${id}')">MARK FINISHED</button></div></div>`;
+  }
+
+  html+=`<div class="marginalia-header">
+    <div class="marginalia-title">Marginalia (${jots.length})</div>
+    <button class="btn-jot" onclick="openJotFor('${id}')">+ JOT</button></div>`;
+
+  if(!jots.length){
+    html+=`<div class="empty-state" style="padding:24px 32px">
+      <div class="empty-state-sub">No notes yet. Tap + JOT to mark this page.</div></div>`;
+  } else {
+    [...jots].sort((a,b)=>(a.page||0)-(b.page||0)).forEach(j=>{
+      const ds=j.createdAt?new Date(j.createdAt).toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'';
+      const thtml=(j.tags||[]).map(t=>`<span class="tag-chip">${t}</span>`).join('');
+      html+=`<div class="jot-card" onclick="openJotEdit('${j.id}')">
+        <div class="jot-ref"><span class="jot-page">p.${j.page||'—'}</span><span class="jot-date">${ds}</span></div>
+        ${j.quote?`<div class="jot-quote">${escHtml(j.quote)}</div>`:''}
+        <div class="jot-body">${renderMarkdown(j.body||'')}</div>
+        ${thtml?`<div class="jot-tags">${thtml}</div>`:''}</div>`;
+    });
+  }
+
+  // More button behaviour
+  document.getElementById('book-more-btn').onclick=()=>showModal('Options',`
+    <button class="modal-btn" style="margin-bottom:8px;display:block;width:100%;text-align:left;padding:12px" onclick="deleteBook('${id}');closeModal()">DELETE THIS BOOK</button>
+    <button class="modal-btn" onclick="closeModal()">CANCEL</button>`);
+
+  document.getElementById('book-detail-content').innerHTML=html;
+  goScreen('book');
+}
+
+function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function updatePage(bid){
+  const b=DATA.books.find(x=>x.id===bid); if(!b)return;
+  showModal('Update page',`
+    <div style="margin-bottom:12px;font-family:var(--ff-body);font-size:13px;color:var(--ink-mid)">Currently p.${b.currentPage||0} of ${b.totalPages||'?'}</div>
+    <input class="modal-input" id="upd-pg" type="number" inputmode="numeric" value="${b.currentPage||0}">
+    <div class="modal-btn-row">
+      <button class="modal-btn" onclick="closeModal()">Cancel</button>
+      <button class="modal-btn primary" onclick="confirmUpdatePage('${bid}')">Update</button></div>`);
+  setTimeout(()=>document.getElementById('upd-pg')?.focus(),200);
+}
+function confirmUpdatePage(bid){
+  const v=parseInt(document.getElementById('upd-pg').value); if(!v)return;
+  const b=DATA.books.find(x=>x.id===bid);
+  if(b){const diff=v-(b.currentPage||0);b.currentPage=v;DB.save(DATA);if(diff>0)logPace(diff);}
+  closeModal(); openBook(bid);
+}
+function finishBook(id){
+  const b=DATA.books.find(x=>x.id===id);
+  if(b){b.status='finished';b.finishedAt=new Date().toISOString();DB.save(DATA);}
+  openBook(id); showToast('Marked as finished.');
+}
+function deleteBook(id){
+  DATA.books=DATA.books.filter(x=>x.id!==id);
+  DATA.jots=DATA.jots.filter(x=>x.bookId!==id);
+  DB.save(DATA); goScreen('shelf');
+}
+
+// ── JOT EDITOR ──────────────────────────────────────────────────
+let jotState={bookId:null,jotId:null,page:null,tags:[]};
+function openJotFor(bid){
+  jotState={bookId:bid,jotId:null,page:null,tags:[]};
+  document.getElementById('jot-textarea').value='';
+  document.getElementById('jot-preview-pane').innerHTML='';
+  refreshJotBookRef(); refreshJotTags(); setJotTab('write');
+  goScreen('jot');
+}
+function openJotEdit(jid){
+  const j=DATA.jots.find(x=>x.id===jid); if(!j)return;
+  jotState={bookId:j.bookId,jotId:jid,page:j.page,tags:[...(j.tags||[])]};
+  const body=(j.quote?'> '+j.quote+'\n\n':'')+(j.body||'');
+  document.getElementById('jot-textarea').value=body;
+  refreshJotBookRef(); refreshJotTags(); setJotTab('write');
+  goScreen('jot');
+}
+function refreshJotBookRef(){
+  const b=DATA.books.find(x=>x.id===jotState.bookId);
+  if(b){
+    document.getElementById('jot-book-name').textContent=b.title;
+    document.getElementById('jot-book-ch').textContent=b.author||'';
+    document.getElementById('jot-thumb').style.background=spineColor(b.title);
+  } else {
+    document.getElementById('jot-book-name').textContent='Choose a book…';
+    document.getElementById('jot-book-ch').textContent='TAP TO SELECT';
+    document.getElementById('jot-thumb').style.background='var(--rule)';
+  }
+  document.getElementById('jot-page-badge').textContent=jotState.page?'p. '+jotState.page:'p. –';
+}
+function refreshJotTags(){
+  const row=document.getElementById('jot-tags-row');
+  row.querySelectorAll('.tag-chip').forEach(c=>c.remove());
+  jotState.tags.forEach(t=>{
+    const chip=document.createElement('span');
+    chip.className='tag-chip active'; chip.textContent=t;
+    chip.onclick=()=>{jotState.tags=jotState.tags.filter(x=>x!==t);refreshJotTags();};
+    row.insertBefore(chip,document.getElementById('jot-tag-input'));
+  });
+}
+function handleTagInput(e){
+  if(e.key==='Enter'||e.key===' '){
+    e.preventDefault();
+    const v=e.target.value.replace(/^#/,'').trim();
+    if(v){const tag='#'+v;if(!jotState.tags.includes(tag))jotState.tags.push(tag);refreshJotTags();}
+    e.target.value='';
+  }
+}
+function setJotTab(tab){
+  const wp=document.getElementById('jot-write-pane');
+  const pp=document.getElementById('jot-preview-pane');
+  document.querySelectorAll('.jot-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-both').classList.remove('active');
+  if(tab==='write'){
+    document.getElementById('tab-write').classList.add('active');
+    wp.style.display=''; pp.style.display='none';
+  } else if(tab==='preview'){
+    document.getElementById('tab-preview').classList.add('active');
+    pp.innerHTML=renderMarkdown(document.getElementById('jot-textarea').value);
+    wp.style.display='none'; pp.style.display='';
+  } else {
+    document.getElementById('tab-both').classList.add('active');
+    pp.innerHTML=renderMarkdown(document.getElementById('jot-textarea').value);
+    wp.style.display=''; pp.style.display='';
+  }
+}
+function insertMd(before,after){
+  const ta=document.getElementById('jot-textarea');
+  const s=ta.selectionStart,e=ta.selectionEnd,sel=ta.value.slice(s,e);
+  const ins=before.replace(/\\n/g,'\n')+sel+after;
+  ta.value=ta.value.slice(0,s)+ins+ta.value.slice(e);
+  ta.focus(); ta.selectionStart=ta.selectionEnd=s+ins.length;
+}
+function saveJot(){
+  if(!jotState.bookId){showToast('Choose a book first.');return;}
+  const raw=document.getElementById('jot-textarea').value.trim();
+  if(!raw){showToast('Nothing to save.');return;}
+  let quote='',body=raw;
+  const qm=raw.match(/^>\s*(.+?)(\n|$)/);
+  if(qm){quote=qm[1];body=raw.slice(qm[0].length).trim();}
+  if(jotState.jotId){
+    const j=DATA.jots.find(x=>x.id===jotState.jotId);
+    if(j)Object.assign(j,{quote,body,page:jotState.page,tags:jotState.tags,updatedAt:new Date().toISOString()});
+  } else {
+    DATA.jots.push({id:uid(),bookId:jotState.bookId,quote,body,page:jotState.page,tags:jotState.tags,createdAt:new Date().toISOString()});
+  }
+  DB.save(DATA); showToast('Saved.'); closeJot();
+}
+function closeJot(){if(screenHistory.length)goBack();else goScreen('shelf');}
+function showBookPicker(){
+  if(!DATA.books.length){showToast('Add a book first via Capture.');return;}
+  const opts=DATA.books.map(b=>`<button class="modal-btn" style="margin-bottom:8px;display:block;width:100%;text-align:left;padding:12px" onclick="pickBook('${b.id}')">${b.title}</button>`).join('');
+  showModal('Choose book',opts+`<button class="modal-btn" onclick="closeModal()">CANCEL</button>`);
+}
+function pickBook(id){jotState.bookId=id;refreshJotBookRef();closeModal();}
+function openPageInput(e){
+  e.stopPropagation();
+  document.getElementById('page-input-overlay').classList.add('open');
+  document.getElementById('page-input-field').value=jotState.page||'';
+  setTimeout(()=>document.getElementById('page-input-field').focus(),100);
+}
+function closePageInput(e){if(!e||e.target===document.getElementById('page-input-overlay'))document.getElementById('page-input-overlay').classList.remove('open');}
+function confirmPageInput(){
+  const v=parseInt(document.getElementById('page-input-field').value);
+  if(v>0)jotState.page=v;
+  document.getElementById('jot-page-badge').textContent=jotState.page?'p. '+jotState.page:'p. –';
+  document.getElementById('page-input-overlay').classList.remove('open');
+}
+
+// ── MARKDOWN ─────────────────────────────────────────────────────
+function renderMarkdown(md){
+  if(!md)return'';
+  return md
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/^>\s*(.+)/gm,'<blockquote>$1</blockquote>')
+    .replace(/^###\s+(.+)/gm,'<h3>$1</h3>')
+    .replace(/^---$/gm,'<hr style="border:none;border-top:1px solid var(--rule);margin:12px 0">')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g,'<em>$1</em>')
+    .replace(/^•\s+(.+)/gm,'<div style="padding-left:14px">• $1</div>')
+    .replace(/\n/g,'<br>');
+}
+
+// ── CAMERA / ISBN ────────────────────────────────────────────────
+let cameraStream=null,scanInterval=null,pendingBook=null;
+async function startCamera(){
+  stopCamera();
+  if(!navigator.mediaDevices){showManualISBN();return;}
+  try{
+    cameraStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
+    document.getElementById('camera-video').srcObject=cameraStream;
+    simulateScan();
+  } catch(e){showManualISBN();}
+}
+function stopCamera(){
+  clearInterval(scanInterval);
+  if(cameraStream){cameraStream.getTracks().forEach(t=>t.stop());cameraStream=null;}
+}
+function simulateScan(){
+  let ticks=0; const nums='9780525433338';
+  scanInterval=setInterval(()=>{
+    ticks++;
+    document.getElementById('scan-num').textContent=nums.slice(0,Math.min(ticks*2,13));
+    if(ticks>=7){clearInterval(scanInterval);document.getElementById('scan-status').textContent='found';document.getElementById('scan-dot').style.opacity='1';handleISBN('9780525433338');}
+  },300);
+}
+async function handleISBN(isbn){
+  document.getElementById('scan-num').textContent=isbn;
+  try{
+    const res=await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}`);
+    const data=await res.json();
+    if(data.items?.length){
+      const info=data.items[0].volumeInfo;
+      pendingBook={id:uid(),isbn,title:info.title||'Unknown',author:(info.authors||['Unknown']).join(', '),
+        year:info.publishedDate?.slice(0,4)||'',totalPages:info.pageCount||0,
+        categories:info.categories||[],thumbnail:info.imageLinks?.thumbnail||'',status:'to-read',currentPage:0};
+    }
+  } catch(e){
+    pendingBook={id:uid(),isbn,title:'The Idiot',author:'Elif Batuman',year:'2017',totalPages:432,categories:['Fiction'],status:'to-read',currentPage:0};
+  }
+  if(pendingBook)showISBNResult(pendingBook);
+}
+function showISBNResult(b){
+  document.getElementById('isbn-title').textContent=b.title;
+  document.getElementById('isbn-author').textContent=b.author+' · '+b.year;
+  document.getElementById('isbn-isbn').textContent=b.isbn||'';
+  document.getElementById('isbn-pages-chip').textContent=b.totalPages?b.totalPages+'PP':'—';
+  document.getElementById('isbn-genre-chip').textContent=(b.categories[0]||'BOOK').toUpperCase().slice(0,12);
+  const cov=document.getElementById('isbn-cover');
+  if(b.thumbnail){cov.innerHTML=`<img src="${b.thumbnail}" style="width:100%;height:100%;object-fit:cover">`;}
+  else{cov.style.background=spineColor(b.title);cov.innerHTML=`<div style="font-family:var(--ff-body);font-size:8px;color:rgba(255,255,255,.9);text-align:center;padding:4px">${b.title}</div>`;}
+  document.getElementById('isbn-result-sheet').classList.add('open');
+}
+function addBookStatus(status){
+  if(!pendingBook)return;
+  pendingBook.status=status;
+  if(status==='reading')pendingBook.startedReading=new Date().toISOString();
+  DATA.books.push(pendingBook); DB.save(DATA);
+  showToast(`Added "${pendingBook.title}".`);
+  closeCapture();
+}
+function closeCapture(){
+  stopCamera();
+  document.getElementById('isbn-result-sheet').classList.remove('open');
+  document.getElementById('isbn-manual-section').classList.remove('open');
+  pendingBook=null; goBack();
+}
+function showManualISBN(){
+  document.getElementById('isbn-manual-section').classList.add('open');
+  setTimeout(()=>document.getElementById('isbn-manual-input').focus(),300);
+}
+async function lookupManualISBN(){
+  const v=document.getElementById('isbn-manual-input').value.replace(/-/g,'').trim();
+  if(v.length<10){showToast('Enter a valid ISBN.');return;}
+  document.getElementById('isbn-manual-section').classList.remove('open');
+  await handleISBN(v);
+}
+
+// ── OCR ──────────────────────────────────────────────────────────
+let ocrStream=null,capturedOCRText='';
+async function startOCR(){
+  if(!navigator.mediaDevices)return;
+  try{ocrStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});document.getElementById('ocr-video').srcObject=ocrStream;}catch(e){}
+}
+function stopOCR(){if(ocrStream){ocrStream.getTracks().forEach(t=>t.stop());ocrStream=null;}}
+function closeOCR(){stopOCR();goBack();}
+function retakeOCR(){
+  document.getElementById('ocr-result').style.display='none';
+  document.getElementById('ocr-capture-btn').style.display='';
+  document.getElementById('ocr-progress-bar').style.width='0%';
+}
+function captureOCR(){
+  document.getElementById('ocr-capture-btn').style.display='none';
+  let p=0; const bar=document.getElementById('ocr-progress-bar');
+  const t=setInterval(()=>{p+=8;bar.style.width=p+'%';if(p>=100){clearInterval(t);
+    capturedOCRText='"All theory is gray, my friend. But forever green is the tree of life."';
+    document.getElementById('ocr-lifted-text').textContent=capturedOCRText;
+    document.getElementById('ocr-source-attr').textContent='— Goethe, Faust (quoted)';
+    document.getElementById('ocr-result').style.display='';}},80);
+}
+function copyOCR(){navigator.clipboard?.writeText(capturedOCRText);showToast('Copied.');}
+function useOCRAsJot(){
+  stopOCR();
+  jotState={bookId:currentBookId||(DATA.books[0]?.id||null),jotId:null,page:null,tags:[]};
+  document.getElementById('jot-textarea').value='> '+capturedOCRText+'\n\n';
+  refreshJotBookRef(); refreshJotTags(); setJotTab('write');
+  goScreen('jot');
+}
+
+// ── THREADS ──────────────────────────────────────────────────────
+function renderThreads(){
+  const tagMap={};
+  DATA.jots.forEach(j=>(j.tags||[]).forEach(t=>{
+    if(!tagMap[t])tagMap[t]={count:0,jots:[]};
+    tagMap[t].count++; tagMap[t].jots.push(j);
+  }));
+  const tags=Object.entries(tagMap).sort((a,b)=>b[1].count-a[1].count);
+  document.getElementById('threads-count').textContent=tags.length;
+
+  const svg=document.getElementById('threads-svg');
+  if(!tags.length){
+    svg.innerHTML='<text x="150" y="150" text-anchor="middle" font-family="Playfair Display" font-style="italic" font-size="14" fill="#9a9590">No threads yet.</text>';
+  } else {
+    const max=tags[0][1].count, cx=150,cy=150;
+    let s='';
+    const pos=tags.slice(0,12).map(([tag,d],i,arr)=>{
+      const a=(i/arr.length)*Math.PI*2-Math.PI/2;
+      const r=50+(1-d.count/max)*55;
+      return{x:cx+Math.cos(a)*r,y:cy+Math.sin(a)*r,tag,count:d.count};
+    });
+    pos.forEach(p=>s+=`<line x1="${cx}" y1="${cy}" x2="${p.x}" y2="${p.y}" stroke="#d4cfc4" stroke-width="1" stroke-dasharray="3,3"/>`);
+    if(pos.length){
+      s+=`<circle cx="${cx}" cy="${cy}" r="16" fill="#8b2020"/>`;
+      s+=`<text x="${cx}" y="${cy+4}" text-anchor="middle" font-family="DM Mono" font-size="8" fill="#faf7f2" letter-spacing="0.3">${pos[0].tag.slice(0,8)}</text>`;
+    }
+    pos.slice(1).forEach(p=>{
+      const nr=5+Math.sqrt(p.count)*2;
+      s+=`<circle cx="${p.x}" cy="${p.y}" r="${nr}" fill="#1a1710"/>`;
+      s+=`<text x="${p.x}" y="${p.y-nr-3}" text-anchor="middle" font-family="DM Mono" font-size="7" fill="#4a4640">${p.tag}</text>`;
+    });
+    svg.innerHTML=s;
+  }
+
+  let html='';
+  if(!tags.length){
+    html=`<div class="empty-state"><div class="empty-state-icon">✦</div>
+      <div class="empty-state-title">No threads yet.</div>
+      <div class="empty-state-sub">Add #tags to jots and they appear here.</div></div>`;
+  } else {
+    tags.forEach(([tag,d])=>{
+      const j=d.jots[0];
+      const preview=j?.quote||j?.body?.slice(0,80)||'';
+      const bk=j?DATA.books.find(b=>b.id===j.bookId):null;
+      html+=`<div class="thread-list-item">
+        <div class="thread-item-header">
+          <span class="thread-item-tag">${tag}</span>
+          <span class="thread-item-count">${d.count} note${d.count>1?'s':''} · ${new Set(d.jots.map(x=>x.bookId)).size} book${new Set(d.jots.map(x=>x.bookId)).size>1?'s':''}</span></div>
+        ${preview?`<div class="thread-item-quote">${preview.slice(0,100)}${preview.length>100?'…':''}</div>`:''}
+        ${bk?`<div class="thread-item-source">${bk.title} · p.${j?.page||'—'}</div>`:''}</div>`;
+    });
+  }
+  document.getElementById('threads-list').innerHTML=html;
+}
+
+// ── ALMANAC ──────────────────────────────────────────────────────
+function calcStreak(){
+  let streak=0,d=new Date();
+  for(let i=0;i<365;i++){
+    const k=new Date(d).toISOString().slice(0,10);
+    if(DATA.paceLog[k])streak++;
+    else if(streak>0)break;
+    d.setDate(d.getDate()-1);
+  }
+  return streak;
+}
+function renderAlmanac(){
+  const finished=DATA.books.filter(b=>b.status==='finished');
+  const totalPages=DATA.books.reduce((s,b)=>s+(b.currentPage||0),0);
+  const streak=calcStreak();
+  document.getElementById('alm-books').textContent=finished.length;
+  document.getElementById('alm-pages').textContent=totalPages.toLocaleString();
+  document.getElementById('alm-streak').textContent=streak;
+  document.getElementById('alm-year').textContent=new Date().getFullYear();
+
+  const days=[];
+  for(let i=13;i>=0;i--){
+    const d=new Date(); d.setDate(d.getDate()-i);
+    const k=d.toISOString().slice(0,10);
+    const pp=DATA.paceLog[k]||0;
+    days.push({label:['S','M','T','W','T','F','S'][d.getDay()],pp,isToday:i===0});
+  }
+  const maxPP=Math.max(...days.map(d=>d.pp),1);
+  document.getElementById('fortnight-chart').innerHTML=days.map(d=>`
+    <div class="bar-day">
+      <div class="bar-val">${d.pp||''}</div>
+      <div class="bar-fill ${d.isToday?'today':''}" style="height:${Math.max(d.pp/maxPP*60,2)}px"></div>
+      <div class="bar-label">${d.label}</div></div>`).join('');
+
+  const months=['J','F','M','A','M','J','J','A','S','O','N','D'];
+  const yr=new Date().getFullYear();
+  const mt=months.map((_,i)=>{
+    const pfx=`${yr}-${String(i+1).padStart(2,'0')}`;
+    return Object.entries(DATA.paceLog).filter(([k])=>k.startsWith(pfx)).reduce((s,[,v])=>s+v,0);
+  });
+  const mmax=Math.max(...mt,1);
+  document.getElementById('heat-grid').innerHTML=months.map((m,i)=>{
+    const t=mt[i]; const l=t===0?'':(t<mmax*.25?'h1':t<mmax*.5?'h2':t<mmax*.75?'h3':'h4');
+    return`<div class="heat-month"><div class="heat-month-label">${m}</div><div class="heat-cell ${l}"></div></div>`;
+  }).join('');
+
+  const cur=DATA.books.find(b=>b.status==='reading');
+  const avg=days.reduce((s,d)=>s+d.pp,0)/14;
+  let insight='';
+  if(cur&&cur.totalPages&&avg>0){
+    const rem=cur.totalPages-(cur.currentPage||0);
+    const dl=Math.ceil(rem/avg);
+    const fd=new Date(Date.now()+dl*864e5).toLocaleDateString('en-GB',{month:'long',day:'numeric'});
+    insight=`<div class="almanac-insight-num">${Math.round(avg)} pp / day, lately.</div>
+      <div class="almanac-insight-text">At this pace you'll finish <em>${cur.title}</em> around ${fd}.</div>`;
+  } else if(avg>0){
+    insight=`<div class="almanac-insight-num">${Math.round(avg)} pp / day</div>
+      <div class="almanac-insight-text">Keep the streak alive.</div>`;
+  } else {
+    insight=`<div class="almanac-insight-num">—</div>
+      <div class="almanac-insight-text">Update a page count to see pace insights appear.</div>`;
+  }
+  document.getElementById('almanac-insight').innerHTML=insight;
+}
+
+// ── IMPORT / EXPORT ──────────────────────────────────────────────
+function exportJSON(){
+  dl(new Blob([JSON.stringify(DATA,null,2)],{type:'application/json'}),'jotter-backup.json');
+  showToast('JSON exported.');
+}
+function exportCSV(){
+  const rows=[['Title','Author','ISBN','Status','Pages','CurrentPage','DateAdded']];
+  DATA.books.forEach(b=>rows.push([b.title,b.author||'',b.isbn||'',b.status,b.totalPages||'',b.currentPage||'',b.addedAt||'']));
+  const csv=rows.map(r=>r.map(c=>'"'+(c+'').replace(/"/g,'""')+'"').join(',')).join('\n');
+  dl(new Blob([csv],{type:'text/csv'}),'jotter.csv'); showToast('CSV exported.');
+}
+function exportMarkdown(){
+  let md='# Jotter — Marginalia\n\n';
+  DATA.books.forEach(b=>{
+    const jots=DATA.jots.filter(j=>j.bookId===b.id); if(!jots.length)return;
+    md+=`## ${b.title}\n*${b.author||''}*\n\n`;
+    [...jots].sort((a,c)=>(a.page||0)-(c.page||0)).forEach(j=>{
+      if(j.quote)md+=`> ${j.quote}\n\n`;
+      if(j.body)md+=j.body+'\n\n';
+      if(j.page)md+=`*p. ${j.page}*\n\n`;
+      if(j.tags?.length)md+=j.tags.join(' ')+'\n\n';
+      md+='---\n\n';
+    });
+  });
+  dl(new Blob([md],{type:'text/markdown'}),'jotter-marginalia.md'); showToast('Markdown exported.');
+}
+function dl(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);}
+function importFile(e){
+  const file=e.target.files[0]; if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    try{
+      if(file.name.endsWith('.json')){
+        const imp=JSON.parse(ev.target.result);
+        if(imp.books&&imp.jots){DATA=imp;DB.save(DATA);showToast('Imported.');renderAlmanac();}
+      } else {
+        const lines=ev.target.result.split('\n').slice(1); let n=0;
+        lines.forEach(line=>{
+          const c=line.split(',').map(x=>x.replace(/^"|"$/g,'').trim());
+          if(!c[0])return;
+          if(!DATA.books.find(b=>b.title===c[0])){
+            DATA.books.push({id:uid(),title:c[0],author:c[1]||'',isbn:c[2]||'',
+              status:c[3]||'to-read',totalPages:parseInt(c[4])||0,currentPage:parseInt(c[5])||0,
+              addedAt:new Date().toISOString()});n++;
+          }
+        });
+        DB.save(DATA); showToast(`Imported ${n} books.`); renderAlmanac();
+      }
+    }catch{showToast('Could not parse file.');}
+  };
+  reader.readAsText(file);
+}
+function showImportModal(){
+  showModal('Import library',`
+    <div style="margin-bottom:14px;font-family:var(--ff-body);font-style:italic;font-size:13px;color:var(--ink-mid)">Choose a Goodreads CSV or Jotter JSON.</div>
+    <div class="io-upload-area" onclick="document.getElementById('import-modal-file').click()">
+      <div class="io-upload-text">TAP TO CHOOSE FILE</div>
+      <input type="file" id="import-modal-file" accept=".json,.csv" style="display:none" onchange="importFile(event);closeModal()">
+    </div>
+    <div style="margin-top:12px"><button class="modal-btn" onclick="closeModal()">Cancel</button></div>`);
+}
+
+// ── SEARCH ───────────────────────────────────────────────────────
+function openSearch(){document.getElementById('search-overlay').classList.add('open');setTimeout(()=>document.getElementById('search-input').focus(),200);}
+function closeSearch(){document.getElementById('search-overlay').classList.remove('open');document.getElementById('search-input').value='';document.getElementById('search-results').innerHTML='';}
+function doSearch(q){
+  const res=document.getElementById('search-results');
+  if(!q.trim()){res.innerHTML='';return;}
+  const ql=q.toLowerCase();
+  const matches=DATA.jots.filter(j=>(j.body||'').toLowerCase().includes(ql)||(j.quote||'').toLowerCase().includes(ql)||(j.tags||[]).some(t=>t.toLowerCase().includes(ql)));
+  if(!matches.length){res.innerHTML=`<div class="empty-state" style="padding:32px"><div class="empty-state-sub">No results.</div></div>`;return;}
+  res.innerHTML=matches.map(j=>{
+    const b=DATA.books.find(x=>x.id===j.bookId);
+    return`<div class="jot-card" onclick="closeSearch();openBook('${j.bookId}')">
+      <div class="jot-ref"><span class="jot-page">${b?.title||''} · p.${j.page||'—'}</span></div>
+      ${j.quote?`<div class="jot-quote">${j.quote}</div>`:''}
+      <div class="jot-body">${(j.body||'').slice(0,120)}</div></div>`;
+  }).join('');
+}
+
+// ── MODAL ────────────────────────────────────────────────────────
+function showModal(title,body){document.getElementById('modal-title').textContent=title;document.getElementById('modal-body').innerHTML=body;document.getElementById('modal-overlay').classList.add('open');}
+function closeModal(e){if(!e||e.target===document.getElementById('modal-overlay'))document.getElementById('modal-overlay').classList.remove('open');}
+
+// ── TOAST ────────────────────────────────────────────────────────
+let toastTimer=null;
+function showToast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+// ── SERVICE WORKER ───────────────────────────────────────────────
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+
+// ── EVENT LISTENERS ──────────────────────────────────────────────
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    if(document.getElementById('search-overlay').classList.contains('open'))closeSearch();
+    else if(document.getElementById('modal-overlay').classList.contains('open'))closeModal({target:document.getElementById('modal-overlay')});
+    else if(document.getElementById('page-input-overlay').classList.contains('open'))document.getElementById('page-input-overlay').classList.remove('open');
+  }
+});
+document.getElementById('jot-textarea').addEventListener('input',()=>{
+  if(document.getElementById('tab-both').classList.contains('active'))
+    document.getElementById('jot-preview-pane').innerHTML=renderMarkdown(document.getElementById('jot-textarea').value);
+});
+
+</script>
+</body>
+</html>

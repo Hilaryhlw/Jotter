@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Parchment background -->
+  <rect width="512" height="512" fill="#f0ebe0" rx="96"/>
+
+  <!-- Book shadow -->
+  <rect x="122" y="90" width="284" height="348" rx="12" fill="#1a1710" opacity="0.10"/>
+  <!-- Book pages -->
+  <rect x="112" y="80" width="284" height="348" rx="10" fill="#ede6d4" stroke="#c8c0b0" stroke-width="3"/>
+  <!-- Crimson spine -->
+  <rect x="112" y="80" width="48" height="348" rx="10" fill="#8b2020"/>
+  <!-- Spine shadow edge -->
+  <rect x="148" y="80" width="12" height="348" fill="#6a1818" opacity="0.6"/>
+
+  <!-- Three ruled lines -->
+  <line x1="185" y1="212" x2="360" y2="212" stroke="#1a1710" stroke-width="6.5" stroke-linecap="round" opacity="0.18"/>
+  <line x1="185" y1="256" x2="360" y2="256" stroke="#1a1710" stroke-width="6.5" stroke-linecap="round" opacity="0.18"/>
+  <line x1="185" y1="300" x2="360" y2="300" stroke="#1a1710" stroke-width="6.5" stroke-linecap="round" opacity="0.18"/>
+
+  <!-- Quill nib -->
+  <path d="M 272 154 L 326 240 L 272 368 L 218 240 Z"
+        fill="#8b2020" opacity="0.92"/>
+  <!-- Nib split -->
+  <line x1="272" y1="240" x2="272" y2="368"
+        stroke="#ede6d4" stroke-width="6.5" stroke-linecap="round"/>
+  <!-- Nib shoulder highlight -->
+  <path d="M 272 154 L 326 240 L 272 256 L 218 240 Z"
+        fill="#c8524a" opacity="0.5"/>
+  <!-- Ink drop -->
+  <circle cx="272" cy="374" r="12" fill="#8b2020" opacity="0.85"/>
+</svg>
