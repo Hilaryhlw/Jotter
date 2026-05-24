@@ -1807,133 +1807,67 @@ function selectStatus(s) {
   });
 }
 
+// ── WORKER URL — replace with your Cloudflare Worker URL after deploying ──
+const WORKER_URL = 'https://jotter-search.YOUR-SUBDOMAIN.workers.dev';
+
 async function searchBooks() {
   const q = document.getElementById('add-search-field').value.trim();
   if (!q) return;
   const el = document.getElementById('book-search-results');
   el.innerHTML = '<div class="searching-hint">Searching…</div>';
-  const enc = encodeURIComponent(q);
-  const isCJK = /[\u2e80-\u9fff\uf900-\ufaff]/.test(q);
 
   let books = [];
-  const seen = new Set();
 
-  function norm(title, author, year, pages, thumb, isbn, cats) {
-    if (!title || title === 'Unknown') return null;
-    const key = title.toLowerCase().replace(/\s/g,'').slice(0,12);
-    if (seen.has(key)) return null;
-    seen.add(key);
-    return { title, author: author||'', year: year||'', pages: pages||0,
-             thumb: (thumb||'').replace('http://','https://').replace('zoom=1','zoom=3'),
-             isbn: isbn||'', cats: cats||[] };
-  }
-
-  function gbItems(items) {
-    (items||[]).forEach(item => {
-      const info = item.volumeInfo;
-      const ids = info.industryIdentifiers||[];
-      const b = norm(info.title, (info.authors||[]).join(', '),
-        info.publishedDate?.slice(0,4), info.pageCount,
-        info.imageLinks?.thumbnail||info.imageLinks?.smallThumbnail,
-        ids.find(x=>x.type==='ISBN_13')?.identifier||ids.find(x=>x.type==='ISBN_10')?.identifier,
-        info.categories);
-      if (b) books.push(b);
-    });
-  }
-
-  // Parse 博客來 HTML search results
-  function parseBK(html) {
-    if (!html || html.length < 500) return;
-    const doc = new DOMParser().parseFromString(html, 'text/html');
-    let items = [];
-    for (const sel of ['ul.searchbook > li', 'li[id^="item"]', '.type02_bd-a', '.item']) {
-      items = [...doc.querySelectorAll(sel)]; if (items.length) break;
+  try {
+    // Try worker first (has full TW database access)
+    const workerOk = WORKER_URL && !WORKER_URL.includes('YOUR-SUBDOMAIN');
+    if (workerOk) {
+      const r = await fetch(`${WORKER_URL}?mode=search&q=${encodeURIComponent(q)}`);
+      const d = await r.json();
+      books = d.results || [];
     }
-    if (!items.length) {
-      doc.querySelectorAll('a[href*="/products/"]').forEach(a => {
-        const li = a.closest('li') || a.parentElement;
-        if (li && !items.includes(li)) items.push(li);
-      });
+  } catch(e) {}
+
+  // Fallback: query APIs directly (works for non-TW books)
+  if (!books.length) {
+    const enc = encodeURIComponent(q);
+    const seen = new Set();
+    function add(title, author, year, pages, thumb, isbn, source) {
+      if (!title) return;
+      const key = title.toLowerCase().replace(/\s/g,'').slice(0,12);
+      if (seen.has(key)) return; seen.add(key);
+      books.push({ title, author:author||'', year:year||'', pages:pages||0,
+                   thumb:(thumb||'').replace('http://','https://').replace('zoom=1','zoom=3'),
+                   isbn:isbn||'', source:source||'' });
     }
-    items.slice(0, 6).forEach(item => {
-      const tEl = item.querySelector('h4 a, strong a, a[href*="/products/"]');
-      if (!tEl) return;
-      const title = tEl.textContent.trim(); if (!title || title.length < 2) return;
-      const aEl = item.querySelector('ul.msg li a, .author a');
-      const img = item.querySelector('img');
-      const thumb = (img?.getAttribute('data-original')||img?.getAttribute('data-src')||img?.getAttribute('src')||'').replace('http://','https://');
-      const b = norm(title, aEl?.textContent.trim()||'', '', 0, thumb, '');
-      if (b) books.push(b);
-    });
+    await Promise.allSettled([
+      fetch(`https://www.googleapis.com/books/v1/volumes?q=${enc}&country=TW&maxResults=8`)
+        .then(r=>r.json()).then(d=>(d.items||[]).forEach(item=>{
+          const info=item.volumeInfo, ids=info.industryIdentifiers||[];
+          add(info.title,(info.authors||[]).join(', '),info.publishedDate?.slice(0,4),info.pageCount,
+              info.imageLinks?.thumbnail||info.imageLinks?.smallThumbnail,
+              ids.find(x=>x.type==='ISBN_13')?.identifier||'','Google Books TW');
+        })).catch(()=>{}),
+      fetch(`https://www.googleapis.com/books/v1/volumes?q=${enc}&maxResults=8`)
+        .then(r=>r.json()).then(d=>(d.items||[]).forEach(item=>{
+          const info=item.volumeInfo, ids=info.industryIdentifiers||[];
+          add(info.title,(info.authors||[]).join(', '),info.publishedDate?.slice(0,4),info.pageCount,
+              info.imageLinks?.thumbnail||info.imageLinks?.smallThumbnail,
+              ids.find(x=>x.type==='ISBN_13')?.identifier||'','Google Books');
+        })).catch(()=>{}),
+      fetch(`https://openlibrary.org/search.json?q=${enc}&fields=title,author_name,cover_i,first_publish_year,isbn&limit=6`)
+        .then(r=>r.json()).then(d=>(d.docs||[]).forEach(doc=>{
+          add(doc.title,(doc.author_name||[]).join(', '),
+              doc.first_publish_year?String(doc.first_publish_year):'',0,
+              doc.cover_i?`https://covers.openlibrary.org/b/id/${doc.cover_i}-M.jpg`:'',
+              (doc.isbn||[])[0]||'','Open Library');
+        })).catch(()=>{}),
+    ]);
   }
-
-  // Parse Taaze HTML
-  function parseTaaze(d) {
-    const list = d?.data?.result?.list || d?.data || d?.list || d?.result || [];
-    (Array.isArray(list) ? list : []).slice(0,5).forEach(item => {
-      const title = item.title||item.name||''; if (!title) return;
-      const author = (Array.isArray(item.author)?item.author.join(', '):item.author)||'';
-      const thumb = item.cover||item.coverUrl||item.image||'';
-      const b = norm(title, author, item.publishYear||item.year||'', item.pages||0, thumb, item.isbn||'');
-      if (b) books.push(b);
-    });
-  }
-
-  // Parse NCL response
-  function parseNCL(d) {
-    const recs = d?.result||d?.records||
-      (Array.isArray(d) ? d : null)||
-      Object.values(d||{}).find(v=>Array.isArray(v))||[];
-    (Array.isArray(recs)?recs:[]).slice(0,5).forEach(r => {
-      const title = r.title||r.TI||r['245a']||''; if (!title) return;
-      const author = r.author||r.AU||r['100a']||'';
-      const b = norm(title, author, r.year||r.PY||'', parseInt(r.pages||0)||0, '', r.isbn||'');
-      if (b) books.push(b);
-    });
-  }
-
-  await Promise.allSettled([
-    // 1. Google Books global
-    fetch(`https://www.googleapis.com/books/v1/volumes?q=${enc}&maxResults=8`)
-      .then(r=>r.json()).then(d=>gbItems(d.items)).catch(()=>{}),
-
-    // 2. Google Books country=TW — Traditional Chinese catalog
-    fetch(`https://www.googleapis.com/books/v1/volumes?q=${enc}&maxResults=8&country=TW`)
-      .then(r=>r.json()).then(d=>gbItems(d.items)).catch(()=>{}),
-
-    // 3. Google Books country=HK
-    fetch(`https://www.googleapis.com/books/v1/volumes?q=${enc}&maxResults=5&country=HK`)
-      .then(r=>r.json()).then(d=>gbItems(d.items)).catch(()=>{}),
-
-    // 4. Open Library
-    fetch(`https://openlibrary.org/search.json?q=${enc}&fields=title,author_name,number_of_pages_median,cover_i,first_publish_year,isbn&limit=6`)
-      .then(r=>r.json()).then(d=>{
-        (d.docs||[]).forEach(doc => {
-          const b = norm(doc.title, (doc.author_name||[]).join(', '),
-            doc.first_publish_year?String(doc.first_publish_year):'', doc.number_of_pages_median,
-            doc.cover_i?`https://covers.openlibrary.org/b/id/${doc.cover_i}-M.jpg`:'',
-            (doc.isbn||[])[0]||'');
-          if (b) books.push(b);
-        });
-      }).catch(()=>{}),
-
-    // 5. NCL Taiwan (國家圖書館) — official TW ISBN registry
-    isCJK ? fetch(`https://apin.ncl.edu.tw/opac/servlet/Query?format=json&q=${enc}&field=title&count=5`, {signal:AbortSignal.timeout(5000)})
-      .then(r=>r.json()).then(d=>parseNCL(d)).catch(()=>{}) : Promise.resolve(),
-
-    // 6. Taaze 讀冊生活 — TW secondhand + new books
-    isCJK ? fetch(`https://www.taaze.tw/api/searchResult.json?type=1&keyword=${enc}`, {signal:AbortSignal.timeout(5000)})
-      .then(r=>r.json()).then(d=>parseTaaze(d)).catch(()=>{}) : Promise.resolve(),
-
-    // 7. 博客來 — largest TW bookstore (direct, no proxy)
-    isCJK ? fetch(`https://search.books.com.tw/search/query/key/${enc}/cat/BKA/`,
-        {headers:{'Accept':'text/html,*/*','Accept-Language':'zh-TW,zh;q=0.9'}, signal:AbortSignal.timeout(6000)})
-      .then(r=>r.text()).then(html=>parseBK(html)).catch(()=>{}) : Promise.resolve(),
-  ]);
 
   if (!books.length) {
     el.innerHTML = `<div class="searching-hint">No results found.<br>
-      <span style="font-size:13px;color:var(--ink-faint)">Try different keywords or use ISBN tab.</span></div>`;
+      <span style="font-size:13px;color:var(--ink-faint)">Try different keywords or use the ISBN tab.</span></div>`;
     return;
   }
 
@@ -1941,9 +1875,9 @@ async function searchBooks() {
   el.innerHTML = books.map((book, i) => {
     const color = spineColor(book.title);
     const tH = book.thumb
-      ? `<img src="${book.thumb}" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy" onerror="_coverErr(this)" data-color="${color}" data-title="${book.title.replace(/"/g,'&quot;')}">`
+      ? `<img src="${book.thumb}" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy" onerror="_coverErr(this)" data-color="${color}" data-title="${(book.title||'').replace(/"/g,'&quot;')}">`
       : `<div style="width:100%;height:100%;background:${color};display:flex;align-items:center;justify-content:center;padding:4px"><span style="font-family:var(--ff-body);font-size:9px;color:rgba(255,255,255,.9);text-align:center;line-height:1.3">${book.title.slice(0,22)}</span></div>`;
-    const meta = [book.year, book.pages?book.pages+'pp':''].filter(Boolean).join(' · ');
+    const meta = [book.year, book.pages?book.pages+'pp':'', book.source].filter(Boolean).join(' · ');
     return `<div class="search-book-result" id="sbr-${i}">
       <div class="search-book-thumb" onclick="expandSearchResult(${i})">${tH}</div>
       <div style="flex:1;min-width:0">
@@ -1970,215 +1904,134 @@ function expandSearchResult(i) {
   if (!window._sbrStatus) window._sbrStatus = {};
   window._sbrStatus[i] = window._sbrStatus[i] || 'to-read';
 }
-
-function setSBRStatus(i, s) {
-  if (!window._sbrStatus) window._sbrStatus = {};
-  window._sbrStatus[i] = s;
-  ['to-read','reading','finished'].forEach(x =>
-    document.getElementById(`sbr-s-${i}-${x}`)?.classList.toggle('active', x===s));
+function setSBRStatus(i,s){
+  if(!window._sbrStatus)window._sbrStatus={};window._sbrStatus[i]=s;
+  ['to-read','reading','finished'].forEach(x=>document.getElementById(`sbr-s-${i}-${x}`)?.classList.toggle('active',x===s));
 }
-
-function csStatus(s) { window._confirmStatus = s; }
-
-function doAddSearchBook(i) {
-  const item = window._searchResults?.[i]; if (!item) return;
-  const book = {
-    id: uid(),
-    title:      item.title  || item.volumeInfo?.title || 'Unknown',
-    author:     item.author || (item.volumeInfo?.authors||[]).join(', ') || '',
-    year:       item.year   || item.volumeInfo?.publishedDate?.slice(0,4) || '',
-    totalPages: item.pages  || item.volumeInfo?.pageCount || 0,
-    categories: item.cats   || item.volumeInfo?.categories || [],
-    thumbnail:  httpsThumb(item.thumb || item.volumeInfo?.imageLinks?.thumbnail || ''),
-    isbn:       item.isbn   || '',
-    status:     window._sbrStatus?.[i] || window._confirmStatus || 'to-read',
-    currentPage: 0,
-    addedAt: new Date().toISOString()
-  };
-  if (book.status === 'reading') book.startedReading = new Date().toISOString();
-  DATA.books.push(book); DB.save(DATA);
-  closeModal();
-  if (window._sbrStatus) delete window._sbrStatus[i];
-  showToast(`"${book.title}" added.`);
-  goScreen('shelf');
+function csStatus(s){window._confirmStatus=s;}
+function doAddSearchBook(i){
+  const item=window._searchResults?.[i];if(!item)return;
+  const book={id:uid(),
+    title:item.title||item.volumeInfo?.title||'Unknown',
+    author:item.author||(item.volumeInfo?.authors||[]).join(', ')||'',
+    year:item.year||item.volumeInfo?.publishedDate?.slice(0,4)||'',
+    totalPages:item.pages||item.volumeInfo?.pageCount||0,
+    categories:item.cats||item.volumeInfo?.categories||[],
+    thumbnail:httpsThumb(item.thumb||item.volumeInfo?.imageLinks?.thumbnail||''),
+    isbn:item.isbn||'',
+    status:window._sbrStatus?.[i]||window._confirmStatus||'to-read',
+    currentPage:0,addedAt:new Date().toISOString()};
+  if(book.status==='reading')book.startedReading=new Date().toISOString();
+  DATA.books.push(book);DB.save(DATA);closeModal();
+  if(window._sbrStatus)delete window._sbrStatus[i];
+  showToast(`"${book.title}" added.`);goScreen('shelf');
 }
 
 async function lookupISBNField() {
   const raw = document.getElementById('isbn-field').value.trim();
-  const v = raw.replace(/[-\s]/g, '');
-  if (v.length < 10) { showToast('Enter a valid ISBN-10 or ISBN-13.'); return; }
+  const v = raw.replace(/[-\s]/g,'');
+  if(v.length<10){showToast('Enter a valid ISBN-10 or ISBN-13.');return;}
 
   const el = document.getElementById('isbn-field-result');
-  const isTW = v.startsWith('9786') || v.startsWith('978626');
+  const isTW = v.startsWith('9786')||v.startsWith('978626');
   const isCN = v.startsWith('9787');
 
-  const srcNames = ['博客來', 'NCL Taiwan', 'Taaze', 'Google Books TW', 'Google Books', 'Open Library'];
-  let si = 0;
-  el.innerHTML = `<div style="font-family:var(--ff-display);font-style:italic;font-size:15px;color:var(--ink-faint)">Checking <b style="color:var(--ink)">${srcNames[0]}</b>…</div>`;
-  const tick = setInterval(() => {
-    si = (si+1) % srcNames.length;
-    el.innerHTML = `<div style="font-family:var(--ff-display);font-style:italic;font-size:15px;color:var(--ink-faint)">Checking <b style="color:var(--ink)">${srcNames[si]}</b>…</div>`;
-  }, 800);
-
-  function mk(o) {
-    return { id:uid(), isbn:v, title:o.title||'Unknown', author:o.author||'',
-      year:o.year||'', totalPages:o.pages||0,
-      thumbnail:(o.thumb||'').replace('http://','https://').replace('zoom=1','zoom=3'),
-      categories:o.cats||[], status:'to-read', currentPage:0, addedAt:new Date().toISOString() };
-  }
-
-  function gbBook(info) {
-    return mk({ title:info.title, author:(info.authors||[]).join(', '),
-      year:info.publishedDate?.slice(0,4), pages:info.pageCount,
-      thumb:info.imageLinks?.thumbnail||info.imageLinks?.smallThumbnail, cats:info.categories });
-  }
-
-  // Parse 博客來 search for ISBN
-  function parseBKFirst(html) {
-    if (!html || html.length < 500) return null;
-    const doc = new DOMParser().parseFromString(html, 'text/html');
-    let item = null;
-    for (const sel of ['ul.searchbook > li','li[id^="item"]','.type02_bd-a','.item']) {
-      item = doc.querySelector(sel); if (item) break;
-    }
-    if (!item) { const a = doc.querySelector('a[href*="/products/"]'); if (a) item = a.closest('li')||a.parentElement; }
-    if (!item) return null;
-    const tEl = item.querySelector('h4 a, strong a, a[href*="/products/"]');
-    if (!tEl) return null;
-    const title = tEl.textContent.trim(); if (!title || title.length < 2) return null;
-    const aEl = item.querySelector('ul.msg li a, .author a');
-    const img = item.querySelector('img');
-    const thumb = (img?.getAttribute('data-original')||img?.getAttribute('data-src')||img?.getAttribute('src')||'').replace('http://','https://');
-    return { title, author:aEl?.textContent.trim()||'', thumb, isbn:v, year:'', pages:0, cats:[] };
-  }
+  el.innerHTML = `<div style="font-family:var(--ff-display);font-style:italic;font-size:15px;color:var(--ink-faint)">Searching <b style="color:var(--ink)">Taiwan databases</b>…</div>`;
 
   let book = null, source = '';
 
-  // 1. 博客來 direct (no proxy — works from https://)
-  try {
-    const r = await fetch(`https://search.books.com.tw/search/query/key/${v}/cat/BKA/`,
-      { headers:{'Accept':'text/html,*/*','Accept-Language':'zh-TW,zh;q=0.9'}, signal:AbortSignal.timeout(7000) });
-    const html = await r.text();
-    const hit = parseBKFirst(html);
-    if (hit) { book = mk(hit); source = '博客來'; }
-  } catch(e) {}
+  function mkBook(o, src) {
+    return { id:uid(), isbn:v, title:o.title||'Unknown', author:o.author||'',
+      year:o.year||'', totalPages:o.pages||0,
+      thumbnail:(o.thumb||'').replace('http://','https://').replace('zoom=1','zoom=3'),
+      categories:o.cats||[], status:'to-read', currentPage:0, addedAt:new Date().toISOString(),
+      _src: src };
+  }
 
-  // 2. NCL Taiwan (國家圖書館) — covers ALL 978-626 ISBNs
-  if (!book) {
+  // Try worker first (queries 博客來, NCL, Taaze server-side)
+  const workerOk = WORKER_URL && !WORKER_URL.includes('YOUR-SUBDOMAIN');
+  if (workerOk) {
     try {
-      const r = await fetch(`https://apin.ncl.edu.tw/opac/servlet/Query?format=json&q=${v}&field=isbn&count=1`,
-        { signal:AbortSignal.timeout(6000) });
+      const r = await fetch(`${WORKER_URL}?mode=isbn&isbn=${v}`);
       const d = await r.json();
-      const recs = d?.result||d?.records||(Array.isArray(d)?d:null)||Object.values(d||{}).find(v=>Array.isArray(v))||[];
-      const rec = Array.isArray(recs) ? recs[0] : null;
-      if (rec) {
-        const title = rec.title||rec.TI||rec['245a']||'';
-        if (title) {
-          book = mk({ title, author:rec.author||rec.AU||rec['100a']||'',
-            year:rec.year||rec.PY||'', pages:parseInt(rec.pages||0)||0, thumb:'', cats:[] });
-          source = 'NCL Taiwan';
-        }
+      if (d.results?.length) {
+        const res = d.results[0];
+        book = mkBook(res, res.source||'Worker');
+        source = res.source || 'Worker';
       }
     } catch(e) {}
   }
 
-  // 3. Taaze 讀冊
+  // Direct API fallbacks (work from https://)
   if (!book) {
     try {
-      const r = await fetch(`https://www.taaze.tw/api/searchResult.json?type=1&keyword=${v}`,
-        { signal:AbortSignal.timeout(5000) });
-      const d = await r.json();
-      const list = d?.data?.result?.list||d?.data||d?.list||d?.result||[];
-      const item = Array.isArray(list) ? list[0] : null;
-      if (item) {
-        const title = item.title||item.name||'';
-        if (title) {
-          book = mk({ title, author:(Array.isArray(item.author)?item.author.join(', '):item.author)||'',
-            year:item.publishYear||item.year||'', pages:item.pages||0,
-            thumb:item.cover||item.coverUrl||item.image||'', isbn:item.isbn||v, cats:[] });
-          source = 'Taaze';
-        }
+      const r=await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${v}&country=TW&maxResults=1`);
+      const d=await r.json();
+      if(d.items?.length){
+        const info=d.items[0].volumeInfo;
+        book=mkBook({title:info.title,author:(info.authors||[]).join(', '),
+          year:info.publishedDate?.slice(0,4),pages:info.pageCount,
+          thumb:info.imageLinks?.thumbnail||info.imageLinks?.smallThumbnail,cats:info.categories},'Google Books TW');
+        source='Google Books TW';
       }
-    } catch(e) {}
+    } catch(e){}
   }
-
-  // 4. Google Books country=TW
   if (!book) {
     try {
-      const r = await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${v}&country=TW&maxResults=1`);
-      const d = await r.json();
-      if (d.items?.length) { book = gbBook(d.items[0].volumeInfo); source = 'Google Books (TW)'; }
-    } catch(e) {}
-  }
-
-  // 5. Google Books global
-  if (!book) {
-    try {
-      const r = await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${v}&maxResults=1`);
-      const d = await r.json();
-      if (d.items?.length) { book = gbBook(d.items[0].volumeInfo); source = 'Google Books'; }
-    } catch(e) {}
-  }
-
-  // 6. Open Library books API
-  if (!book) {
-    try {
-      const r = await fetch(`https://openlibrary.org/api/books?bibkeys=ISBN:${v}&format=json&jscmd=data`);
-      const d = await r.json();
-      const entry = d[`ISBN:${v}`];
-      if (entry) {
-        book = mk({ title:entry.title, author:(entry.authors||[]).map(a=>a.name).join(', '),
-          year:entry.publish_date?.match(/\d{4}/)?.[0], pages:entry.number_of_pages,
-          thumb:entry.cover?.large||entry.cover?.medium||entry.cover?.small,
-          cats:entry.subjects?[entry.subjects[0]?.name]:[] });
-        source = 'Open Library';
+      const r=await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${v}&maxResults=1`);
+      const d=await r.json();
+      if(d.items?.length){
+        const info=d.items[0].volumeInfo;
+        book=mkBook({title:info.title,author:(info.authors||[]).join(', '),
+          year:info.publishedDate?.slice(0,4),pages:info.pageCount,
+          thumb:info.imageLinks?.thumbnail||info.imageLinks?.smallThumbnail,cats:info.categories},'Google Books');
+        source='Google Books';
       }
-    } catch(e) {}
+    } catch(e){}
   }
-
-  // 7. Open Library search
   if (!book) {
     try {
-      const r = await fetch(`https://openlibrary.org/search.json?isbn=${v}&fields=title,author_name,number_of_pages_median,cover_i,first_publish_year`);
-      const d = await r.json();
-      if (d.docs?.length) {
-        const doc = d.docs[0];
-        book = mk({ title:doc.title, author:(doc.author_name||[]).join(', '),
-          year:doc.first_publish_year?String(doc.first_publish_year):'', pages:doc.number_of_pages_median,
-          thumb:doc.cover_i?`https://covers.openlibrary.org/b/id/${doc.cover_i}-L.jpg`:'' });
-        source = 'Open Library';
+      const r=await fetch(`https://openlibrary.org/api/books?bibkeys=ISBN:${v}&format=json&jscmd=data`);
+      const d=await r.json();
+      const entry=d[`ISBN:${v}`];
+      if(entry){
+        book=mkBook({title:entry.title,author:(entry.authors||[]).map(a=>a.name).join(', '),
+          year:entry.publish_date?.match(/\d{4}/)?.[0],pages:entry.number_of_pages,
+          thumb:entry.cover?.large||entry.cover?.medium||''},'Open Library');
+        source='Open Library';
       }
-    } catch(e) {}
+    } catch(e){}
   }
-
-  // 8. Google Books plain number (last resort)
   if (!book) {
     try {
-      const r = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${v}&maxResults=5`);
-      const d = await r.json();
-      const match = (d.items||[]).find(item =>
-        (item.volumeInfo.industryIdentifiers||[]).some(x => x.identifier?.replace(/-/g,'')=== v));
-      if (match) { book = gbBook(match.volumeInfo); source = 'Google Books'; }
-    } catch(e) {}
+      const r=await fetch(`https://openlibrary.org/search.json?isbn=${v}&fields=title,author_name,number_of_pages_median,cover_i,first_publish_year`);
+      const d=await r.json();
+      if(d.docs?.length){
+        const doc=d.docs[0];
+        book=mkBook({title:doc.title,author:(doc.author_name||[]).join(', '),
+          year:doc.first_publish_year?String(doc.first_publish_year):'',pages:doc.number_of_pages_median,
+          thumb:doc.cover_i?`https://covers.openlibrary.org/b/id/${doc.cover_i}-L.jpg`:''},'Open Library');
+        source='Open Library';
+      }
+    } catch(e){}
   }
 
-  clearInterval(tick);
-
   if (!book) {
-    const hint = isTW
-      ? '找不到此台灣 ISBN。已搜尋博客來、國家圖書館、Taaze 及 Google Books。請改用書名搜尋或手動新增。'
-      : isCN ? '找不到此大陸版 ISBN。請改用書名搜尋，或手動輸入。'
-      : 'Not found in any database. Try searching by title or add manually.';
+    const setupMsg = workerOk ? '' :
+      `<div style="font-family:var(--ff-sc);font-size:10px;color:var(--crimson);margin-bottom:10px;padding:8px;background:rgba(139,32,32,.06);border-radius:4px">
+        ⚡ Deploy the Jotter Worker to search 博客來 & NCL Taiwan<br>
+        See WORKER_SETUP.md in your GitHub repo
+      </div>`;
+    const hint = isTW ? '找不到此台灣 ISBN。' : isCN ? '找不到此大陸版 ISBN。' : 'Not found.';
     el.innerHTML = `
-      <div style="border-left:4px solid var(--rule);padding:14px 16px;margin-bottom:16px">
-        <div style="font-family:var(--ff-sc);font-size:11px;color:var(--ink-faint);margin-bottom:8px">NOT FOUND · 8 SOURCES</div>
+      <div style="border-left:4px solid var(--rule);padding:14px;margin-bottom:14px">
+        <div style="font-family:var(--ff-sc);font-size:11px;color:var(--ink-faint);margin-bottom:8px">NOT FOUND</div>
         <div style="font-family:var(--ff-body);font-size:15px;color:var(--ink);line-height:1.65">${hint}</div>
       </div>
+      ${setupMsg}
       <div style="display:flex;gap:8px">
         <button class="modal-btn" style="flex:1"
-          onclick="setAddTab('search');document.getElementById('isbn-field-result').innerHTML='';
-                   document.getElementById('add-search-field').value='';
-                   document.getElementById('add-search-field').focus();">搜尋書名 →</button>
+          onclick="setAddTab('search');document.getElementById('isbn-field-result').innerHTML='';document.getElementById('add-search-field').focus();">搜尋書名 →</button>
         <button class="modal-btn primary" style="flex:1" onclick="prefillManualFromISBN('${v}')">手動新增 →</button>
       </div>`;
     return;
