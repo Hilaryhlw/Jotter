@@ -1992,46 +1992,67 @@ function scoreRecord(rec, queryISBN) {
 // ── Provider: Readmoo 讀墨 ─────────────────────────────────────────────
 // Taiwan's largest ebook platform. Primary source for TW commercial ebooks.
 const ProviderReadmoo = {
+  // Readmoo has no public documented JSON API.
+  // Their only reachable endpoint from a browser is their search page (HTML).
+  // We attempt their internal search API patterns; all will fail gracefully
+  // if they return HTML or CORS-blocked responses.
+  // Real Readmoo data can only be accessed via their app or a server-side proxy.
   _parse(d) {
-    // Readmoo search API returns {data: {results: [{id, title, authors, publisher, ...}]}}
-    // or {results: [...]} depending on endpoint version
-    const items = d?.data?.results || d?.data?.items || d?.results || d?.items || [];
-    return (Array.isArray(items) ? items : []).map(item => ({
-      title:     item.title || item.name || '',
+    // Handle multiple possible response shapes from Readmoo internal APIs
+    const items =
+      d?.data?.results ||     // /api/search v2
+      d?.data?.items   ||     // /api/search v1
+      d?.results       ||     // flat results
+      d?.items         ||     // flat items
+      d?.data          ||     // bare data array
+      [];
+    if (!Array.isArray(items) || items.length === 0) return [];
+    return items.map(item => ({
+      title:     item.title       || item.name          || '',
       author:    Array.isArray(item.authors)
-                   ? item.authors.map(a => a.name||a).join('、')
-                   : (item.author || item.authors || ''),
-      year:      item.publish_date?.slice(0,4) || item.year || '',
-      pages:     item.page_count || item.pages || 0,
-      publisher: item.publisher?.name || item.publisher || '',
-      thumb:     item.cover_url || item.cover || item.image || '',
-      isbn:      item.isbn || item.ean || item.identifier || '',
+                   ? item.authors.map(a => (typeof a === 'string' ? a : a.name||a.display_name||'')).join('、')
+                   : (item.author || item.authors_string || ''),
+      year:      (item.publish_date || item.published_at || item.year || '').toString().slice(0,4),
+      pages:     parseInt(item.page_count || item.pages || item.page || 0) || 0,
+      publisher: (item.publisher?.name || item.publisher?.display_name || item.publisher || '').toString(),
+      thumb:     item.cover_url   || item.cover_image_url || item.cover || item.image_url || item.image || '',
+      isbn:      item.isbn        || item.isbn13 || item.ean || item.identifier || '',
       language:  'zh-TW',
       _source:   'Readmoo 讀墨',
-    }));
+    })).filter(b => b.title.length > 0);
   },
   async fetchByISBN(isbn) {
-    const results = [];
-    // Try multiple Readmoo endpoint patterns
+    // Try every known Readmoo API pattern — most will return HTML or CORS error,
+    // caught silently. If any returns valid JSON with data, use it.
+    const enc = encodeURIComponent(isbn);
     for (const url of [
-      `https://readmoo.com/api/search?q=${encodeURIComponent(isbn)}&limit=5`,
-      `https://readmoo.com/api/books?isbn=${encodeURIComponent(isbn)}`,
+      `https://readmoo.com/api/search?q=${enc}&format=json&limit=5`,
+      `https://readmoo.com/api/search?q=${enc}&limit=5`,
+      `https://api.readmoo.com/store/v3/search?q=${enc}&limit=5`,
+      `https://api.readmoo.com/search?isbn=${enc}`,
     ]) {
       try {
         const d = await safeFetch(url);
         const parsed = this._parse(d);
-        if (parsed.length) return parsed;
-      } catch(e) {}
+        if (parsed.length > 0) return parsed;
+      } catch(e) { /* CORS or HTML — try next */ }
     }
-    return results;
+    return [];
   },
   async fetchByTitle(q) {
-    try {
-      const d = await safeFetch(
-        `https://readmoo.com/api/search?q=${encodeURIComponent(q)}&limit=10`
-      );
-      return this._parse(d);
-    } catch(e) { return []; }
+    const enc = encodeURIComponent(q);
+    for (const url of [
+      `https://readmoo.com/api/search?q=${enc}&format=json&limit=10`,
+      `https://readmoo.com/api/search?q=${enc}&limit=10`,
+      `https://api.readmoo.com/store/v3/search?q=${enc}&limit=10`,
+    ]) {
+      try {
+        const d = await safeFetch(url);
+        const parsed = this._parse(d);
+        if (parsed.length > 0) return parsed;
+      } catch(e) { /* try next */ }
+    }
+    return [];
   },
 };
 
@@ -2098,14 +2119,32 @@ const ProviderGoogleBooks = {
   async fetchByISBN(isbn) {
     const enc = encodeURIComponent(isbn);
     const results = [];
-    // All country variants — TW/HK/CN first because they have commercial TW ebooks
-    await Promise.allSettled([
-      ...['TW','HK','CN',''].map(cc =>
+    // Strategy 1: isbn: prefix with all country variants
+    await Promise.allSettled(
+      ['TW','HK','CN',''].map(cc =>
         safeFetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${enc}${cc?'&country='+cc:''}&maxResults=3`)
           .then(d => this._parse(d.items, cc?`(${cc})`:'').forEach(b => results.push(b)))
           .catch(()=>{})
-      ),
-    ]);
+      )
+    );
+    if (results.length > 0) return results;
+    // Strategy 2: plain number query — Google indexes some books without isbn: prefix
+    // e.g. TW ebooks on Play Store appear in plain search but not isbn: lookup
+    await Promise.allSettled(
+      ['TW','HK',''].map(cc =>
+        safeFetch(`https://www.googleapis.com/books/v1/volumes?q=${enc}${cc?'&country='+cc:''}&maxResults=5`)
+          .then(d => {
+            // Only accept if ISBN matches — avoids false positives from plain search
+            this._parse(d.items, cc?`(${cc})`:'').forEach(b => {
+              const cleanB = (b.isbn||'').replace(/[^0-9X]/gi,'');
+              const cleanQ = isbn.replace(/[^0-9X]/gi,'');
+              if (cleanB === cleanQ || cleanB === cleanQ.replace(/^978/,'').slice(0,9)) {
+                results.push(b);
+              }
+            });
+          }).catch(()=>{})
+      )
+    );
     return results;
   },
   async fetchByTitle(q) {
@@ -2258,14 +2297,20 @@ const ProviderWorldCat = {
 // of widely-available books including TW commercial titles.
 const ProviderClaude = {
   async fetchByISBN(isbn) {
-    const isTW = ISBNProfile.isTW(isbn);
-    const isCN = ISBNProfile.isCN(isbn);
+    const profile = ISBNProfile.classify(isbn);
+    const isTW = profile === 'tw';
+    const isCN = profile === 'cn';
+    // Ask Claude directly about this ISBN — Claude's training data includes
+    // metadata for widely-available books including TW commercial titles.
+    // We ask in Traditional Chinese for TW ISBNs to get zh-TW field values.
     const prompt = (isTW || isCN)
-      ? `你是一個書籍 metadata 資料庫。請根據 ISBN ${isbn} 回傳書籍資料，僅輸出 JSON，不要任何其他文字。
-格式：{"title":"書名","author":"作者","publisher":"出版社","year":"出版年份","pages":頁數,"language":"zh-TW","found":true}
-若不認識此 ISBN，回傳：{"found":false}`
-      : `You are a book metadata database. For ISBN ${isbn}, return ONLY JSON, no other text.
-Format: {"title":"","author":"","publisher":"","year":"","pages":0,"language":"","found":true}
+      ? `你是書籍 metadata 專家。ISBN ${isbn} 是哪一本書？
+請直接回傳 JSON（不要說明文字、不要 markdown、不要 code block）：
+{"title":"完整書名（繁體中文）","author":"作者全名","publisher":"出版社","year":"西元年份四位數","pages":頁數整數,"language":"zh-TW","found":true}
+如果你不認識此 ISBN，回傳：{"found":false}`
+      : `You are a book metadata expert. What book has ISBN ${isbn}?
+Return ONLY JSON (no explanation, no markdown, no code block):
+{"title":"","author":"","publisher":"","year":"YYYY","pages":0,"language":"","found":true}
 If unknown: {"found":false}`;
     try {
       const resp = await fetch('https://api.anthropic.com/v1/messages', {
@@ -2273,25 +2318,30 @@ If unknown: {"found":false}`;
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           model: 'claude-sonnet-4-20250514',
-          max_tokens: 200,
+          max_tokens: 300,
           messages: [{ role: 'user', content: prompt }],
         }),
       });
       const rd = await resp.json();
-      const text = rd.content?.[0]?.text || '';
-      const m = text.match(/\{[\s\S]*\}/);
+      const text = (rd.content?.[0]?.text || '').trim();
+      // Extract JSON — handle cases where model wraps in backticks
+      const jsonStr = text.replace(/^```[a-z]*
+?/,'').replace(/
+?```$/,'').trim();
+      const m = jsonStr.match(/\{[\s\S]*\}/);
       if (!m) return [];
       const meta = JSON.parse(m[0]);
-      if (!meta.found || !meta.title) return [];
+      if (!meta.found || !meta.title || isGarbageTitle(meta.title)) return [];
+      // Preserve the queried ISBN even if Claude returns a slightly different format
       return [{
-        title:     meta.title,
-        author:    meta.author    || '',
-        publisher: meta.publisher || '',
-        year:      meta.year      || '',
-        pages:     meta.pages     || 0,
+        title:     meta.title.trim(),
+        author:    (meta.author    || '').trim(),
+        publisher: (meta.publisher || '').trim(),
+        year:      (meta.year      || '').toString().replace(/\D/g,'').slice(0,4),
+        pages:     parseInt(meta.pages) || 0,
         language:  meta.language  || (isTW ? 'zh-TW' : isCN ? 'zh-CN' : ''),
         thumb:     '',
-        isbn,
+        isbn,   // always use the queried ISBN, not Claude's guess
         _source:   'Claude AI',
       }];
     } catch(e) { return []; }
@@ -2429,24 +2479,28 @@ async function runTier(providers, method, arg, pool) {
 // ── ISBN search — tiered provider cascade ─────────────────────────────
 async function isbnSearch(isbn, onProgress) {
   const profile = ISBNProfile.classify(isbn);
+  const isTWCN  = profile === 'tw' || profile === 'cn';
   const tiers   = PROVIDER_TIERS[profile] || PROVIDER_TIERS.intl;
   const pool    = makePool(isbn);
 
   // Tier 1 + Tier 2 always run concurrently (bookstores + aggregators)
+  // For TW/CN ISBNs: also run Claude AI concurrently — it has reliable
+  // training knowledge of TW commercial books, and costs no extra latency
+  // when run in parallel.
   onProgress?.('Searching bookstores…');
-  await Promise.allSettled([
-    runTier(tiers.tier1, 'fetchByISBN', isbn, pool),
-    runTier(tiers.tier2, 'fetchByISBN', isbn, pool),
-  ]);
+  const concurrentProviders = isTWCN
+    ? [...tiers.tier1, ...tiers.tier2, ...tiers.tier4]  // include Claude in parallel
+    : [...tiers.tier1, ...tiers.tier2];
+  await runTier(concurrentProviders, 'fetchByISBN', isbn, pool);
 
-  // Tier 3 (library catalogs) — only if tiers 1+2 found nothing
+  // Tier 3 (library catalogs) — only if still nothing
   if (pool.size() === 0) {
     onProgress?.('Checking library catalogs…');
     await runTier(tiers.tier3, 'fetchByISBN', isbn, pool);
   }
 
-  // Claude AI — final fallback when everything else fails
-  if (pool.size() === 0) {
+  // For non-TW/CN: Claude as final fallback
+  if (pool.size() === 0 && !isTWCN) {
     onProgress?.('Checking Claude AI…');
     await runTier(tiers.tier4, 'fetchByISBN', isbn, pool);
   }
