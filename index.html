@@ -768,17 +768,18 @@ async function doBookSearch(){
   // For ISBN: send isbn: prefix
   // For English: try intitle: first then raw
   const base='https://www.googleapis.com/books/v1/volumes';
+  const gbKey='&key=AIzaSyAASBenZp1xB0Iss4932SMX8GhzK_gz8Rg';
   const gbCalls=isISBN
-    ? [`${base}?q=isbn:${isbn}&maxResults=5`,
-       `${base}?q=${encodeURIComponent(isbn)}&maxResults=5`]
+    ? [`${base}?q=isbn:${isbn}&maxResults=5${gbKey}`,
+       `${base}?q=${encodeURIComponent(isbn)}&maxResults=5${gbKey}`]
     : isCJK
       // Chinese: raw query works best; also try with langRestrict=zh-TW and zh-CN
-      ? [`${base}?q=${encodeURIComponent(q)}&maxResults=10&printType=books`,
-         `${base}?q=${encodeURIComponent(q)}&maxResults=10&printType=books&langRestrict=zh-TW`,
-         `${base}?q=${encodeURIComponent(q)}&maxResults=10&printType=books&langRestrict=zh-CN`]
+      ? [`${base}?q=${encodeURIComponent(q)}&maxResults=10&printType=books${gbKey}`,
+         `${base}?q=${encodeURIComponent(q)}&maxResults=10&printType=books&langRestrict=zh-TW${gbKey}`,
+         `${base}?q=${encodeURIComponent(q)}&maxResults=10&printType=books&langRestrict=zh-CN${gbKey}`]
       // English / other: intitle first, then raw
-      : [`${base}?q=intitle:${encodeURIComponent(q)}&maxResults=10&printType=books`,
-         `${base}?q=${encodeURIComponent(q)}&maxResults=10&printType=books`];
+      : [`${base}?q=intitle:${encodeURIComponent(q)}&maxResults=10&printType=books${gbKey}`,
+         `${base}?q=${encodeURIComponent(q)}&maxResults=10&printType=books${gbKey}`];
 
   for(const url of gbCalls){
     if(results.length>=10)break;
@@ -1067,8 +1068,7 @@ async function saveEx2(){
   exSubTab('list');
 }
 async function delCurEx2(){
-  if(!confirm('Delete this excerpt?
-確定刪除？'))return;
+  if(!confirm('Delete this excerpt? · 確定刪除？'))return;
   await dd('excerpts',A.exid);
   A.exid=null;
   exSubTab('list');
@@ -1105,22 +1105,7 @@ async function renderExs(id){
     </div>`).join('');
 }
 
-function openAddEx(){
-  A.exid=null;resetExM();
-  document.getElementById('M-ex-ttl').textContent='Add Excerpt · 新增劃線';
-  document.getElementById('del-ex').style.display='none';
-  openM('M-ex');
-}
-async function openEditEx(id){
-  const h=await dg('excerpts',id);if(!h)return;
-  A.exid=id;A.tags=[...(h.tags||[])];
-  document.getElementById('M-ex-ttl').textContent='Edit Excerpt · 編輯劃線';
-  document.getElementById('del-ex').style.display='block';
-  document.getElementById('ex-txt').value=h.text;
-  document.getElementById('ex-page').value=h.page||'';
-  renderChips();openM('M-ex');
-}
-function resetExM(){A.tags=[];document.getElementById('ex-txt').value='';document.getElementById('ex-page').value='';document.getElementById('tag-in').value='';renderChips()}
+// old modal-based excerpt functions removed
 function renderChips(){
   const area=document.getElementById('tga');const inp=document.getElementById('tag-in');
   area.querySelectorAll('.trm').forEach(x=>x.remove());
