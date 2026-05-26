@@ -739,64 +739,81 @@ async function doBookSearch(){
   const status=document.getElementById('bsearch-status');
   status.textContent='Searching… 搜尋中…';
 
-  const isISBN=/^\d{9,13}[\dX]?$/.test(q.replace(/[-\s]/g,''));
   const isbn=q.replace(/[-\s]/g,'');
-  // Detect CJK characters — Chinese/Japanese/Korean query
-  const isCJK=/[\u3000-\u9fff\uf900-\ufaff\u3400-\u4dbf]/.test(q);
+  const isISBN=/^\d{9,13}[\dX]?$/.test(isbn);
+  const isCJK=/[\u2e80-\u9fff\uf900-\ufaff\u3400-\u4dbf]/.test(q);
+  const KEY='AIzaSyAASBenZp1xB0Iss4932SMX8GhzK_gz8Rg';
+  const base='https://www.googleapis.com/books/v1/volumes';
   let results=[];
 
-  // Helper to push GB item into results (dedup by title)
-  function pushGB(v){
-    if(!v.title)return false;
-    const key=v.title.toLowerCase().slice(0,40);
-    if(results.some(x=>x.title.toLowerCase().slice(0,40)===key))return false;
-    const cov=gbCover(v);
+  function pushItem(v){
+    if(!v||!v.title)return;
+    const key=v.title.toLowerCase().replace(/\s/g,'').slice(0,20);
+    if(results.some(x=>x._key===key))return;
+    const il=v.imageLinks||{};
+    // Try every possible image size, largest first
+    const rawCov=il.extraLarge||il.large||il.medium||il.small||il.thumbnail||il.smallThumbnail||'';
+    const cov=rawCov?rawCov.replace('http:','https:').replace(/&edge=curl/,'').replace(/zoom=\d/,'zoom=3'):'';
+    const isbnVal=(v.industryIdentifiers||[]).find(x=>x.type==='ISBN_13')?.identifier||
+                  (v.industryIdentifiers||[]).find(x=>x.type==='ISBN_10')?.identifier||'';
     results.push({
+      _key:key,
       title:v.title,
       author:(v.authors||[]).join(', '),
       year:(v.publishedDate||'').slice(0,4),
       cover:cov||null,
-      isbn:(v.industryIdentifiers||[]).find(x=>x.type==='ISBN_13')?.identifier||
-           (v.industryIdentifiers||[]).find(x=>x.type==='ISBN_10')?.identifier||'',
+      isbn:isbnVal,
       src:'Google Books'
     });
-    return true;
   }
 
-  // ── GOOGLE BOOKS strategy ──
-  // For CJK: send raw query without intitle: — GB handles Chinese natively
-  // For ISBN: send isbn: prefix
-  // For English: try intitle: first then raw
-  const base='https://www.googleapis.com/books/v1/volumes';
-  const gbKey='&key=AIzaSyAASBenZp1xB0Iss4932SMX8GhzK_gz8Rg';
-  const gbCalls=isISBN
-    ? [`${base}?q=isbn:${isbn}&maxResults=5${gbKey}`,
-       `${base}?q=${encodeURIComponent(isbn)}&maxResults=5${gbKey}`]
-    : isCJK
-      // Chinese: raw query works best; also try with langRestrict=zh-TW and zh-CN
-      ? [`${base}?q=${encodeURIComponent(q)}&maxResults=10&printType=books${gbKey}`,
-         `${base}?q=${encodeURIComponent(q)}&maxResults=10&printType=books&langRestrict=zh-TW${gbKey}`,
-         `${base}?q=${encodeURIComponent(q)}&maxResults=10&printType=books&langRestrict=zh-CN${gbKey}`]
-      // English / other: intitle first, then raw
-      : [`${base}?q=intitle:${encodeURIComponent(q)}&maxResults=10&printType=books${gbKey}`,
-         `${base}?q=${encodeURIComponent(q)}&maxResults=10&printType=books${gbKey}`];
+  const tf=(url,ms=8000)=>Promise.race([
+    fetch(url),
+    new Promise((_,rj)=>setTimeout(()=>rj('timeout'),ms))
+  ]);
 
-  for(const url of gbCalls){
+  // Build query list — more aggressive for Chinese
+  let queries=[];
+  if(isISBN){
+    queries=[
+      `${base}?q=isbn:${isbn}&maxResults=5&key=${KEY}`,
+      `${base}?q=${encodeURIComponent(isbn)}&maxResults=5&key=${KEY}`,
+    ];
+  } else if(isCJK){
+    // For Chinese: send raw characters, try multiple language scopes
+    // Google Books indexes zh-TW and zh-CN separately
+    queries=[
+      `${base}?q=${encodeURIComponent(q)}&maxResults=10&printType=books&key=${KEY}`,
+      `${base}?q=${encodeURIComponent(q)}&maxResults=10&printType=books&langRestrict=zh-TW&key=${KEY}`,
+      `${base}?q=${encodeURIComponent(q)}&maxResults=10&printType=books&langRestrict=zh-CN&key=${KEY}`,
+      `${base}?q=${encodeURIComponent(q)}&maxResults=10&key=${KEY}`,
+    ];
+  } else {
+    queries=[
+      `${base}?q=intitle:${encodeURIComponent(q)}&maxResults=10&printType=books&key=${KEY}`,
+      `${base}?q=${encodeURIComponent(q)}&maxResults=10&printType=books&key=${KEY}`,
+      `${base}?q=inauthor:${encodeURIComponent(q)}&maxResults=5&printType=books&key=${KEY}`,
+    ];
+  }
+
+  // Run GB queries
+  for(const url of queries){
     if(results.length>=10)break;
     try{
-      const r=await tf(url,7000);
+      const r=await tf(url);
       if(!r.ok)continue;
       const d=await r.json();
+      if(d.error){console.warn('GB error:',d.error.message);continue;}
       for(const item of (d.items||[])){
-        pushGB(item.volumeInfo);
+        pushItem(item.volumeInfo);
         if(results.length>=10)break;
       }
-    }catch(e){}
+    }catch(e){console.warn('GB fetch failed:',e);}
   }
 
-  status.textContent=results.length?`Found ${results.length}… 搜尋中文書庫…`:'Searching Chinese catalog… 查詢中文書庫…';
+  status.textContent=results.length?`Found ${results.length}… checking more sources`:'Checking Open Library…';
 
-  // ── OPEN LIBRARY ──
+  // Open Library — great for Chinese and global books
   if(results.length<8){try{
     const olq=isISBN?`isbn=${isbn}`:`title=${encodeURIComponent(q)}`;
     const r=await tf(`https://openlibrary.org/search.json?${olq}&limit=8&fields=title,author_name,first_publish_year,cover_i,isbn`);
@@ -804,40 +821,20 @@ async function doBookSearch(){
       const d=await r.json();
       for(const b of (d.docs||[])){
         if(!b.title)continue;
-        const key=(b.title+(b.author_name?.[0]||'')).toLowerCase();
-        if(results.some(x=>((x.title+(x.author||'')).toLowerCase())===key))continue;
+        const key=b.title.toLowerCase().replace(/\s/g,'').slice(0,20);
+        if(results.some(x=>x._key===key))continue;
         const cov=b.cover_i?`https://covers.openlibrary.org/b/id/${b.cover_i}-M.jpg`:
-          b.isbn?.[0]?`https://covers.openlibrary.org/b/isbn/${b.isbn[0]}-M.jpg`:null;
-        results.push({
-          title:b.title,author:(b.author_name||[]).join(', '),
-          year:String(b.first_publish_year||''),cover:cov,
-          isbn:b.isbn?.[0]||'',src:'Open Library'
-        });
+                  b.isbn?.[0]?`https://covers.openlibrary.org/b/isbn/${b.isbn[0]}-M.jpg`:null;
+        results.push({_key:key,title:b.title,author:(b.author_name||[]).join(', '),
+          year:String(b.first_publish_year||''),cover:cov,isbn:b.isbn?.[0]||'',src:'Open Library'});
         if(results.length>=12)break;
       }
     }
   }catch(e){}}
 
-  // ── OPEN LIBRARY ISBN direct (for ISBN queries) ──
-  if(isISBN&&results.length<3){try{
-    const r=await tf(`https://openlibrary.org/isbn/${isbn}.json`,5000);
-    if(r.ok){
-      const b=await r.json();
-      if(b.title){
-        const covId=b.covers?.[0];
-        const cov=covId?`https://covers.openlibrary.org/b/id/${covId}-M.jpg`
-          :`https://covers.openlibrary.org/b/isbn/${isbn}-M.jpg`;
-        const key=b.title.toLowerCase();
-        if(!results.some(x=>x.title.toLowerCase()===key)){
-          results.unshift({title:b.title,author:'',year:(b.publish_date||'').replace(/\D/g,'').slice(0,4),cover:cov,isbn,src:'Open Library'});
-        }
-      }
-    }
-  }catch(e){}}
-
-  // ── For cover-less results: try to get cover via ISBN from OL CDN ──
+  // For results still missing covers, try OL cover CDN by ISBN
   for(const item of results){
-    if(!item.cover && item.isbn){
+    if(!item.cover&&item.isbn){
       item.cover=`https://covers.openlibrary.org/b/isbn/${item.isbn}-M.jpg`;
     }
   }
@@ -850,10 +847,10 @@ async function doBookSearch(){
     document.getElementById('bsearch-nf').style.display='block';
     return;
   }
-
   A.searchResults=results;
   renderSearchResults(results);
 }
+
 
 function renderSearchResults(results){
   const list=document.getElementById('sr-list');
