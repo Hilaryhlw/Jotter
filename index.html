@@ -527,6 +527,13 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
             <span id="clabel">Upload cover · 上傳封面（選填）</span>
           </button>
           <input type="file" id="cfile" accept="image/*" style="display:none" onchange="onCover(this)">
+          <div style="margin-top:8px;display:flex;align-items:center;gap:10px">
+            <img id="cover-preview" src="" alt="cover preview"
+              style="display:none;width:52px;aspect-ratio:2/3;object-fit:cover;border-radius:2px 4px 4px 2px;box-shadow:0 1px 8px rgba(0,0,0,.2)">
+            <span id="cover-preview-note" style="font-family:var(--body);font-style:italic;font-size:0.72rem;color:var(--ink4);display:none">
+              Auto-cropped to book ratio · 已自動裁切為書封比例
+            </span>
+          </div>
         </div>
         <div class="fg"><label class="fl">Cover Colour · 封面顏色</label><div class="swatches" id="sws"></div></div>
       </div>
@@ -743,98 +750,111 @@ async function doBookSearch(){
   const isISBN=/^\d{9,13}[\dX]?$/.test(isbn);
   const isCJK=/[\u2e80-\u9fff\uf900-\ufaff\u3400-\u4dbf]/.test(q);
   const KEY='AIzaSyAASBenZp1xB0Iss4932SMX8GhzK_gz8Rg';
-  const base='https://www.googleapis.com/books/v1/volumes';
   let results=[];
 
-  function pushItem(v){
-    if(!v||!v.title)return;
-    const key=v.title.toLowerCase().replace(/\s/g,'').slice(0,20);
-    if(results.some(x=>x._key===key))return;
-    const il=v.imageLinks||{};
-    // Try every possible image size, largest first
-    const rawCov=il.extraLarge||il.large||il.medium||il.small||il.thumbnail||il.smallThumbnail||'';
-    const cov=rawCov?rawCov.replace('http:','https:').replace(/&edge=curl/,'').replace(/zoom=\d/,'zoom=3'):'';
-    const isbnVal=(v.industryIdentifiers||[]).find(x=>x.type==='ISBN_13')?.identifier||
-                  (v.industryIdentifiers||[]).find(x=>x.type==='ISBN_10')?.identifier||'';
-    results.push({
-      _key:key,
-      title:v.title,
-      author:(v.authors||[]).join(', '),
-      year:(v.publishedDate||'').slice(0,4),
-      cover:cov||null,
-      isbn:isbnVal,
-      src:'Google Books'
-    });
-  }
-
-  const tf=(url,ms=8000)=>Promise.race([
-    fetch(url),
+  const tf=(url,ms=9000)=>Promise.race([
+    fetch(url,{headers:{'Referer':'https://hilaryhlw.github.io/'}}),
     new Promise((_,rj)=>setTimeout(()=>rj('timeout'),ms))
   ]);
 
-  // Build query list — more aggressive for Chinese
-  let queries=[];
-  if(isISBN){
-    queries=[
-      `${base}?q=isbn:${isbn}&maxResults=5&key=${KEY}`,
-      `${base}?q=${encodeURIComponent(isbn)}&maxResults=5&key=${KEY}`,
-    ];
-  } else if(isCJK){
-    // For Chinese: send raw characters, try multiple language scopes
-    // Google Books indexes zh-TW and zh-CN separately
-    queries=[
-      `${base}?q=${encodeURIComponent(q)}&maxResults=10&printType=books&key=${KEY}`,
-      `${base}?q=${encodeURIComponent(q)}&maxResults=10&printType=books&langRestrict=zh-TW&key=${KEY}`,
-      `${base}?q=${encodeURIComponent(q)}&maxResults=10&printType=books&langRestrict=zh-CN&key=${KEY}`,
-      `${base}?q=${encodeURIComponent(q)}&maxResults=10&key=${KEY}`,
-    ];
-  } else {
-    queries=[
-      `${base}?q=intitle:${encodeURIComponent(q)}&maxResults=10&printType=books&key=${KEY}`,
-      `${base}?q=${encodeURIComponent(q)}&maxResults=10&printType=books&key=${KEY}`,
-      `${base}?q=inauthor:${encodeURIComponent(q)}&maxResults=5&printType=books&key=${KEY}`,
-    ];
+  function pushItem(item, src){
+    if(!item||!item.title)return false;
+    const key=item.title.toLowerCase().replace(/\s/g,'').slice(0,20);
+    if(results.some(x=>x._key===key))return false;
+    results.push({_key:key,...item,src});
+    return true;
   }
 
-  // Run GB queries
-  for(const url of queries){
-    if(results.length>=10)break;
-    try{
-      const r=await tf(url);
-      if(!r.ok)continue;
-      const d=await r.json();
-      if(d.error){console.warn('GB error:',d.error.message);continue;}
-      for(const item of (d.items||[])){
-        pushItem(item.volumeInfo);
-        if(results.length>=10)break;
-      }
-    }catch(e){console.warn('GB fetch failed:',e);}
-  }
-
-  status.textContent=results.length?`Found ${results.length}… checking more sources`:'Checking Open Library…';
-
-  // Open Library — great for Chinese and global books
-  if(results.length<8){try{
-    const olq=isISBN?`isbn=${isbn}`:`title=${encodeURIComponent(q)}`;
-    const r=await tf(`https://openlibrary.org/search.json?${olq}&limit=8&fields=title,author_name,first_publish_year,cover_i,isbn`);
+  // ══ SOURCE 1: Open Library — no key needed, great Chinese coverage ══
+  status.textContent='Searching Open Library…';
+  try{
+    const olq=isISBN
+      ?`https://openlibrary.org/api/books?bibkeys=ISBN:${isbn}&format=json&jscmd=data`
+      :`https://openlibrary.org/search.json?${isCJK?'title':'q'}=${encodeURIComponent(q)}&limit=10&fields=title,author_name,first_publish_year,cover_i,isbn,publisher`;
+    const r=await tf(olq);
     if(r.ok){
       const d=await r.json();
-      for(const b of (d.docs||[])){
-        if(!b.title)continue;
-        const key=b.title.toLowerCase().replace(/\s/g,'').slice(0,20);
-        if(results.some(x=>x._key===key))continue;
-        const cov=b.cover_i?`https://covers.openlibrary.org/b/id/${b.cover_i}-M.jpg`:
-                  b.isbn?.[0]?`https://covers.openlibrary.org/b/isbn/${b.isbn[0]}-M.jpg`:null;
-        results.push({_key:key,title:b.title,author:(b.author_name||[]).join(', '),
-          year:String(b.first_publish_year||''),cover:cov,isbn:b.isbn?.[0]||'',src:'Open Library'});
-        if(results.length>=12)break;
+      if(isISBN){
+        // books API format
+        const b=d[`ISBN:${isbn}`];
+        if(b?.title){
+          const cov=b.cover?.large||b.cover?.medium||b.cover?.small||
+                    `https://covers.openlibrary.org/b/isbn/${isbn}-M.jpg`;
+          pushItem({title:b.title,author:(b.authors||[]).map(a=>a.name).join(', '),
+            year:(b.publish_date||'').replace(/\D/g,'').slice(0,4),cover:cov,isbn},'Open Library');
+        }
+      } else {
+        // search API format
+        for(const b of (d.docs||[])){
+          if(!b.title)continue;
+          const cov=b.cover_i?`https://covers.openlibrary.org/b/id/${b.cover_i}-M.jpg`:
+                    b.isbn?.[0]?`https://covers.openlibrary.org/b/isbn/${b.isbn[0]}-M.jpg`:null;
+          pushItem({title:b.title,author:(b.author_name||[]).join(', '),
+            year:String(b.first_publish_year||''),cover:cov,isbn:b.isbn?.[0]||''},'Open Library');
+          if(results.length>=8)break;
+        }
+      }
+    }
+  }catch(e){console.warn('OL failed:',e)}
+
+  // ══ SOURCE 2: Open Library ISBN direct path ══
+  if(isISBN && results.length===0){try{
+    const r=await tf(`https://openlibrary.org/isbn/${isbn}.json`,6000);
+    if(r.ok){
+      const b=await r.json();
+      if(b.title){
+        const covId=b.covers?.[0];
+        const cov=covId?`https://covers.openlibrary.org/b/id/${covId}-M.jpg`
+                       :`https://covers.openlibrary.org/b/isbn/${isbn}-M.jpg`;
+        pushItem({title:b.title,author:'',year:(b.publish_date||'').replace(/\D/g,'').slice(0,4),
+          cover:cov,isbn},'Open Library');
       }
     }
   }catch(e){}}
 
-  // For results still missing covers, try OL cover CDN by ISBN
+  // ══ SOURCE 3: Google Books — works when API key restriction is set to your domain ══
+  if(results.length<8){
+    status.textContent='Searching Google Books…';
+    const base='https://www.googleapis.com/books/v1/volumes';
+    const gbUrls=isISBN
+      ?[`${base}?q=isbn:${isbn}&maxResults=5&key=${KEY}`,
+        `${base}?q=isbn:${isbn}&maxResults=5`]
+      :isCJK
+      ?[`${base}?q=${encodeURIComponent(q)}&maxResults=10&printType=books&key=${KEY}`,
+        `${base}?q=${encodeURIComponent(q)}&maxResults=10&printType=books&langRestrict=zh-TW&key=${KEY}`,
+        `${base}?q=${encodeURIComponent(q)}&maxResults=10&printType=books&langRestrict=zh-CN&key=${KEY}`,
+        `${base}?q=${encodeURIComponent(q)}&maxResults=10&printType=books`]
+      :[`${base}?q=intitle:${encodeURIComponent(q)}&maxResults=10&printType=books&key=${KEY}`,
+        `${base}?q=${encodeURIComponent(q)}&maxResults=10&printType=books&key=${KEY}`,
+        `${base}?q=${encodeURIComponent(q)}&maxResults=10&printType=books`];
+
+    for(const url of gbUrls){
+      if(results.length>=10)break;
+      try{
+        const r=await tf(url,7000);
+        if(!r.ok)continue;
+        const d=await r.json();
+        if(d.error){console.warn('GB:',d.error.message);continue;}
+        for(const item of (d.items||[])){
+          const v=item.volumeInfo;
+          if(!v?.title)continue;
+          const il=v.imageLinks||{};
+          const rawCov=il.extraLarge||il.large||il.medium||il.small||il.thumbnail||il.smallThumbnail||'';
+          const cov=rawCov?rawCov.replace('http:','https:').replace(/&edge=curl/,'').replace(/zoom=\d/,'zoom=3'):'';
+          const isbnVal=(v.industryIdentifiers||[]).find(x=>x.type==='ISBN_13')?.identifier||
+                        (v.industryIdentifiers||[]).find(x=>x.type==='ISBN_10')?.identifier||'';
+          pushItem({title:v.title,author:(v.authors||[]).join(', '),
+            year:(v.publishedDate||'').slice(0,4),cover:cov||null,isbn:isbnVal},'Google Books');
+          if(results.length>=10)break;
+        }
+        if(results.length>0)break; // got results, stop trying more GB URLs
+      }catch(e){console.warn('GB fetch:',e)}
+    }
+  }
+
+  // ══ Last resort: cover by ISBN from OL CDN for any missing covers ══
   for(const item of results){
-    if(!item.cover&&item.isbn){
+    if(!item.cover && item.isbn){
       item.cover=`https://covers.openlibrary.org/b/isbn/${item.isbn}-M.jpg`;
     }
   }
@@ -896,6 +916,10 @@ function openAdd(){
   document.getElementById('bsearch-status').textContent='';
   document.getElementById('in-t').value='';document.getElementById('in-a').value='';document.getElementById('in-y').value='';
   document.getElementById('clabel').textContent='Upload cover · 上傳封面（選填）';
+  const _prev=document.getElementById('cover-preview');
+  const _note=document.getElementById('cover-preview-note');
+  if(_prev){_prev.style.display='none';_prev.src='';}
+  if(_note){_note.style.display='none';}
   document.querySelectorAll('.so').forEach(b=>b.classList.toggle('on',b.dataset.s==='reading'));
   switchTab('search');renderSws();openM('M-book');
 }
@@ -923,7 +947,42 @@ function renderSws(){
   document.getElementById('sws').innerHTML=COLS.map(c=>`<div class="sw${c===A.color?' on':''}" style="background:${c}" onclick="selC('${c}')"></div>`).join('');
 }
 function selC(c){A.color=c;renderSws()}
-function onCover(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{A.cdata=ev.target.result;document.getElementById('clabel').textContent=f.name};r.readAsDataURL(f)}
+function onCover(inp){
+  const f=inp.files[0];if(!f)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    const img=new Image();
+    img.onload=()=>{
+      // Crop to exact 2:3 ratio and resize to 400x600
+      const TARGET_W=400,TARGET_H=600;
+      const srcRatio=img.width/img.height;
+      const tgtRatio=2/3;
+      let sx=0,sy=0,sw=img.width,sh=img.height;
+      if(srcRatio>tgtRatio){
+        // image is wider than 2:3 — crop sides
+        sw=img.height*tgtRatio;
+        sx=(img.width-sw)/2;
+      } else {
+        // image is taller than 2:3 — crop top/bottom
+        sh=img.width/tgtRatio;
+        sy=(img.height-sh)/2;
+      }
+      const canvas=document.createElement('canvas');
+      canvas.width=TARGET_W;canvas.height=TARGET_H;
+      const ctx=canvas.getContext('2d');
+      ctx.drawImage(img,sx,sy,sw,sh,0,0,TARGET_W,TARGET_H);
+      A.cdata=canvas.toDataURL('image/jpeg',0.88);
+      document.getElementById('clabel').textContent=f.name+' ✓';
+      // Show preview
+      const prev=document.getElementById('cover-preview');
+      const note=document.getElementById('cover-preview-note');
+      if(prev){prev.src=A.cdata;prev.style.display='block';}
+      if(note){note.style.display='block';}
+    };
+    img.src=ev.target.result;
+  };
+  reader.readAsDataURL(f);
+}
 
 async function saveBook(){
   let title,author,year,cdata,curl,color;
