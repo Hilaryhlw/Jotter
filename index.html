@@ -69,17 +69,17 @@ nav{position:fixed;bottom:0;left:0;right:0;height:calc(var(--nav) + var(--safe))
 .sg-label{display:flex;align-items:baseline;gap:7px;font-family:var(--body);font-style:italic;font-size:0.88rem;color:var(--ink2);margin-bottom:13px}
 .sg-label .sn{font-family:var(--body);font-size:0.7rem;color:var(--ink3);letter-spacing:.06em;text-transform:uppercase;font-style:normal}
 .sg-label::after{content:'';flex:1;height:1px;background:var(--bg1);margin-left:4px}
-.bgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px 13px}
+.bgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px 13px;align-items:start}
 @media(min-width:480px){.bgrid{grid-template-columns:repeat(4,1fr)}}
 @media(min-width:700px){.bgrid{grid-template-columns:repeat(5,1fr)}}
 
 .bc{cursor:pointer;display:flex;flex-direction:column;gap:7px;animation:up .3s ease both}
 @keyframes up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.bcover{aspect-ratio:2/3;border-radius:2px 5px 5px 2px;overflow:hidden;position:relative;box-shadow:-2px 2px 0 rgba(0,0,0,.18),1px 4px 14px rgba(0,0,0,.2);transition:transform .22s,box-shadow .22s}
+.bcover{aspect-ratio:2/3;border-radius:2px 5px 5px 2px;overflow:hidden;position:relative;box-shadow:-2px 2px 0 rgba(0,0,0,.18),1px 4px 14px rgba(0,0,0,.2);transition:transform .22s,box-shadow .22s;width:100%}
 .bc:hover .bcover{transform:translateY(-4px) rotate(-.5deg);box-shadow:-2px 6px 0 rgba(0,0,0,.18),2px 10px 22px rgba(0,0,0,.24)}
-.bcover img{width:100%;height:100%;object-fit:cover}
+.bcover img{width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0}
 .bcover::before{content:'';position:absolute;left:0;top:0;bottom:0;width:5px;background:rgba(0,0,0,.2);z-index:1}
-.bph{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px;text-align:center}
+.bph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px;text-align:center}
 .bph-t{font-family:var(--serif);font-size:0.62rem;font-weight:600;color:rgba(255,255,255,.92);line-height:1.3;word-break:break-word;hyphens:auto}
 .bph-a{font-family:var(--body);font-style:italic;font-size:0.52rem;color:rgba(255,255,255,.5);margin-top:4px}
 .sdot{position:absolute;top:7px;right:7px;width:7px;height:7px;border-radius:50%;z-index:2}
@@ -269,6 +269,14 @@ textarea.fi{resize:vertical;min-height:86px}
 .btn-s:hover{background:var(--bg1)}
 .btn-d{padding:8px 14px;border-radius:4px;font-family:var(--body);font-size:0.8rem;color:var(--red);border:1px solid rgba(125,31,23,.18);cursor:pointer}
 .btn-d:hover{background:rgba(125,31,23,.06)}
+
+/* CITATION MODAL */
+.cite-tabs{display:flex;border-bottom:1px solid var(--bg1);margin-bottom:16px}
+.cite-tab{flex:1;padding:10px 0;font-family:var(--body);font-size:0.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);border-bottom:2px solid transparent;cursor:pointer;transition:all .15s;text-align:center}
+.cite-tab.on{color:var(--ink);border-bottom-color:var(--red)}
+.cite-box{background:var(--bg1);border-radius:4px;padding:14px 16px;font-family:var(--body);font-size:0.88rem;line-height:1.7;color:var(--ink2);white-space:pre-wrap;word-break:break-word;margin-bottom:12px;min-height:80px}
+.cite-actions{display:flex;gap:8px;flex-wrap:wrap}
+.cite-note{font-family:var(--body);font-style:italic;font-size:0.72rem;color:var(--ink4);margin-top:10px;line-height:1.5}
 
 /* TOAST */
 #toast{position:fixed;left:50%;bottom:calc(var(--nav) + var(--safe) + 10px);transform:translateX(-50%) translateY(14px);background:var(--ink);color:var(--bg);padding:8px 18px;border-radius:20px;font-family:var(--body);font-size:0.8rem;opacity:0;z-index:500;transition:opacity .2s,transform .2s;white-space:nowrap;pointer-events:none}
@@ -589,6 +597,36 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
       </div>
       <button class="btn btn-s" onclick="closeM('M-ex')">Cancel 取消</button>
       <button class="btn btn-p" onclick="saveEx()">Save 儲存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ MODAL: SHARE / CITATION ════ -->
+<div class="bk" id="M-cite">
+  <div class="sh">
+    <div class="sh-handle"></div>
+    <div class="sh-head">
+      <h3>Share &amp; Cite · 分享與引用</h3>
+      <button class="sh-close" onclick="closeM('M-cite')">✕</button>
+    </div>
+    <div class="sh-body">
+      <div class="cite-tabs">
+        <button class="cite-tab on" onclick="citTab('share')">Share 分享</button>
+        <button class="cite-tab" onclick="citTab('mla')">MLA</button>
+        <button class="cite-tab" onclick="citTab('apa')">APA</button>
+      </div>
+      <div id="cite-content" class="cite-box"></div>
+      <div class="cite-actions">
+        <button class="btn btn-p" onclick="copyCite()" id="cite-copy-btn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          Copy · 複製
+        </button>
+        <button class="btn btn-s" onclick="shareNative()" id="cite-share-btn" style="display:none">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+          Share · 分享
+        </button>
+      </div>
+      <p class="cite-note" id="cite-format-note"></p>
     </div>
   </div>
 </div>
@@ -1131,6 +1169,102 @@ async function delCurEx2(){
   toast('Deleted · 已刪除');
 }
 
+// ════ SHARE & CITATION ════
+let _citeEx = null; // current excerpt being cited
+let _citeBook = null;
+let _citeMode = 'share';
+
+async function openShareEx(id){
+  const h = await dg('excerpts', id);
+  if(!h) return;
+  const b = await dg('books', h.bookId);
+  _citeEx = h;
+  _citeBook = b;
+  _citeMode = 'share';
+  // show native share button if supported
+  document.getElementById('cite-share-btn').style.display =
+    navigator.share ? '' : 'none';
+  citTab('share');
+  openM('M-cite');
+}
+
+function citTab(mode){
+  _citeMode = mode;
+  document.querySelectorAll('.cite-tab').forEach((b,i)=>
+    b.classList.toggle('on', ['share','mla','apa'][i]===mode));
+  const box = document.getElementById('cite-content');
+  const note = document.getElementById('cite-format-note');
+  const h = _citeEx;
+  const b = _citeBook;
+  if(!h) return;
+
+  const title  = b?.title || 'Unknown Title';
+  const author = b?.author || '';
+  const year   = b?.year   || 'n.d.';
+  const page   = h.page    ? `p. ${h.page}` : '';
+  const quote  = h.text;
+
+  // Parse author for MLA/APA (Last, First format)
+  // Handle "First Last" → "Last, First" for single author
+  function fmtAuthorMLA(a){
+    if(!a) return 'Unknown Author';
+    const parts = a.split(',');
+    if(parts.length>=2) return a; // already "Last, First"
+    const words = a.trim().split(/\s+/);
+    if(words.length===1) return words[0];
+    const last = words[words.length-1];
+    const first = words.slice(0,-1).join(' ');
+    return `${last}, ${first}`;
+  }
+  function fmtAuthorAPA(a){
+    if(!a) return 'Unknown Author';
+    // Multiple authors: split by comma+space or "and"
+    const authors = a.split(/,\s*(?:and\s+)?|;\s*|\s+and\s+/).map(s=>s.trim()).filter(Boolean);
+    return authors.map(au=>{
+      const words = au.trim().split(/\s+/);
+      if(words.length===1) return words[0];
+      const last = words[words.length-1];
+      const initials = words.slice(0,-1).map(w=>w[0].toUpperCase()+'.').join(' ');
+      return `${last}, ${initials}`;
+    }).join(', ');
+  }
+
+  if(mode==='share'){
+    box.textContent = `"${quote}"\n\n— ${title}${author?' · '+author:''}${page?' ('+page+')':''}`;
+    note.textContent = 'Copy or share this excerpt with source attribution.';
+  } else if(mode==='mla'){
+    // MLA 9th: Author Last, First. Title. Publisher, Year, page.
+    const auth = fmtAuthorMLA(author);
+    const pg = h.page ? `p. ${h.page}.` : '';
+    box.textContent = `${auth}. "${quote}" ${title}. ${year}${pg?' '+pg:''}`;
+    note.textContent = 'MLA 9th edition format. Add publisher details manually if needed.';
+  } else if(mode==='apa'){
+    // APA 7th: Author, A. A. (Year). Title. (p. X).
+    const auth = fmtAuthorAPA(author);
+    const pg = h.page ? ` (p. ${h.page})` : '';
+    box.textContent = `${auth} (${year}). "${quote}" In ${title}${pg}.`;
+    note.textContent = 'APA 7th edition format. Add publisher/DOI details manually if needed.';
+  }
+}
+
+function copyCite(){
+  const text = document.getElementById('cite-content').textContent;
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn = document.getElementById('cite-copy-btn');
+    btn.textContent = '✓ Copied!';
+    setTimeout(()=>{
+      btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copy · 複製`;
+    }, 1800);
+  }).catch(()=> toast('Copy failed · 複製失敗'));
+}
+
+function shareNative(){
+  const text = document.getElementById('cite-content').textContent;
+  if(navigator.share){
+    navigator.share({ text }).catch(()=>{});
+  }
+}
+
 async function renderExs(id){
   const exs=await di('excerpts','bookId',id);
   exs.sort((a,b)=>b.createdAt-a.createdAt);
@@ -1148,6 +1282,9 @@ async function renderExs(id){
   list.innerHTML=exs.map((h,i)=>`
     <div class="ex-item" style="animation-delay:${i*.04}s">
       <div class="ex-acts">
+        <button class="ab" onclick="openShareEx('${h.id}')" title="Share · 分享">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+        </button>
         <button class="ab" onclick="openEditEx2('${h.id}')" title="Edit · 編輯">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
         </button>
