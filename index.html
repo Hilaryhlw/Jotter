@@ -757,6 +757,20 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
           </div>
         </div>
         <div id="isbn-nf" style="display:none;font-style:italic;color:var(--ink3);font-size:0.82rem;margin-bottom:12px">找不到此書，請改用手動輸入。</div>
+        <details id="gkey-details" style="margin-top:12px">
+          <summary style="font-family:var(--body);font-size:0.7rem;letter-spacing:0.07em;text-transform:uppercase;color:var(--ink4);cursor:pointer;user-select:none;list-style:none;display:flex;align-items:center;gap:5px;padding:4px 0">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/></svg>
+            Google Books API Key <span id="gkey-status" style="margin-left:4px;font-size:0.68rem;color:var(--green)"></span>
+          </summary>
+          <div style="margin-top:8px;display:flex;gap:7px;align-items:center">
+            <input class="fi" id="gkey-in" type="password" placeholder="AIza… （選填，大幅提升中文書搜尋成功率）" style="font-size:0.82rem;flex:1">
+            <button class="btn btn-s" onclick="saveGKey()" style="white-space:nowrap;font-size:0.8rem;padding:8px 12px">儲存</button>
+            <button class="btn btn-s" onclick="clearGKey()" style="white-space:nowrap;font-size:0.8rem;padding:8px 10px;color:var(--ink3)">清除</button>
+          </div>
+          <p style="font-size:0.67rem;color:var(--ink4);margin-top:6px;font-style:italic;line-height:1.55">
+            前往 <a href="https://console.cloud.google.com/apis/library/books.googleapis.com" target="_blank" style="color:var(--ink3);text-decoration:underline">Google Cloud Console</a> 啟用 Books API → 建立憑證 → 複製 API Key。每天免費 1,000 次查詢。Key 只儲存在您的裝置，不會上傳。
+          </p>
+        </details>
       </div>
       <div id="P-manual" style="display:none">
         <div class="fg"><label class="fl">書名 *</label><input class="fi" id="in-t" placeholder="書名"></div>
@@ -950,6 +964,30 @@ function renderSws(){
 }
 function selC(c){A.color=c;renderSws()}
 function onCover(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{A.cdata=ev.target.result;document.getElementById('clabel').textContent=f.name};r.readAsDataURL(f)}
+// ── Google Books API Key management ──
+function loadGKey(){return localStorage.getItem('jotter-gkey')||''}
+function saveGKey(){
+  const v=document.getElementById('gkey-in').value.trim();
+  if(!v){toast('請輸入 API Key');return}
+  localStorage.setItem('jotter-gkey',v);
+  updateGKeyUI();
+  toast('API Key 已儲存');
+}
+function clearGKey(){
+  localStorage.removeItem('jotter-gkey');
+  document.getElementById('gkey-in').value='';
+  updateGKeyUI();
+  toast('API Key 已清除');
+}
+function updateGKeyUI(){
+  const k=loadGKey();
+  const el=document.getElementById('gkey-status');
+  const inp=document.getElementById('gkey-in');
+  if(el){el.textContent=k?'✓ 已設定':''}
+  if(inp&&k){inp.placeholder='已設定（輸入新值可覆蓋）';inp.value=''}
+}
+function gkeyParam(){const k=loadGKey();return k?`&key=${encodeURIComponent(k)}`:''}
+
 // ── ISBN search: 7-layer fallback ──
 // Tries public APIs in order; stops at first hit.
 // Cover images are tried from multiple CDNs even after metadata is found.
@@ -976,7 +1014,7 @@ async function searchISBN(){
   // ── 1. Google Books: isbn: query (best for en + jp books) ──
   if(!result){try{
     const r=await Promise.race([
-      fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}&maxResults=1&langRestrict=`),
+      fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}&maxResults=1&langRestrict=${gkeyParam()}`),
       new Promise((_,rj)=>setTimeout(()=>rj('timeout'),5000))
     ]);
     const d=await r.json();
@@ -991,7 +1029,7 @@ async function searchISBN(){
   // ── 2. Google Books: bare ISBN query (catches more zh-TW editions) ──
   if(!result){try{
     const r=await Promise.race([
-      fetch(`https://www.googleapis.com/books/v1/volumes?q=${isbn}&maxResults=3`),
+      fetch(`https://www.googleapis.com/books/v1/volumes?q=${isbn}&maxResults=3${gkeyParam()}`),
       new Promise((_,rj)=>setTimeout(()=>rj('timeout'),5000))
     ]);
     const d=await r.json();
@@ -1067,7 +1105,7 @@ async function searchISBN(){
   // ── 7. Google Books zh-TW explicit: last resort for traditional Chinese ──
   if(!result){try{
     const r=await Promise.race([
-      fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}&maxResults=1`),
+      fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}&maxResults=1${gkeyParam()}`),
       new Promise((_,rj)=>setTimeout(()=>rj('timeout'),5000))
     ]);
     const d=await r.json();
@@ -1315,6 +1353,7 @@ function toast(msg){const el=document.getElementById('toast');el.textContent=msg
 async function init(){
   await openDB();
   renderSws();
+  updateGKeyUI();
   renderShelf();
   document.querySelectorAll('.bk').forEach(el=>el.addEventListener('click',ev=>{if(ev.target===el)closeM(el.id)}));
   document.getElementById('isbn-in').addEventListener('keydown',ev=>{if(ev.key==='Enter')searchISBN()});
