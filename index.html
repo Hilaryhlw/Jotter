@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#1A1916">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -15,23 +15,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg:      #F0EBE1;
-  --bg1:     #E8E2D8;
-  --bg2:     #DDD7CC;
-  --white:   #FAF8F4;
-  --ink:     #1A1916;
-  --ink2:    #3D3A35;
-  --ink3:    #7A7670;
-  --ink4:    #AEA9A2;
-  --red:     #7D1F17;
-  --red2:    #9B2820;
-  --gold:    #A67C2E;
-  --green:   #2E6644;
-  --serif:   'Playfair Display', Georgia, serif;
-  --body:    'EB Garamond', Georgia, serif;
-  --nav:     58px;
-  --safe:    env(safe-area-inset-bottom, 0px);
+:root{
+  --bg:#F0EBE1;--bg1:#E8E2D8;--bg2:#DDD7CC;--wh:#FAF8F4;
+  --ink:#1A1916;--ink2:#3D3A35;--ink3:#7A7670;--ink4:#AEA9A2;
+  --red:#7D1F17;--gold:#A67C2E;--green:#2E6644;
+  --serif:'Playfair Display',Georgia,serif;
+  --body:'EB Garamond',Georgia,serif;
+  --nav:58px;--safe:env(safe-area-inset-bottom,0px);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{-webkit-text-size-adjust:100%}
@@ -39,371 +29,148 @@ body{background:var(--bg);color:var(--ink);font-family:var(--body);min-height:10
 button{cursor:pointer;border:none;background:none;font-family:inherit;color:inherit}
 input,textarea,select{font-family:inherit;color:inherit}
 img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
 
-/* SCREENS */
 .screen{display:none;min-height:100vh;padding-bottom:calc(var(--nav) + var(--safe) + 24px)}
 .screen.active{display:block}
 #S-detail{padding-bottom:80px}
 
-/* ── BOTTOM NAV ── */
-nav {
-  position:fixed;bottom:0;left:0;right:0;
-  height:calc(var(--nav) + var(--safe));
-  background:var(--ink);
-  display:flex;align-items:flex-start;
-  padding-bottom:var(--safe);
-  z-index:200;
-  border-top:none;
-}
-.nb {
-  flex:1;height:var(--nav);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:3px;
-  color:#5A5750;
-  font-family:var(--body);font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;
-  transition:color .2s;
-  position:relative;
-}
-.nb.on { color:var(--bg); }
-.nb svg { width:21px;height:21px;stroke-width:1.6 }
-.nb-dot {
-  position:absolute;bottom:7px;
-  width:3px;height:3px;border-radius:50%;
-  background:var(--red2);opacity:0;transition:opacity .2s;
-}
-.nb.on .nb-dot { opacity:1 }
+/* NAV */
+nav{position:fixed;bottom:0;left:0;right:0;height:calc(var(--nav)+var(--safe));background:var(--ink);display:flex;align-items:flex-start;padding-bottom:var(--safe);z-index:200}
+.nb{flex:1;height:var(--nav);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#5A5750;font-family:var(--body);font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;transition:color .2s;position:relative}
+.nb.on{color:var(--bg)}
+.nb svg{width:20px;height:20px;stroke-width:1.6}
+.nb-dot{position:absolute;bottom:7px;width:3px;height:3px;border-radius:50%;background:var(--red);opacity:0;transition:opacity .2s}
+.nb.on .nb-dot{opacity:1}
 
-/* ── SHELF ── */
-.shelf-hd {
-  padding:52px 22px 0;
-  display:flex;align-items:flex-end;justify-content:space-between;
-}
-.shelf-hd h1 {
-  font-family:var(--serif);font-style:italic;
-  font-size:2.6rem;font-weight:400;letter-spacing:-0.02em;line-height:1;
-}
-.shelf-meta {
-  font-family:var(--body);font-size:0.72rem;
-  color:var(--ink3);letter-spacing:0.06em;text-transform:uppercase;
-  padding-bottom:4px;
-}
-
-/* filter strip */
-.fstrip {
-  display:flex;gap:5px;padding:14px 22px 0;
-  overflow-x:auto;scrollbar-width:none;
-}
+/* SHELF */
+.shelf-hd{padding:52px 22px 0;display:flex;align-items:flex-end;justify-content:space-between}
+.shelf-hd h1{font-family:var(--serif);font-style:italic;font-size:2.4rem;font-weight:400;letter-spacing:-.02em;line-height:1}
+.shelf-meta{font-family:var(--body);font-size:0.72rem;color:var(--ink3);letter-spacing:.06em;text-transform:uppercase;padding-bottom:3px}
+.fstrip{display:flex;gap:5px;padding:14px 22px 0;overflow-x:auto;scrollbar-width:none}
 .fstrip::-webkit-scrollbar{display:none}
-.fchip {
-  padding:5px 13px;border-radius:2px;
-  border:1px solid var(--bg2);
-  font-family:var(--body);font-size:0.75rem;
-  color:var(--ink3);white-space:nowrap;
-  flex-shrink:0;transition:all .15s;
-}
-.fchip.on { background:var(--ink);color:var(--bg);border-color:var(--ink) }
-
-/* shelf divider */
-.shelf-rule {
-  margin:20px 22px 0;
-  height:1px;background:var(--bg2);
-}
-
-/* shelf group */
-.sg { padding:20px 22px 0 }
-.sg-label {
-  display:flex;align-items:baseline;gap:8px;
-  font-family:var(--body);font-style:italic;
-  font-size:0.88rem;color:var(--ink2);
-  margin-bottom:14px;
-}
-.sg-label .sg-num {
-  font-family:var(--body);font-size:0.72rem;
-  color:var(--ink3);letter-spacing:0.06em;
-  text-transform:uppercase;
-}
-.sg-label::after { content:'';flex:1;height:1px;background:var(--bg1);margin-left:4px }
-
-/* book grid */
-.bgrid {
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:22px 14px;
-}
+.fchip{padding:5px 13px;border-radius:2px;border:1px solid var(--bg2);font-family:var(--body);font-size:0.75rem;color:var(--ink3);white-space:nowrap;flex-shrink:0;transition:all .15s;cursor:pointer}
+.fchip.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.shelf-rule{margin:16px 22px 0;height:1px;background:var(--bg2)}
+.sg{padding:20px 22px 0}
+.sg-label{display:flex;align-items:baseline;gap:8px;font-family:var(--body);font-style:italic;font-size:0.88rem;color:var(--ink2);margin-bottom:14px}
+.sg-label .sgn{font-family:var(--body);font-size:0.72rem;color:var(--ink3);letter-spacing:.06em;text-transform:uppercase}
+.sg-label::after{content:'';flex:1;height:1px;background:var(--bg1);margin-left:4px}
+.bgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px 14px}
 @media(min-width:480px){.bgrid{grid-template-columns:repeat(4,1fr)}}
 @media(min-width:700px){.bgrid{grid-template-columns:repeat(5,1fr)}}
-
-.bc { cursor:pointer;display:flex;flex-direction:column;gap:8px;animation:up .32s ease both }
+.bc{cursor:pointer;display:flex;flex-direction:column;gap:8px;animation:up .3s ease both}
 @keyframes up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-
-.bcover {
-  aspect-ratio:2/3;border-radius:2px 5px 5px 2px;overflow:hidden;
-  position:relative;
-  box-shadow:-2px 2px 0 rgba(0,0,0,.18),1px 4px 14px rgba(0,0,0,.2);
-  transition:transform .22s ease,box-shadow .22s ease;
-}
-.bc:hover .bcover { transform:translateY(-4px) rotate(-.5deg);box-shadow:-2px 6px 0 rgba(0,0,0,.18),2px 10px 22px rgba(0,0,0,.24) }
-.bcover img { width:100%;height:100%;object-fit:cover }
-.bcover::before {
-  content:'';position:absolute;left:0;top:0;bottom:0;
-  width:5px;background:rgba(0,0,0,.2);z-index:1;
-}
-.bph {
-  width:100%;height:100%;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:10px;text-align:center;
-}
-.bph-t { font-family:var(--serif);font-size:0.62rem;font-weight:600;color:rgba(255,255,255,.92);line-height:1.3;word-break:break-word;hyphens:auto }
-.bph-a { font-family:var(--body);font-style:italic;font-size:0.52rem;color:rgba(255,255,255,.5);margin-top:4px }
-
-.sdot { position:absolute;top:7px;right:7px;width:7px;height:7px;border-radius:50%;z-index:2 }
-.sd-reading { background:var(--gold) }
-.sd-finished { background:var(--green) }
-.sd-to-read { background:var(--ink4) }
-
-.b-edit {
-  position:absolute;top:6px;left:7px;z-index:3;
-  width:22px;height:22px;border-radius:50%;
-  background:rgba(26,25,22,.72);color:var(--bg);
-  display:flex;align-items:center;justify-content:center;
-  opacity:0;transition:opacity .15s;
-}
-.bc:hover .b-edit { opacity:1 }
-@media(hover:none){ .b-edit{opacity:1} }
-
-.btitle {
-  font-family:var(--serif);font-size:0.8rem;font-weight:500;
-  line-height:1.28;color:var(--ink);
-  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
-}
-.bauthor {
-  font-family:var(--body);font-style:italic;font-size:0.68rem;
-  color:var(--ink3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-}
-
-#shelf-empty { display:none;text-align:center;padding:80px 24px;font-family:var(--body);font-style:italic;color:var(--ink3) }
-#shelf-empty.show { display:block }
-
-/* FAB */
-#fab {
-  position:fixed;
-  bottom:calc(var(--nav) + var(--safe) + 16px);right:18px;
-  width:48px;height:48px;border-radius:50%;
-  background:var(--ink);color:var(--bg);
-  display:flex;align-items:center;justify-content:center;
-  box-shadow:0 4px 20px rgba(0,0,0,.3);z-index:150;
-  transition:transform .18s,box-shadow .18s;
-}
+.bcover{aspect-ratio:2/3;border-radius:2px 5px 5px 2px;overflow:hidden;position:relative;box-shadow:-2px 2px 0 rgba(0,0,0,.18),1px 4px 14px rgba(0,0,0,.2);transition:transform .22s ease,box-shadow .22s ease}
+.bc:hover .bcover{transform:translateY(-4px) rotate(-.5deg);box-shadow:-2px 6px 0 rgba(0,0,0,.18),2px 10px 22px rgba(0,0,0,.24)}
+.bcover img{width:100%;height:100%;object-fit:cover}
+.bcover::before{content:'';position:absolute;left:0;top:0;bottom:0;width:5px;background:rgba(0,0,0,.2);z-index:1}
+.bph{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px;text-align:center}
+.bph-t{font-family:var(--serif);font-size:0.62rem;font-weight:600;color:rgba(255,255,255,.92);line-height:1.3;word-break:break-word;hyphens:auto}
+.bph-a{font-family:var(--body);font-style:italic;font-size:0.52rem;color:rgba(255,255,255,.5);margin-top:4px}
+.sdot{position:absolute;top:7px;right:7px;width:7px;height:7px;border-radius:50%;z-index:2}
+.sd-reading{background:var(--gold)}.sd-finished{background:var(--green)}.sd-to-read{background:var(--ink4)}
+.b-edit{position:absolute;top:6px;left:7px;z-index:3;width:22px;height:22px;border-radius:50%;background:rgba(26,25,22,.72);color:var(--bg);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .15s}
+.bc:hover .b-edit{opacity:1}
+@media(hover:none){.b-edit{opacity:1}}
+.btitle{font-family:var(--serif);font-size:0.8rem;font-weight:500;line-height:1.28;color:var(--ink);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.bauthor{font-family:var(--body);font-style:italic;font-size:0.68rem;color:var(--ink3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#shelf-empty{display:none;text-align:center;padding:80px 24px;font-family:var(--body);font-style:italic;color:var(--ink3);line-height:1.8}
+#shelf-empty.show{display:block}
+#fab{position:fixed;bottom:calc(var(--nav)+var(--safe)+16px);right:18px;width:48px;height:48px;border-radius:50%;background:var(--ink);color:var(--bg);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(0,0,0,.3);z-index:150;transition:transform .18s,box-shadow .18s}
 #fab:hover{transform:scale(1.08);box-shadow:0 6px 26px rgba(0,0,0,.38)}
 
-/* ── DETAIL ── */
-.d-hero {
-  background:var(--ink);color:var(--bg);
-  padding:52px 22px 24px;
-  display:flex;gap:18px;align-items:flex-start;
-  position:relative;
-}
-.d-back {
-  position:absolute;top:14px;left:14px;
-  display:flex;align-items:center;gap:2px;
-  font-family:var(--body);font-size:0.75rem;color:#5A5750;
-  padding:6px 8px;border-radius:4px;transition:color .15s;
-}
-.d-back:hover { color:var(--bg) }
-.d-cov {
-  width:78px;flex-shrink:0;
-  border-radius:2px 4px 4px 2px;overflow:hidden;position:relative;
-  box-shadow:-1px 2px 0 rgba(255,255,255,.07),1px 4px 16px rgba(0,0,0,.5);
-}
+/* DETAIL */
+.d-hero{background:var(--ink);color:var(--bg);padding:52px 22px 24px;display:flex;gap:18px;align-items:flex-start;position:relative}
+.d-back{position:absolute;top:14px;left:14px;display:flex;align-items:center;gap:2px;font-family:var(--body);font-size:0.75rem;color:#5A5750;padding:6px 8px;border-radius:4px;transition:color .15s}
+.d-back:hover{color:var(--bg)}
+.d-cov{width:78px;flex-shrink:0;border-radius:2px 4px 4px 2px;overflow:hidden;position:relative;box-shadow:-1px 2px 0 rgba(255,255,255,.07),1px 4px 16px rgba(0,0,0,.5)}
 .d-cov::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:rgba(0,0,0,.28);z-index:1}
 .d-cov img{width:100%;aspect-ratio:2/3;object-fit:cover}
 .d-cov-ph{width:100%;aspect-ratio:2/3;display:flex;align-items:center;justify-content:center;padding:6px;font-family:var(--serif);font-size:0.52rem;color:rgba(255,255,255,.75);text-align:center;line-height:1.3}
-
-.d-meta { flex:1;padding-top:2px }
-.d-eyebrow {
-  font-family:var(--body);font-size:0.62rem;
-  letter-spacing:0.14em;text-transform:uppercase;color:#5A5750;margin-bottom:6px;
-}
-.d-title { font-family:var(--serif);font-size:1.35rem;font-weight:400;line-height:1.18;margin-bottom:4px }
-.d-author { font-family:var(--body);font-style:italic;font-size:0.88rem;color:#7A7670;margin-bottom:12px }
-.d-pill {
-  display:inline-flex;align-items:center;gap:5px;
-  padding:3px 11px;border-radius:2px;
-  border:1px solid rgba(255,255,255,.12);
-  font-family:var(--body);font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;color:#7A7670;
-}
+.d-meta{flex:1;padding-top:2px}
+.d-ey{font-family:var(--body);font-size:0.62rem;letter-spacing:.14em;text-transform:uppercase;color:#5A5750;margin-bottom:6px}
+.d-title{font-family:var(--serif);font-size:1.3rem;font-weight:400;line-height:1.18;margin-bottom:4px}
+.d-author{font-family:var(--body);font-style:italic;font-size:0.88rem;color:#7A7670;margin-bottom:12px}
+.d-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 11px;border-radius:2px;border:1px solid rgba(255,255,255,.12);font-family:var(--body);font-size:0.65rem;letter-spacing:.08em;text-transform:uppercase;color:#7A7670}
 .d-pill .dot{width:5px;height:5px;border-radius:50%}
 .d-editbtn{position:absolute;top:52px;right:16px;color:#5A5750;padding:4px;transition:color .15s}
 .d-editbtn:hover{color:var(--bg)}
-
-/* detail tabs */
-.d-tabs {
-  display:flex;background:var(--bg);
-  border-bottom:1px solid var(--bg1);
-  position:sticky;top:0;z-index:50;
-}
-.d-tab {
-  flex:1;padding:14px 0;
-  font-family:var(--body);font-size:0.72rem;
-  letter-spacing:0.1em;text-transform:uppercase;
-  color:var(--ink3);border-bottom:2px solid transparent;
-  transition:all .15s;text-align:center;
-}
-.d-tab.on { color:var(--ink);border-bottom-color:var(--red) }
-
+.d-tabs{display:flex;background:var(--bg);border-bottom:1px solid var(--bg1);position:sticky;top:0;z-index:50;overflow-x:auto;scrollbar-width:none}
+.d-tabs::-webkit-scrollbar{display:none}
+.d-tab{flex-shrink:0;padding:13px 16px;font-family:var(--body);font-size:0.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap}
+.d-tab.on{color:var(--ink);border-bottom-color:var(--red)}
 .d-sec{display:none}
 .d-sec.on{display:block}
 
-/* highlights */
-.hl-bar {
-  padding:16px 22px 4px;
-  font-family:var(--body);font-size:0.68rem;
-  letter-spacing:0.09em;text-transform:uppercase;color:var(--ink4);
-}
-.hl-list { padding:0 22px }
-.hl-item {
-  padding:18px 0;border-bottom:1px solid var(--bg1);
-  position:relative;animation:up .25s ease both;
-}
+/* EXCERPTS / HIGHLIGHTS */
+.hl-bar{padding:16px 22px 4px;font-family:var(--body);font-size:0.68rem;letter-spacing:.09em;text-transform:uppercase;color:var(--ink4)}
+.hl-list{padding:0 22px}
+.hl-item{padding:18px 0;border-bottom:1px solid var(--bg1);position:relative;animation:up .25s ease both}
 .hl-item:last-child{border-bottom:none}
-.hl-q {
-  font-family:var(--body);font-style:italic;
-  font-size:1.05rem;line-height:1.68;color:var(--ink);
-  border-left:2px solid var(--red);padding-left:14px;
-  margin-bottom:10px;
-}
-.hl-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}
-.htag {
-  padding:2px 9px;border-radius:2px;
-  background:var(--bg1);color:var(--ink2);
-  font-family:var(--body);font-size:0.68rem;letter-spacing:0.03em;
-  cursor:pointer;transition:all .12s;
-}
+.hl-q{font-family:var(--body);font-style:italic;font-size:1.05rem;line-height:1.68;color:var(--ink);border-left:2px solid var(--red);padding-left:14px;margin-bottom:10px}
+.hl-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.hl-page{font-family:var(--body);font-size:0.72rem;color:var(--ink3);display:flex;align-items:center;gap:3px}
+.hl-page svg{width:11px;height:11px}
+.hl-tags{display:flex;flex-wrap:wrap;gap:4px}
+.htag{padding:2px 9px;border-radius:2px;background:var(--bg1);color:var(--ink2);font-family:var(--body);font-size:0.68rem;letter-spacing:.03em;cursor:pointer;transition:all .12s}
 .htag:hover,.htag.on{background:var(--ink);color:var(--bg)}
-.hl-date { font-family:var(--body);font-size:0.65rem;color:var(--ink4) }
-.hl-acts {
-  position:absolute;top:16px;right:0;
-  display:flex;gap:2px;opacity:0;transition:opacity .15s;
-}
+.hl-date{font-family:var(--body);font-size:0.65rem;color:var(--ink4)}
+.hl-acts{position:absolute;top:16px;right:0;display:flex;gap:2px;opacity:0;transition:opacity .15s}
 .hl-item:hover .hl-acts{opacity:1}
 @media(hover:none){.hl-acts{opacity:1}}
-.ab {
-  width:28px;height:28px;border-radius:3px;
-  display:flex;align-items:center;justify-content:center;
-  color:var(--ink3);transition:all .12s;
-}
+.ab{width:28px;height:28px;border-radius:3px;display:flex;align-items:center;justify-content:center;color:var(--ink3);transition:all .12s}
 .ab:hover{background:var(--bg1);color:var(--ink)}
 .ab svg{width:13px;height:13px}
 .hl-empty{padding:48px 22px;font-family:var(--body);font-style:italic;color:var(--ink3)}
-
-/* hl add fab */
-.hlfab {
-  position:fixed;bottom:20px;right:18px;
-  display:none;align-items:center;gap:6px;
-  padding:10px 18px;border-radius:24px;
-  background:var(--ink);color:var(--bg);
-  font-family:var(--body);font-size:0.8rem;
-  box-shadow:0 4px 18px rgba(0,0,0,.3);z-index:150;
-  transition:transform .18s,box-shadow .18s;
-}
+.hlfab{position:fixed;bottom:20px;right:18px;display:none;align-items:center;gap:6px;padding:10px 18px;border-radius:24px;background:var(--ink);color:var(--bg);font-family:var(--body);font-size:0.8rem;box-shadow:0 4px 18px rgba(0,0,0,.3);z-index:150;transition:transform .18s,box-shadow .18s}
 .hlfab.show{display:flex}
 .hlfab:hover{transform:translateY(-2px);box-shadow:0 6px 22px rgba(0,0,0,.34)}
 
-/* journal */
-.jn-wrap{padding:22px}
-.jn-display{
-  font-family:var(--body);font-size:1rem;line-height:1.82;color:var(--ink);
-  white-space:pre-wrap;min-height:60px;
-}
-.jn-display.empty{font-style:italic;color:var(--ink3)}
-.jn-ta{
-  width:100%;min-height:260px;resize:none;outline:none;
-  background:var(--white);border:1px solid var(--bg2);border-radius:4px;
-  padding:16px;font-family:var(--body);font-size:1rem;line-height:1.82;color:var(--ink);
-  display:none;transition:border-color .2s;
-}
-.jn-ta:focus{border-color:var(--ink3)}
-.jn-btns{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
+/* NOTES */
+.note-wrap{padding:22px}
+.note-display{font-family:var(--body);font-size:1rem;line-height:1.82;color:var(--ink);white-space:pre-wrap;min-height:60px}
+.note-display.empty{font-style:italic;color:var(--ink3)}
+.note-ta{width:100%;min-height:260px;resize:none;outline:none;background:var(--wh);border:1px solid var(--bg2);border-radius:4px;padding:16px;font-family:var(--body);font-size:1rem;line-height:1.82;color:var(--ink);display:none;transition:border-color .2s}
+.note-ta:focus{border-color:var(--ink3)}
+.note-btns{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
 
-/* ── THREAD ── */
-.t-top {
-  position:sticky;top:0;background:var(--bg);z-index:50;
-  border-bottom:1px solid var(--bg1);
-}
+/* THREAD */
+.t-top{position:sticky;top:0;background:var(--bg);z-index:50;border-bottom:1px solid var(--bg1)}
 .t-hd{padding:52px 22px 14px}
-.t-hd h1{font-family:var(--serif);font-style:italic;font-size:2.4rem;font-weight:400;letter-spacing:-0.02em;margin-bottom:14px}
-.sbox {
-  display:flex;align-items:center;gap:8px;
-  background:var(--white);border:1px solid var(--bg2);border-radius:4px;
-  padding:10px 14px;transition:border-color .2s;
-}
+.t-hd h1{font-family:var(--serif);font-style:italic;font-size:2.2rem;font-weight:400;letter-spacing:-.02em;margin-bottom:14px}
+.sbox{display:flex;align-items:center;gap:8px;background:var(--wh);border:1px solid var(--bg2);border-radius:4px;padding:10px 14px;transition:border-color .2s;margin-bottom:10px}
 .sbox:focus-within{border-color:var(--ink3)}
 .sbox svg{width:15px;height:15px;color:var(--ink4);flex-shrink:0}
 .sbox input{flex:1;border:none;outline:none;background:none;font-family:var(--body);font-size:0.95rem}
 .sbox input::placeholder{color:var(--ink4);font-style:italic}
-
-.tcloud{display:flex;gap:5px;flex-wrap:wrap;padding:12px 22px 14px}
-
-.sort-row{
-  display:flex;align-items:center;gap:6px;
-  padding:8px 22px;
-  border-top:1px solid var(--bg1);
-  font-family:var(--body);font-size:0.7rem;color:var(--ink3);
-}
-.sch{
-  padding:3px 10px;border-radius:2px;border:1px solid var(--bg2);
-  font-family:var(--body);font-size:0.7rem;color:var(--ink3);
-  transition:all .12s;
-}
+.tcloud{display:flex;gap:5px;flex-wrap:wrap;padding:0 22px 14px}
+.sort-row{display:flex;align-items:center;gap:6px;padding:8px 22px;border-top:1px solid var(--bg1);font-family:var(--body);font-size:0.7rem;color:var(--ink3)}
+.sch{padding:3px 10px;border-radius:2px;border:1px solid var(--bg2);font-family:var(--body);font-size:0.7rem;color:var(--ink3);cursor:pointer;transition:all .12s}
 .sch.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 #t-count{margin-left:auto;font-style:italic;color:var(--ink4)}
-
 .tlist{padding:0 22px}
-.tc{
-  padding:18px 0;border-bottom:1px solid var(--bg1);
-  animation:up .2s ease both;
-}
+.tc{padding:18px 0;border-bottom:1px solid var(--bg1);animation:up .2s ease both}
 .tc:last-child{border-bottom:none}
-.tq{
-  font-family:var(--body);font-style:italic;
-  font-size:1rem;line-height:1.68;color:var(--ink);
-  border-left:2px solid var(--bg2);padding-left:14px;
-  margin-bottom:10px;
-}
-.tsrc{
-  display:flex;align-items:center;gap:5px;
-  font-family:var(--body);font-size:0.72rem;color:var(--ink3);
-}
+.tq{font-family:var(--body);font-style:italic;font-size:1rem;line-height:1.68;color:var(--ink);border-left:2px solid var(--bg2);padding-left:14px;margin-bottom:10px}
+.tq-page{font-size:0.72rem;color:var(--ink3);font-style:normal}
+.tsrc{display:flex;align-items:center;gap:5px;font-family:var(--body);font-size:0.72rem;color:var(--ink3)}
 .tsrc strong{color:var(--ink2);font-style:italic;font-weight:400}
-.t-empty{
-  display:none;text-align:center;padding:52px 22px;
-  font-family:var(--body);font-style:italic;color:var(--ink3);
-  line-height:1.8;
-}
+.t-empty{display:none;text-align:center;padding:52px 22px;font-family:var(--body);font-style:italic;color:var(--ink3);line-height:1.8}
 .t-empty.show{display:block}
 
-/* ── EXPORT ── */
+/* EXPORT */
 .exp-hd{padding:52px 22px 20px;border-bottom:1px solid var(--bg1)}
-.exp-hd h1{font-family:var(--serif);font-style:italic;font-size:2.2rem;font-weight:400;letter-spacing:-0.02em}
+.exp-hd h1{font-family:var(--serif);font-style:italic;font-size:2.2rem;font-weight:400;letter-spacing:-.02em}
 .exp-hd p{font-family:var(--body);font-style:italic;color:var(--ink3);font-size:0.88rem;margin-top:4px}
 .exp-body{padding:24px 22px;display:flex;flex-direction:column;gap:28px}
-.sec-title{
-  font-family:var(--body);font-size:0.68rem;
-  letter-spacing:0.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:10px;
-}
+.sec-title{font-family:var(--body);font-size:0.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:10px}
 .stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.stat-b{
-  background:var(--white);border:1px solid var(--bg1);border-radius:4px;
-  padding:16px;text-align:center;
-}
+.stat-b{background:var(--wh);border:1px solid var(--bg1);border-radius:4px;padding:16px;text-align:center}
 .stat-n{font-family:var(--serif);font-size:2rem;font-weight:400;line-height:1;margin-bottom:2px}
-.stat-l{font-family:var(--body);font-size:0.62rem;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink3)}
+.stat-l{font-family:var(--body);font-size:0.62rem;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3)}
 .erow{display:flex;flex-direction:column;gap:8px}
-.ei{
-  background:var(--white);border:1px solid var(--bg1);border-radius:4px;
-  padding:15px 18px;display:flex;align-items:center;gap:14px;
-  cursor:pointer;transition:border-color .18s,box-shadow .18s;
-}
+.ei{background:var(--wh);border:1px solid var(--bg1);border-radius:4px;padding:15px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:border-color .18s,box-shadow .18s}
 .ei:hover{border-color:var(--ink3);box-shadow:0 2px 10px rgba(0,0,0,.07)}
 .ei-ico{width:38px;height:38px;border-radius:4px;background:var(--bg1);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
 .ei-txt strong{font-family:var(--serif);font-weight:400;font-size:0.95rem;display:block;margin-bottom:1px}
@@ -414,187 +181,103 @@ nav {
 .ei.danger .ei-ico{background:rgba(125,31,23,.07)}
 .ei.danger strong{color:var(--red)}
 
-/* ── MODALS ── */
-.bk {
-  display:none;position:fixed;inset:0;
-  background:rgba(26,25,22,.6);backdrop-filter:blur(4px);
-  z-index:300;align-items:flex-end;justify-content:center;
-}
+/* MODALS */
+.bk{display:none;position:fixed;inset:0;background:rgba(26,25,22,.6);backdrop-filter:blur(4px);z-index:300;align-items:flex-end;justify-content:center}
 .bk.open{display:flex;animation:bdin .18s ease}
 @keyframes bdin{from{opacity:0}to{opacity:1}}
-.sh{
-  background:var(--bg);border-radius:12px 12px 0 0;
-  width:100%;max-width:560px;max-height:92vh;overflow-y:auto;
-  padding-bottom:calc(var(--safe) + 16px);
-  animation:sup .26s cubic-bezier(.32,.72,0,1);
-}
+.sh{background:var(--bg);border-radius:12px 12px 0 0;width:100%;max-width:560px;max-height:92vh;overflow-y:auto;padding-bottom:calc(var(--safe)+16px);animation:sup .26s cubic-bezier(.32,.72,0,1)}
 @keyframes sup{from{transform:translateY(36px);opacity:0}to{transform:translateY(0);opacity:1}}
-@media(min-width:600px){
-  .bk{align-items:center}
-  .sh{border-radius:8px;max-width:460px;margin:20px}
-}
+@media(min-width:600px){.bk{align-items:center}.sh{border-radius:8px;max-width:480px;margin:20px}}
 .sh-handle{width:34px;height:4px;background:var(--bg2);border-radius:2px;margin:12px auto 0}
-.sh-head{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:16px 22px 13px;border-bottom:1px solid var(--bg1);
-}
+.sh-head{display:flex;align-items:center;justify-content:space-between;padding:16px 22px 13px;border-bottom:1px solid var(--bg1)}
 .sh-head h3{font-family:var(--serif);font-size:1.08rem;font-weight:400}
-.sh-close{
-  width:28px;height:28px;border-radius:50%;
-  background:var(--bg1);display:flex;align-items:center;justify-content:center;
-  color:var(--ink2);font-size:0.95rem;transition:background .12s;
-}
+.sh-close{width:28px;height:28px;border-radius:50%;background:var(--bg1);display:flex;align-items:center;justify-content:center;color:var(--ink2);font-size:0.95rem;transition:background .12s}
 .sh-close:hover{background:var(--bg2)}
 .sh-body{padding:16px 22px}
 .sh-foot{display:flex;justify-content:flex-end;gap:8px;padding:13px 22px 0;border-top:1px solid var(--bg1)}
 
-/* form */
+/* FORM */
 .fg{margin-bottom:14px}
-.fl{display:block;font-family:var(--body);font-size:0.66rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:5px}
-.fi{
-  width:100%;padding:9px 12px;
-  border:1px solid var(--bg2);border-radius:4px;
-  background:var(--white);font-family:var(--body);font-size:0.95rem;color:var(--ink);
-  outline:none;transition:border-color .18s;-webkit-appearance:none;
-}
+.fl{display:block;font-family:var(--body);font-size:0.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:5px}
+.fi{width:100%;padding:9px 12px;border:1px solid var(--bg2);border-radius:4px;background:var(--wh);font-family:var(--body);font-size:0.95rem;color:var(--ink);outline:none;transition:border-color .18s;-webkit-appearance:none}
 .fi:focus{border-color:var(--ink3)}
 .fi::placeholder{color:var(--ink4);font-style:italic}
 textarea.fi{resize:vertical;min-height:88px}
 .frow{display:flex;gap:10px}.frow .fg{flex:1}
-
-/* status */
 .ss{display:flex;gap:5px;flex-wrap:wrap}
-.so{
-  padding:5px 13px;border-radius:2px;border:1px solid var(--bg2);
-  font-family:var(--body);font-size:0.76rem;color:var(--ink3);
-  cursor:pointer;transition:all .12s;
-}
+.so{padding:5px 13px;border-radius:2px;border:1px solid var(--bg2);font-family:var(--body);font-size:0.76rem;color:var(--ink3);cursor:pointer;transition:all .12s}
 .so.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-
-/* swatches */
 .swatches{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
 .sw{width:24px;height:24px;border-radius:50%;cursor:pointer;transition:transform .12s;border:2px solid transparent}
 .sw.on{border-color:var(--ink);transform:scale(1.18)}
-
-/* isbn */
-.isbn-row{display:flex;gap:7px;margin-bottom:12px}
-.isbn-row input{flex:1}
-.bprev{display:none;background:var(--bg1);border-radius:4px;padding:12px;gap:12px;align-items:flex-start;margin-bottom:12px}
-.bprev.show{display:flex}
-.bprev img{width:48px;border-radius:2px;box-shadow:0 2px 8px rgba(0,0,0,.2)}
-.bprev-m strong{font-family:var(--serif);font-size:0.88rem;display:block;margin-bottom:2px}
-.bprev-m em{font-size:0.76rem;color:var(--ink3)}
-.bprev-m small{display:block;font-size:0.68rem;color:var(--ink4);margin-top:2px}
-
-/* cover upload */
-.upbtn{
-  width:100%;padding:9px 14px;border:1px dashed var(--ink4);border-radius:4px;
-  display:flex;align-items:center;justify-content:center;gap:6px;
-  font-family:var(--body);font-size:0.82rem;color:var(--ink3);
-  transition:border-color .15s,color .15s;
-}
+.upbtn{width:100%;padding:9px 14px;border:1px dashed var(--ink4);border-radius:4px;display:flex;align-items:center;justify-content:center;gap:6px;font-family:var(--body);font-size:0.82rem;color:var(--ink3);transition:border-color .15s,color .15s}
 .upbtn:hover{border-color:var(--ink);color:var(--ink)}
-
-/* tag area */
-.tga{
-  border:1px solid var(--bg2);border-radius:4px;background:var(--white);
-  padding:7px 10px;display:flex;flex-wrap:wrap;gap:5px;min-height:40px;
-  cursor:text;transition:border-color .18s;
-}
+.tga{border:1px solid var(--bg2);border-radius:4px;background:var(--wh);padding:7px 10px;display:flex;flex-wrap:wrap;gap:5px;min-height:40px;cursor:text;transition:border-color .18s}
 .tga:focus-within{border-color:var(--ink3)}
 .tga input{border:none;outline:none;background:none;font-family:var(--body);font-size:0.88rem;min-width:80px;flex:1}
-.trm{
-  display:inline-flex;align-items:center;gap:3px;
-  padding:2px 8px 2px 9px;border-radius:2px;
-  background:var(--bg1);color:var(--ink2);font-size:0.68rem;font-family:var(--body);
-}
-.trm-x{
-  width:13px;height:13px;border-radius:50%;
-  background:var(--ink3);color:white;
-  display:flex;align-items:center;justify-content:center;
-  font-size:0.55rem;cursor:pointer;border:none;
-}
-
-/* add-tabs */
-.atabs{display:flex;gap:5px;margin-bottom:16px}
-
-/* or */
-.or{display:flex;align-items:center;gap:10px;margin:12px 0;font-style:italic;font-size:0.78rem;color:var(--ink4)}
-.or::before,.or::after{content:'';flex:1;height:1px;background:var(--bg1)}
-
-/* buttons */
-.btn{
-  padding:10px 20px;border-radius:4px;font-family:var(--body);font-size:0.86rem;
-  letter-spacing:0.02em;display:inline-flex;align-items:center;gap:5px;transition:all .15s;
-}
-.btn-p{background:var(--ink);color:var(--bg)}
+.trm{display:inline-flex;align-items:center;gap:3px;padding:2px 8px 2px 9px;border-radius:2px;background:var(--bg1);color:var(--ink2);font-size:0.68rem;font-family:var(--body)}
+.trm-x{width:13px;height:13px;border-radius:50%;background:var(--ink3);color:white;display:flex;align-items:center;justify-content:center;font-size:0.55rem;cursor:pointer;border:none}
+.atabs{display:flex;gap:5px;margin-bottom:16px;flex-wrap:wrap}
+.btn{padding:10px 20px;border-radius:4px;font-family:var(--body);font-size:0.86rem;letter-spacing:.02em;display:inline-flex;align-items:center;gap:5px;transition:all .15s;cursor:pointer}
+.btn-p{background:var(--ink);color:var(--bg);border:none}
 .btn-p:hover{background:var(--ink2)}
 .btn-s{background:transparent;color:var(--ink2);border:1px solid var(--bg2)}
 .btn-s:hover{background:var(--bg1)}
-.btn-d{padding:8px 14px;border-radius:4px;font-family:var(--body);font-size:0.8rem;color:var(--red);border:1px solid rgba(125,31,23,.18)}
+.btn-d{padding:8px 14px;border-radius:4px;font-family:var(--body);font-size:0.8rem;color:var(--red);border:1px solid rgba(125,31,23,.18);cursor:pointer;background:none}
 .btn-d:hover{background:rgba(125,31,23,.06)}
-
-/* spinner */
 .spin{width:18px;height:18px;border-radius:50%;border:2px solid var(--bg2);border-top-color:var(--ink);animation:rot .6s linear infinite;display:none}
 .spin.on{display:block}
 @keyframes rot{to{transform:rotate(360deg)}}
-
-/* toast */
-#toast{
-  position:fixed;left:50%;bottom:calc(var(--nav) + var(--safe) + 10px);
-  transform:translateX(-50%) translateY(14px);
-  background:var(--ink);color:var(--bg);
-  padding:8px 18px;border-radius:20px;
-  font-family:var(--body);font-size:0.8rem;
-  opacity:0;z-index:500;transition:opacity .2s,transform .2s;
-  white-space:nowrap;pointer-events:none;
-}
+#toast{position:fixed;left:50%;bottom:calc(var(--nav)+var(--safe)+10px);transform:translateX(-50%) translateY(14px);background:var(--ink);color:var(--bg);padding:8px 18px;border-radius:20px;font-family:var(--body);font-size:0.8rem;opacity:0;z-index:500;transition:opacity .2s,transform .2s;white-space:nowrap;pointer-events:none}
 #toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
-
-/* misc */
-::-webkit-scrollbar{width:3px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--bg2)}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--bg2)}
 select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 5 5-5' stroke='%237A7670' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;appearance:none}
+
+/* search result list */
+.sr-list{display:flex;flex-direction:column;gap:1px;max-height:240px;overflow-y:auto;border:1px solid var(--bg2);border-radius:4px;margin-bottom:12px}
+.sr-item{display:flex;align-items:center;gap:12px;padding:10px 12px;background:var(--wh);cursor:pointer;transition:background .12s;border-bottom:1px solid var(--bg1)}
+.sr-item:last-child{border-bottom:none}
+.sr-item:hover{background:var(--bg1)}
+.sr-img{width:36px;height:54px;object-fit:cover;border-radius:1px 3px 3px 1px;flex-shrink:0;background:var(--bg2)}
+.sr-meta strong{font-family:var(--serif);font-size:0.88rem;font-weight:400;display:block;line-height:1.25;margin-bottom:2px}
+.sr-meta em{font-family:var(--body);font-size:0.75rem;color:var(--ink3)}
+.sr-meta small{font-family:var(--body);font-size:0.68rem;color:var(--ink4);display:block;margin-top:1px}
 </style>
 </head>
 <body>
 
-<!-- ══ SHELF ══ -->
+<!-- SHELF -->
 <div id="S-shelf" class="screen active">
   <div class="shelf-hd">
-    <h1>Shelf</h1>
+    <h1>Shelf <span style="font-style:normal;font-size:1.2rem;color:var(--ink3)">書架</span></h1>
     <span class="shelf-meta" id="shelf-meta"></span>
   </div>
   <div class="fstrip">
-    <button class="fchip on" data-f="all" onclick="setF('all')">全部</button>
-    <button class="fchip" data-f="reading" onclick="setF('reading')">閱讀中</button>
-    <button class="fchip" data-f="finished" onclick="setF('finished')">已讀完</button>
-    <button class="fchip" data-f="to-read" onclick="setF('to-read')">待讀</button>
+    <button class="fchip on" data-f="all" onclick="setF('all')">全部 All</button>
+    <button class="fchip" data-f="reading" onclick="setF('reading')">閱讀中 Reading</button>
+    <button class="fchip" data-f="finished" onclick="setF('finished')">已讀完 Finished</button>
+    <button class="fchip" data-f="to-read" onclick="setF('to-read')">待讀 To Read</button>
   </div>
   <div class="shelf-rule"></div>
   <div id="shelf-content"></div>
-  <div id="shelf-empty">書架還是空的。<br>點擊 <strong>+</strong> 新增第一本書。</div>
-  <button id="fab" onclick="openAdd()" aria-label="新增書籍">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
-      <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-    </svg>
+  <div id="shelf-empty">書架還是空的。<br>Tap <strong>+</strong> to add your first book.</div>
+  <button id="fab" onclick="openAdd()" aria-label="新增書籍 Add book">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
   </button>
 </div>
 
-<!-- ══ DETAIL ══ -->
+<!-- DETAIL -->
 <div id="S-detail" class="screen">
   <div class="d-hero">
     <button class="d-back" onclick="goBack()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-      書架
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>書架
     </button>
     <div class="d-cov" id="d-cov">
       <img id="d-img" src="" alt="" style="display:none">
       <div id="d-ph" class="d-cov-ph"></div>
     </div>
     <div class="d-meta">
-      <div class="d-eyebrow">A READING JOURNAL</div>
+      <div class="d-ey">READING JOURNAL</div>
       <div class="d-title" id="d-title"></div>
       <div class="d-author" id="d-author"></div>
       <div class="d-pill"><span class="dot" id="d-dot"></span><span id="d-stxt"></span></div>
@@ -604,43 +287,43 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
     </button>
   </div>
   <div class="d-tabs">
-    <button class="d-tab on" onclick="dtab('hl')">劃線精華</button>
-    <button class="d-tab" onclick="dtab('jn')">讀書札記</button>
+    <button class="d-tab on" onclick="dtab('hl')">摘錄 Excerpts</button>
+    <button class="d-tab" onclick="dtab('note')">筆記 Notes</button>
   </div>
   <div id="D-hl" class="d-sec on">
     <div class="hl-bar" id="hl-bar"></div>
     <div class="hl-list" id="hl-list"></div>
   </div>
-  <div id="D-jn" class="d-sec">
-    <div class="jn-wrap">
-      <div id="jn-disp" class="jn-display empty">尚無讀書札記。</div>
-      <textarea id="jn-ta" class="jn-ta fi" placeholder="寫下閱讀心得、重點摘要、導讀…"></textarea>
-      <div class="jn-btns" id="jn-btns" style="display:none">
-        <button class="btn btn-s" onclick="cancelJn()">取消</button>
-        <button class="btn btn-p" onclick="saveJn()">儲存</button>
+  <div id="D-note" class="d-sec">
+    <div class="note-wrap">
+      <div id="note-disp" class="note-display empty">尚無筆記。No notes yet.<br><span style="font-size:.85em">點擊「編輯 Edit」開始記錄。</span></div>
+      <textarea id="note-ta" class="note-ta fi" placeholder="Write notes, summaries, reflections…&#10;寫下重點摘要、心得、導讀…"></textarea>
+      <div class="note-btns" id="note-btns" style="display:none">
+        <button class="btn btn-s" onclick="cancelNote()">取消 Cancel</button>
+        <button class="btn btn-p" onclick="saveNote()">儲存 Save</button>
       </div>
       <div style="margin-top:14px">
-        <button class="btn btn-s" id="jn-edit-btn" onclick="editJn()">
+        <button class="btn btn-s" id="note-edit-btn" onclick="editNote()">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-          編輯札記
+          編輯 Edit
         </button>
       </div>
     </div>
   </div>
   <button class="hlfab" id="hlfab" onclick="openAddHl()">
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-    新增劃線
+    摘錄 Excerpt
   </button>
 </div>
 
-<!-- ══ THREAD ══ -->
+<!-- THREAD -->
 <div id="S-thread" class="screen">
   <div class="t-top">
     <div class="t-hd">
-      <h1>Threads</h1>
+      <h1>Threads <span style="font-style:normal;font-size:1.2rem;color:var(--ink3)">知識線索</span></h1>
       <div class="sbox">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input id="tsearch" placeholder="搜尋標籤，如：佛哲、心理學…" oninput="onTS(this.value)" autocomplete="off">
+        <input id="tsearch" placeholder="Search tags… 搜尋標籤" oninput="onTS(this.value)" autocomplete="off">
         <button id="tclr" onclick="clearTS()" style="display:none;color:var(--ink4)">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
@@ -648,186 +331,238 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
     </div>
     <div class="tcloud" id="tcloud"></div>
     <div class="sort-row">
-      排序：
-      <button class="sch on" id="s-t" onclick="setSort('time')">記錄時間</button>
-      <button class="sch" id="s-b" onclick="setSort('book')">書籍來源</button>
+      <span style="color:var(--ink4);font-size:0.68rem">Sort 排序：</span>
+      <button class="sch on" id="s-t" onclick="setSort('time')">時間 Time</button>
+      <button class="sch" id="s-b" onclick="setSort('book')">書名 Book</button>
+      <button class="sch" id="s-pg" onclick="setSort('page')">頁碼 Page</button>
       <span id="t-count"></span>
     </div>
   </div>
   <div class="tlist" id="tlist" style="padding-top:8px"></div>
-  <div class="t-empty show" id="tempty">輸入標籤或點擊上方標籤<br>搜尋跨書籍的精華句子</div>
+  <div class="t-empty show" id="tempty">Search a tag or tap one above<br>搜尋標籤或點擊上方快速篩選</div>
 </div>
 
-<!-- ══ EXPORT ══ -->
+<!-- EXPORT -->
 <div id="S-export" class="screen">
   <div class="exp-hd">
-    <h1>Export &amp; Import</h1>
-    <p>資料備份與還原</p>
+    <h1>Export <span style="font-style:normal;font-size:1.3rem;color:var(--ink3)">備份</span></h1>
+    <p>Data backup & restore · 資料備份與還原</p>
   </div>
   <div class="exp-body">
     <div>
-      <div class="sec-title">書庫統計</div>
+      <div class="sec-title">Statistics · 統計</div>
       <div class="stat-row">
-        <div class="stat-b"><div class="stat-n" id="sb">0</div><div class="stat-l">本書</div></div>
-        <div class="stat-b"><div class="stat-n" id="sh">0</div><div class="stat-l">劃線</div></div>
-        <div class="stat-b"><div class="stat-n" id="st">0</div><div class="stat-l">標籤</div></div>
+        <div class="stat-b"><div class="stat-n" id="sb">0</div><div class="stat-l">Books 書</div></div>
+        <div class="stat-b"><div class="stat-n" id="sh">0</div><div class="stat-l">Excerpts 摘錄</div></div>
+        <div class="stat-b"><div class="stat-n" id="st">0</div><div class="stat-l">Tags 標籤</div></div>
       </div>
     </div>
     <div>
-      <div class="sec-title">匯出備份</div>
+      <div class="sec-title">Export · 匯出</div>
       <div class="erow">
         <div class="ei" onclick="exportJ()">
           <div class="ei-ico">📦</div>
-          <div class="ei-txt"><strong>完整備份 (.json)</strong><span>匯出所有書籍、劃線、標籤與札記</span></div>
+          <div class="ei-txt"><strong>Full Backup · 完整備份 (.json)</strong><span>All books, excerpts, tags & notes · 書籍、摘錄、標籤、筆記</span></div>
           <div class="ei-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="8 17 12 21 16 17"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.88 18.09A5 5 0 0018 9h-1.26A8 8 0 103 16.29"/></svg></div>
         </div>
       </div>
     </div>
     <div>
-      <div class="sec-title">匯入還原</div>
+      <div class="sec-title">Import · 匯入</div>
       <div class="erow">
         <div class="ei" onclick="importJ()">
           <div class="ei-ico">📥</div>
-          <div class="ei-txt"><strong>匯入備份 (.json)</strong><span>還原 Jotter 備份檔案（合併現有資料）</span></div>
+          <div class="ei-txt"><strong>Restore Backup · 還原備份 (.json)</strong><span>Merges with existing data · 合併現有資料</span></div>
           <div class="ei-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="16 17 12 21 8 17"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.88 18.09A5 5 0 0018 9h-1.26A8 8 0 103 16.29"/></svg></div>
         </div>
       </div>
     </div>
     <div>
-      <div class="sec-title" style="color:var(--red)">危險區域</div>
+      <div class="sec-title" style="color:var(--red)">Danger · 危險</div>
       <div class="erow">
         <div class="ei danger" onclick="clearAll()">
           <div class="ei-ico">🗑️</div>
-          <div class="ei-txt"><strong>清除所有資料</strong><span>刪除全部書籍、劃線與札記（不可復原）</span></div>
+          <div class="ei-txt"><strong>Clear All Data · 清除所有資料</strong><span>Irreversible · 不可復原</span></div>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ══ NAV ══ -->
+<!-- NAV -->
 <nav>
   <button class="nb on" id="nb-shelf" onclick="goNav('shelf')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-      <path d="M4 19V6a2 2 0 012-2h12a2 2 0 012 2v13"/><path d="M4 19h16"/><path d="M9 9h6M9 13h4"/>
-    </svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 19V6a2 2 0 012-2h12a2 2 0 012 2v13"/><path d="M4 19h16"/><path d="M9 9h6M9 13h4"/></svg>
     Shelf<div class="nb-dot"></div>
   </button>
   <button class="nb" id="nb-thread" onclick="goNav('thread')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-      <circle cx="12" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="19" cy="19" r="2"/>
-      <path d="M12 7v4M8.5 17.5l3-4.5M15.5 17.5l-3-4.5"/>
-    </svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="19" cy="19" r="2"/><path d="M12 7v4M8.5 17.5l3-4.5M15.5 17.5l-3-4.5"/></svg>
     Threads<div class="nb-dot"></div>
   </button>
   <button class="nb" id="nb-export" onclick="goNav('export')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-      <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
-    </svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
     Export<div class="nb-dot"></div>
   </button>
 </nav>
 <div id="toast"></div>
 
-<!-- ══ MODAL: BOOK ══ -->
+<!-- MODAL: ADD/EDIT BOOK -->
 <div class="bk" id="M-book">
   <div class="sh">
     <div class="sh-handle"></div>
     <div class="sh-head">
-      <h3 id="M-book-ttl">新增書籍</h3>
+      <h3 id="M-book-ttl">新增書籍 Add Book</h3>
       <button class="sh-close" onclick="closeM('M-book')">✕</button>
     </div>
     <div class="sh-body">
       <div class="atabs">
-        <button class="fchip on" id="T-isbn" onclick="switchTab('isbn')">ISBN 搜尋</button>
-        <button class="fchip" id="T-manual" onclick="switchTab('manual')">手動輸入</button>
+        <button class="fchip on" id="T-isbn" onclick="switchTab('isbn')">ISBN</button>
+        <button class="fchip" id="T-title" onclick="switchTab('title')">書名/Title</button>
+        <button class="fchip" id="T-author" onclick="switchTab('author')">作者/Author</button>
+        <button class="fchip" id="T-manual" onclick="switchTab('manual')">手動/Manual</button>
       </div>
+
+      <!-- ISBN panel -->
       <div id="P-isbn">
-        <div class="isbn-row">
-          <input class="fi" id="isbn-in" type="text" inputmode="numeric" placeholder="輸入 ISBN-10 或 ISBN-13…">
-          <button class="btn btn-p" id="isbn-go" onclick="searchISBN()">搜尋</button>
+        <div style="display:flex;gap:7px;margin-bottom:10px">
+          <input class="fi" id="isbn-in" type="text" inputmode="numeric" placeholder="ISBN-10 or ISBN-13…">
+          <button class="btn btn-p" id="isbn-go" onclick="doSearch('isbn')" style="white-space:nowrap">搜尋 Search</button>
           <div class="spin" id="isbn-sp"></div>
         </div>
-        <div class="bprev" id="bprev">
-          <img id="bp-img" src="" alt="">
-          <div class="bprev-m">
-            <strong id="bp-ttl"></strong>
-            <em id="bp-auth"></em>
-            <small id="bp-yr"></small>
-          </div>
-        </div>
-        <div id="isbn-nf" style="display:none;font-style:italic;color:var(--ink3);font-size:0.82rem;margin-bottom:12px">找不到此書，請改用手動輸入。</div>
+        <div id="isbn-nf" style="display:none;font-style:italic;color:var(--ink3);font-size:0.82rem;margin-bottom:10px"></div>
+        <div class="sr-list" id="isbn-results" style="display:none"></div>
       </div>
+
+      <!-- Title search panel -->
+      <div id="P-title" style="display:none">
+        <div style="display:flex;gap:7px;margin-bottom:10px">
+          <input class="fi" id="title-in" placeholder="Search by title… 輸入書名">
+          <button class="btn btn-p" id="title-go" onclick="doSearch('title')" style="white-space:nowrap">搜尋 Search</button>
+          <div class="spin" id="title-sp"></div>
+        </div>
+        <div id="title-nf" style="display:none;font-style:italic;color:var(--ink3);font-size:0.82rem;margin-bottom:10px"></div>
+        <div class="sr-list" id="title-results" style="display:none"></div>
+      </div>
+
+      <!-- Author search panel -->
+      <div id="P-author" style="display:none">
+        <div style="display:flex;gap:7px;margin-bottom:10px">
+          <input class="fi" id="author-in" placeholder="Search by author… 輸入作者">
+          <button class="btn btn-p" id="author-go" onclick="doSearch('author')" style="white-space:nowrap">搜尋 Search</button>
+          <div class="spin" id="author-sp"></div>
+        </div>
+        <div id="author-nf" style="display:none;font-style:italic;color:var(--ink3);font-size:0.82rem;margin-bottom:10px"></div>
+        <div class="sr-list" id="author-results" style="display:none"></div>
+      </div>
+
+      <!-- Manual panel -->
       <div id="P-manual" style="display:none">
-        <div class="fg"><label class="fl">書名 *</label><input class="fi" id="in-t" placeholder="書名"></div>
+        <div class="fg"><label class="fl">書名 Title *</label><input class="fi" id="in-t" placeholder="Title / 書名"></div>
         <div class="frow">
-          <div class="fg"><label class="fl">作者</label><input class="fi" id="in-a" placeholder="作者"></div>
-          <div class="fg"><label class="fl">年份</label><input class="fi" id="in-y" type="number" placeholder="2024"></div>
+          <div class="fg"><label class="fl">作者 Author</label><input class="fi" id="in-a" placeholder="Author / 作者"></div>
+          <div class="fg"><label class="fl">年份 Year</label><input class="fi" id="in-y" type="number" placeholder="2024"></div>
         </div>
         <div class="fg">
-          <label class="fl">封面圖片</label>
+          <label class="fl">封面 Cover</label>
           <button class="upbtn" onclick="document.getElementById('cfile').click()">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-            <span id="clabel">上傳封面（選填）</span>
+            <span id="clabel">Upload cover image / 上傳封面</span>
           </button>
           <input type="file" id="cfile" accept="image/*" style="display:none" onchange="onCover(this)">
         </div>
-        <div class="fg"><label class="fl">封面顏色</label><div class="swatches" id="sws"></div></div>
+        <div class="fg"><label class="fl">封面顏色 Colour</label><div class="swatches" id="sws"></div></div>
       </div>
+
+      <!-- Shared: selected book preview -->
+      <div id="sel-preview" style="display:none;background:var(--bg1);border-radius:4px;padding:12px;gap:12px;align-items:flex-start;margin-bottom:12px;flex-direction:row;display:none">
+        <img id="sel-img" src="" alt="" style="width:44px;border-radius:2px;box-shadow:0 2px 8px rgba(0,0,0,.2);flex-shrink:0">
+        <div>
+          <strong id="sel-title" style="font-family:var(--serif);font-size:0.9rem;display:block;margin-bottom:2px"></strong>
+          <em id="sel-author" style="font-size:0.78rem;color:var(--ink3)"></em>
+          <small id="sel-year" style="display:block;font-size:0.68rem;color:var(--ink4);margin-top:2px"></small>
+          <button onclick="clearSel()" style="font-size:0.68rem;color:var(--ink3);margin-top:4px;text-decoration:underline">× 重新選擇 Change</button>
+        </div>
+      </div>
+
+      <!-- Status (always shown) -->
       <div class="fg" style="margin-top:14px">
-        <label class="fl">閱讀狀態</label>
+        <label class="fl">閱讀狀態 Reading Status</label>
         <div class="ss" id="ss">
-          <button class="so on" data-s="reading" onclick="setSt('reading')">閱讀中</button>
-          <button class="so" data-s="finished" onclick="setSt('finished')">已讀完</button>
-          <button class="so" data-s="to-read" onclick="setSt('to-read')">待讀</button>
+          <button class="so on" data-s="reading" onclick="setSt('reading')">閱讀中 Reading</button>
+          <button class="so" data-s="finished" onclick="setSt('finished')">已讀完 Finished</button>
+          <button class="so" data-s="to-read" onclick="setSt('to-read')">待讀 To Read</button>
         </div>
       </div>
     </div>
     <div class="sh-foot">
       <div id="del-b" style="display:none;margin-right:auto">
-        <button class="btn-d" onclick="delCurBook()">刪除書籍</button>
+        <button class="btn-d" onclick="delCurBook()">刪除 Delete</button>
       </div>
-      <button class="btn btn-s" onclick="closeM('M-book')">取消</button>
-      <button class="btn btn-p" id="save-b" onclick="saveBook()">新增</button>
+      <button class="btn btn-s" onclick="closeM('M-book')">取消 Cancel</button>
+      <button class="btn btn-p" id="save-b" onclick="saveBook()">新增 Add</button>
     </div>
   </div>
 </div>
 
-<!-- ══ MODAL: HIGHLIGHT ══ -->
+<!-- MODAL: ADD/EDIT EXCERPT -->
 <div class="bk" id="M-hl">
   <div class="sh">
     <div class="sh-handle"></div>
     <div class="sh-head">
-      <h3 id="M-hl-ttl">新增劃線精華</h3>
+      <h3 id="M-hl-ttl">新增摘錄 Add Excerpt</h3>
       <button class="sh-close" onclick="closeM('M-hl')">✕</button>
     </div>
     <div class="sh-body">
       <div class="fg">
-        <label class="fl">精華句子 *</label>
-        <textarea class="fi" id="hl-txt" rows="4" placeholder="貼上或輸入書中精彩句子…"></textarea>
+        <label class="fl">摘錄 / 引文 Excerpt *</label>
+        <textarea class="fi" id="hl-txt" rows="4" placeholder="Paste or type the excerpt / quote…&#10;貼上或輸入書中精彩句子…"></textarea>
       </div>
       <div class="fg">
-        <label class="fl">標籤（Enter 新增）</label>
+        <label class="fl">頁碼 Page Number</label>
+        <input class="fi" id="hl-page" type="number" placeholder="e.g. 42" style="width:120px" min="1">
+      </div>
+      <div class="fg">
+        <label class="fl">標籤 Tags（Enter to add）</label>
         <div class="tga" id="tga" onclick="document.getElementById('tag-in').focus()">
-          <input id="tag-in" placeholder="新增標籤…" onkeydown="onTagK(event)" autocomplete="off">
+          <input id="tag-in" placeholder="Add tag… 新增標籤" onkeydown="onTagK(event)" autocomplete="off">
         </div>
-        <p style="font-size:0.68rem;color:var(--ink4);margin-top:4px;font-style:italic">例如：佛哲、政治、心理學</p>
+        <p style="font-size:0.68rem;color:var(--ink4);margin-top:4px;font-style:italic">e.g. philosophy, psychology, 政治, 佛哲</p>
       </div>
     </div>
     <div class="sh-foot">
       <div id="del-hl" style="display:none;margin-right:auto">
-        <button class="btn-d" onclick="delCurHl()">刪除</button>
+        <button class="btn-d" onclick="delCurHl()">刪除 Delete</button>
       </div>
-      <button class="btn btn-s" onclick="closeM('M-hl')">取消</button>
-      <button class="btn btn-p" onclick="saveHl()">儲存</button>
+      <button class="btn btn-s" onclick="closeM('M-hl')">取消 Cancel</button>
+      <button class="btn btn-p" onclick="saveHl()">儲存 Save</button>
     </div>
   </div>
 </div>
 
 <script>
 // ── DB ──
-const DBN='jotter-db',DV=1;let db;
-function openDB(){return new Promise((res,rej)=>{const r=indexedDB.open(DBN,DV);r.onupgradeneeded=e=>{const d=e.target.result;if(!d.objectStoreNames.contains('books')){const b=d.createObjectStore('books',{keyPath:'id'});b.createIndex('status','status');b.createIndex('createdAt','createdAt')}if(!d.objectStoreNames.contains('highlights')){const h=d.createObjectStore('highlights',{keyPath:'id'});h.createIndex('bookId','bookId');h.createIndex('createdAt','createdAt');h.createIndex('tags','tags',{unique:false,multiEntry:true})}if(!d.objectStoreNames.contains('journals')){d.createObjectStore('journals',{keyPath:'bookId'})}};r.onsuccess=e=>{db=e.target.result;res(db)};r.onerror=()=>rej(r.error)})}
+const DBN='jotter-db',DV=2;let db;
+function openDB(){return new Promise((res,rej)=>{
+  const r=indexedDB.open(DBN,DV);
+  r.onupgradeneeded=e=>{
+    const d=e.target.result;
+    if(!d.objectStoreNames.contains('books')){
+      const b=d.createObjectStore('books',{keyPath:'id'});
+      b.createIndex('status','status');b.createIndex('createdAt','createdAt');
+    }
+    if(!d.objectStoreNames.contains('highlights')){
+      const h=d.createObjectStore('highlights',{keyPath:'id'});
+      h.createIndex('bookId','bookId');h.createIndex('createdAt','createdAt');
+      h.createIndex('tags','tags',{unique:false,multiEntry:true});
+      h.createIndex('page','page');
+    }
+    if(!d.objectStoreNames.contains('notes')){
+      d.createObjectStore('notes',{keyPath:'bookId'});
+    }
+  };
+  r.onsuccess=e=>{db=e.target.result;res(db)};
+  r.onerror=()=>rej(r.error);
+})}
 const dg=(s,k)=>new Promise((r,j)=>{const q=db.transaction(s,'readonly').objectStore(s).get(k);q.onsuccess=()=>r(q.result);q.onerror=()=>j(q.error)});
 const da=(s)=>new Promise((r,j)=>{const q=db.transaction(s,'readonly').objectStore(s).getAll();q.onsuccess=()=>r(q.result);q.onerror=()=>j(q.error)});
 const dp=(s,v)=>new Promise((r,j)=>{const q=db.transaction(s,'readwrite').objectStore(s).put(v);q.onsuccess=()=>r(q.result);q.onerror=()=>j(q.error)});
@@ -836,9 +571,9 @@ const di=(s,ix,v)=>new Promise((r,j)=>{const q=db.transaction(s,'readonly').obje
 const dc=(s)=>new Promise((r,j)=>{const q=db.transaction(s,'readwrite').objectStore(s).clear();q.onsuccess=()=>r();q.onerror=()=>j(q.error)});
 
 // ── STATE ──
-const A={bid:null,hlid:null,tab:'isbn',editing:false,status:'reading',color:'#2C5F6E',cdata:null,curl:null,tags:[],flt:'all',tsort:'time',ttags:[],tq:''};
+const A={bid:null,hlid:null,tab:'isbn',editing:false,status:'reading',color:'#2C5F6E',cdata:null,curl:null,tags:[],flt:'all',tsort:'time',ttags:[],tq:'',selBook:null};
 const COLS=['#2C5F6E','#5E4A7A','#8B3A3A','#3A6B4A','#7A5C2E','#1A3D5C','#6B3A3A','#4A5C6B','#6B5A3A','#3A4A6B'];
-const SL={'reading':'閱讀中','finished':'已讀完','to-read':'待讀'};
+const SL={'reading':'閱讀中 Reading','finished':'已讀完 Finished','to-read':'待讀 To Read'};
 const SC={'reading':'#A67C2E','finished':'#2E6644','to-read':'#AEA9A2'};
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,5)}
 function xe(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
@@ -875,16 +610,16 @@ async function renderShelf(){
   const books=await da('books');
   const all=books.filter(b=>A.flt==='all'||b.status===A.flt);
   all.sort((a,b)=>b.createdAt-a.createdAt);
-  document.getElementById('shelf-meta').textContent=books.length?`${books.length} 本`:'';
+  document.getElementById('shelf-meta').textContent=books.length?`${books.length} books`:'';
   if(!all.length){document.getElementById('shelf-content').innerHTML='';document.getElementById('shelf-empty').classList.add('show');return}
   document.getElementById('shelf-empty').classList.remove('show');
   let html='';
   if(A.flt==='all'){
-    const gs=[{k:'reading',l:'正在讀'},{k:'finished',l:'已讀完'},{k:'to-read',l:'待讀'}];
+    const gs=[{k:'reading',l:'閱讀中 Reading'},{k:'finished',l:'已讀完 Finished'},{k:'to-read',l:'待讀 To Read'}];
     for(const g of gs){
       const its=all.filter(b=>b.status===g.k);
       if(!its.length)continue;
-      html+=`<div class="sg"><div class="sg-label">${g.l} <span class="sg-num">${its.length}</span></div><div class="bgrid">${its.map((b,i)=>bcard(b,i)).join('')}</div></div>`;
+      html+=`<div class="sg"><div class="sg-label">${g.l} <span class="sgn">${its.length}</span></div><div class="bgrid">${its.map((b,i)=>bcard(b,i)).join('')}</div></div>`;
     }
   }else{
     html=`<div class="sg"><div class="bgrid">${all.map((b,i)=>bcard(b,i)).join('')}</div></div>`;
@@ -893,7 +628,10 @@ async function renderShelf(){
 }
 function bcard(b,i){
   const src=b.coverData||b.coverUrl;
-  const img=src?`<img src="${xe(src)}" alt="${xe(b.title)}" onerror="this.style.display='none'">`:`<div class="bph" style="background:${b.color||'#2C5F6E'}"><div class="bph-t">${xe(b.title)}</div><div class="bph-a">${xe(b.author||'')}</div></div>`;
+  const img=src
+    ?`<img src="${xe(src)}" alt="${xe(b.title)}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`+
+      `<div class="bph" style="background:${b.color||'#2C5F6E'};display:none"><div class="bph-t">${xe(b.title)}</div><div class="bph-a">${xe(b.author||'')}</div></div>`
+    :`<div class="bph" style="background:${b.color||'#2C5F6E'}"><div class="bph-t">${xe(b.title)}</div><div class="bph-a">${xe(b.author||'')}</div></div>`;
   return`<div class="bc" style="animation-delay:${i*.04}s">
     <div class="bcover" onclick="showDetail('${b.id}')">
       ${img}
@@ -906,241 +644,252 @@ function bcard(b,i){
     <div class="bauthor">${xe(b.author||'')}</div>
   </div>`;
 }
-function setF(f){
-  A.flt=f;
-  document.querySelectorAll('.fchip').forEach(c=>c.classList.toggle('on',c.dataset.f===f));
-  renderShelf();
+function setF(f){A.flt=f;document.querySelectorAll('.fchip').forEach(c=>c.classList.toggle('on',c.dataset.f===f));renderShelf()}
+
+// ── BOOK SEARCH (ISBN / Title / Author) ──
+const tf=(url,ms=8000)=>Promise.race([fetch(url),new Promise((_,rj)=>setTimeout(()=>rj(new Error('timeout')),ms))]);
+
+// Extract a clean cover URL from Google Books item
+function gbCover(v){
+  const raw=v.imageLinks?.extraLarge||v.imageLinks?.large||v.imageLinks?.medium||v.imageLinks?.thumbnail||v.imageLinks?.smallThumbnail||'';
+  return raw.replace('http:','https:').replace(/zoom=\d/,'zoom=3').replace('&edge=curl','');
 }
 
-// ── ADD/EDIT BOOK ──
+// Convert a raw API hit into a normalised result object
+function normGB(v){
+  return{title:v.title||'',author:(v.authors||[]).join(', '),year:(v.publishedDate||'').slice(0,4),cover:gbCover(v)||null,src:'Google Books'};
+}
+
+async function fetchGoogleBooks(query,field){
+  // field: 'isbn', 'intitle', 'inauthor', or '' (free query)
+  const q=field?`${field}:${encodeURIComponent(query)}`:`${encodeURIComponent(query)}`;
+  const url=`https://www.googleapis.com/books/v1/volumes?q=${q}&maxResults=8&langRestrict=`;
+  const r=await tf(url);
+  if(!r.ok)return[];
+  const d=await r.json();
+  return(d.items||[]).map(i=>normGB(i.volumeInfo));
+}
+
+async function fetchOpenLibrary(query,field){
+  // field: 'isbn', 'title', 'author', 'q'
+  let url;
+  if(field==='isbn'){
+    url=`https://openlibrary.org/api/books?bibkeys=ISBN:${encodeURIComponent(query)}&format=json&jscmd=data`;
+    const r=await tf(url);if(!r.ok)return[];
+    const d=await r.json();
+    const b=d[`ISBN:${query}`];
+    if(!b)return[];
+    const cov=b.cover?.large||b.cover?.medium||b.cover?.small||`https://covers.openlibrary.org/b/isbn/${query}-M.jpg`;
+    return[{title:b.title||'',author:(b.authors||[]).map(a=>a.name).join(', '),year:(b.publish_date||'').replace(/\D/g,'').slice(0,4),cover:cov,src:'Open Library'}];
+  }
+  const qParam=field==='title'?`title=${encodeURIComponent(query)}`:field==='author'?`author=${encodeURIComponent(query)}`:`q=${encodeURIComponent(query)}`;
+  url=`https://openlibrary.org/search.json?${qParam}&limit=8&fields=title,author_name,first_publish_year,cover_i,isbn`;
+  const r=await tf(url);if(!r.ok)return[];
+  const d=await r.json();
+  return(d.docs||[]).map(b=>({
+    title:b.title||'',
+    author:(b.author_name||[]).join(', '),
+    year:String(b.first_publish_year||''),
+    cover:b.cover_i?`https://covers.openlibrary.org/b/id/${b.cover_i}-M.jpg`
+      :(b.isbn?.[0]?`https://covers.openlibrary.org/b/isbn/${b.isbn[0]}-M.jpg`:null),
+    src:'Open Library'
+  }));
+}
+
+// Merge results, dedupe by title+author, max 10
+function mergeResults(a,b){
+  const seen=new Set();const out=[];
+  for(const r of [...a,...b]){
+    const key=(r.title+r.author).toLowerCase().replace(/\s/g,'');
+    if(!seen.has(key)){seen.add(key);out.push(r)}
+  }
+  return out.slice(0,10);
+}
+
+function renderResults(containerId,results,mode){
+  const el=document.getElementById(containerId);
+  if(!results.length){el.style.display='none';return}
+  el.style.display='block';
+  el.innerHTML=results.map((r,i)=>`
+    <div class="sr-item" onclick="selectResult(${i},'${mode}')">
+      ${r.cover
+        ?`<img class="sr-img" src="${xe(r.cover)}" alt="" onerror="this.src='';this.style.background='var(--bg2)'">`
+        :`<div class="sr-img" style="background:var(--bg2)"></div>`}
+      <div class="sr-meta">
+        <strong>${xe(r.title)}</strong>
+        <em>${xe(r.author||'')}</em>
+        <small>${r.year?r.year+' · ':''}<span style="color:var(--ink4)">${r.src}</span></small>
+      </div>
+    </div>`).join('');
+  // stash results for selection
+  window._srCache=window._srCache||{};
+  window._srCache[mode]=results;
+}
+
+function selectResult(idx,mode){
+  const r=window._srCache?.[mode]?.[idx];if(!r)return;
+  A.selBook=r;
+  A.curl=r.cover||null;
+  // Fill manual fields as backup
+  document.getElementById('in-t').value=r.title;
+  document.getElementById('in-a').value=r.author||'';
+  document.getElementById('in-y').value=r.year||'';
+  // Show preview
+  const pv=document.getElementById('sel-preview');
+  pv.style.display='flex';
+  document.getElementById('sel-title').textContent=r.title;
+  document.getElementById('sel-author').textContent=r.author||'';
+  document.getElementById('sel-year').textContent=r.year?r.year+' 年出版':'';
+  const si=document.getElementById('sel-img');
+  if(r.cover){si.src=r.cover;si.style.display='block';si.onerror=()=>si.style.display='none'}
+  else si.style.display='none';
+  // Hide result list
+  document.getElementById(mode+'-results').style.display='none';
+  toast(`✓ ${r.title}`);
+}
+function clearSel(){A.selBook=null;document.getElementById('sel-preview').style.display='none'}
+
+async function doSearch(mode){
+  const inputId=mode+'-in';
+  const query=document.getElementById(inputId)?.value.trim()||document.getElementById('isbn-in')?.value.trim()||'';
+  if(!query)return;
+  const nfId=mode+'-nf',spId=mode+'-sp',goId=mode+'-go',resId=mode+'-results';
+  const nfEl=document.getElementById(nfId);
+  nfEl.style.display='block';nfEl.textContent='搜尋中 Searching…';nfEl.style.color='var(--ink4)';
+  document.getElementById(goId).style.display='none';
+  document.getElementById(spId).classList.add('on');
+  document.getElementById(resId).style.display='none';
+  clearSel();
+
+  let results=[];
+  const clean=query.replace(/[-\s]/g,'');
+
+  try{
+    if(mode==='isbn'){
+      // Parallel: Google Books + Open Library
+      const [gb,ol]=await Promise.allSettled([
+        fetchGoogleBooks(clean,'isbn'),
+        fetchOpenLibrary(clean,'isbn')
+      ]);
+      const gbR=gb.status==='fulfilled'?gb.value:[];
+      const olR=ol.status==='fulfilled'?ol.value:[];
+      results=mergeResults(gbR,olR);
+      // If still empty, try bare query (catches some zh-TW editions)
+      if(!results.length){
+        const [gb2,ol2]=await Promise.allSettled([
+          fetchGoogleBooks(clean,''),
+          fetchOpenLibrary(clean,'q')
+        ]);
+        const gb2R=gb2.status==='fulfilled'?gb2.value:[];
+        const ol2R=ol2.status==='fulfilled'?ol2.value:[];
+        results=mergeResults(gb2R,ol2R);
+      }
+    } else if(mode==='title'){
+      const [gb,ol]=await Promise.allSettled([
+        fetchGoogleBooks(query,'intitle'),
+        fetchOpenLibrary(query,'title')
+      ]);
+      const gbR=gb.status==='fulfilled'?gb.value:[];
+      const olR=ol.status==='fulfilled'?ol.value:[];
+      results=mergeResults(gbR,olR);
+    } else if(mode==='author'){
+      const [gb,ol]=await Promise.allSettled([
+        fetchGoogleBooks(query,'inauthor'),
+        fetchOpenLibrary(query,'author')
+      ]);
+      const gbR=gb.status==='fulfilled'?gb.value:[];
+      const olR=ol.status==='fulfilled'?ol.value:[];
+      results=mergeResults(gbR,olR);
+    }
+  }catch(e){}
+
+  if(results.length){
+    nfEl.style.display='none';
+    renderResults(resId,results,mode);
+  }else{
+    nfEl.style.display='block';
+    nfEl.style.color='var(--ink3)';
+    nfEl.textContent=mode==='isbn'
+      ?'找不到此書，請嘗試書名/作者搜尋或手動輸入。 Not found — try Title/Author search or Manual.'
+      :'找不到相符結果。 No results found.';
+  }
+  document.getElementById(goId).style.display='';
+  document.getElementById(spId).classList.remove('on');
+}
+
+// ── ADD/EDIT BOOK MODAL ──
 function openAdd(){
-  A.editing=false;A.cdata=null;A.curl=null;A.status='reading';A.color=COLS[0];
-  document.getElementById('M-book-ttl').textContent='新增書籍';
-  document.getElementById('save-b').textContent='新增';
+  A.editing=false;A.cdata=null;A.curl=null;A.status='reading';A.color=COLS[0];A.selBook=null;
+  document.getElementById('M-book-ttl').textContent='新增書籍 Add Book';
+  document.getElementById('save-b').textContent='新增 Add';
   document.getElementById('del-b').style.display='none';
   document.getElementById('isbn-in').value='';
+  document.getElementById('title-in').value='';
+  document.getElementById('author-in').value='';
   document.getElementById('in-t').value='';document.getElementById('in-a').value='';document.getElementById('in-y').value='';
-  document.getElementById('clabel').textContent='上傳封面（選填）';
-  document.getElementById('bprev').classList.remove('show');
-  document.getElementById('isbn-nf').style.display='none';
+  document.getElementById('clabel').textContent='Upload cover / 上傳封面';
+  ['isbn','title','author'].forEach(m=>{
+    const nf=document.getElementById(m+'-nf');if(nf)nf.style.display='none';
+    const res=document.getElementById(m+'-results');if(res)res.style.display='none';
+  });
+  document.getElementById('sel-preview').style.display='none';
   document.querySelectorAll('.so').forEach(b=>b.classList.toggle('on',b.dataset.s==='reading'));
   switchTab('isbn');renderSws();openM('M-book');
 }
 async function openEdit(id){
   const b=await dg('books',id);if(!b)return;
   A.bid=id;A.editing=true;A.cdata=b.coverData;A.curl=b.coverUrl;A.status=b.status;A.color=b.color||COLS[0];
-  document.getElementById('M-book-ttl').textContent='編輯書籍';
-  document.getElementById('save-b').textContent='儲存';
+  document.getElementById('M-book-ttl').textContent='編輯書籍 Edit Book';
+  document.getElementById('save-b').textContent='儲存 Save';
   document.getElementById('del-b').style.display='block';
   document.getElementById('in-t').value=b.title;document.getElementById('in-a').value=b.author||'';document.getElementById('in-y').value=b.year||'';
   document.querySelectorAll('.so').forEach(x=>x.classList.toggle('on',x.dataset.s===b.status));
+  document.getElementById('sel-preview').style.display='none';
   switchTab('manual');renderSws();openM('M-book');
 }
 function editCurBook(){openEdit(A.bid)}
 function switchTab(t){
   A.tab=t;
-  document.getElementById('P-isbn').style.display=t==='isbn'?'block':'none';
-  document.getElementById('P-manual').style.display=t==='manual'?'block':'none';
-  document.getElementById('T-isbn').classList.toggle('on',t==='isbn');
-  document.getElementById('T-manual').classList.toggle('on',t==='manual');
+  ['isbn','title','author','manual'].forEach(p=>{
+    document.getElementById('P-'+p).style.display=p===t?'block':'none';
+    const btn=document.getElementById('T-'+p);if(btn)btn.classList.toggle('on',p===t);
+  });
 }
 function setSt(s){A.status=s;document.querySelectorAll('.so').forEach(b=>b.classList.toggle('on',b.dataset.s===s))}
-function renderSws(){
-  document.getElementById('sws').innerHTML=COLS.map(c=>`<div class="sw${c===A.color?' on':''}" style="background:${c}" onclick="selC('${c}')"></div>`).join('');
-}
+function renderSws(){document.getElementById('sws').innerHTML=COLS.map(c=>`<div class="sw${c===A.color?' on':''}" style="background:${c}" onclick="selC('${c}')"></div>`).join('')}
 function selC(c){A.color=c;renderSws()}
 function onCover(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{A.cdata=ev.target.result;document.getElementById('clabel').textContent=f.name};r.readAsDataURL(f)}
-// ── ISBN search: keyless multi-source ──
-// No API key required. Works for any user out of the box.
-// Strategy: try 6 sources in parallel batches, pick first hit.
-async function searchISBN(){
-  const raw = document.getElementById('isbn-in').value.trim();
-  const isbn = raw.replace(/[-\s]/g, '');
-  if(!isbn) return;
-
-  const nfEl  = document.getElementById('isbn-nf');
-  const prevEl = document.getElementById('bprev');
-  nfEl.style.display = 'none';
-  prevEl.classList.remove('show');
-  document.getElementById('isbn-go').style.display = 'none';
-  document.getElementById('isbn-sp').classList.add('on');
-
-  // Animated status message
-  const msgs = ['搜尋中…', '查詢中文書庫…', '查詢國際書庫…', '最後比對中…'];
-  let mi = 0;
-  nfEl.style.display = 'block';
-  nfEl.style.color = 'var(--ink4)';
-  nfEl.textContent = msgs[0];
-  const ticker = setInterval(() => { mi=(mi+1)%msgs.length; nfEl.textContent=msgs[mi]; }, 1000);
-
-  let result = null;
-
-  // Helper: timeout-wrapped fetch
-  const tf = (url, ms=7000) => Promise.race([
-    fetch(url),
-    new Promise((_,rj) => setTimeout(() => rj(new Error('timeout')), ms))
-  ]);
-
-  // ── SOURCE 1: Google Books — isbn: field, no key, works globally ──
-  // The trick: omit langRestrict so zh-TW/zh-CN editions surface
-  if(!result){ try{
-    const r = await tf(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}&maxResults=3&fields=items(volumeInfo(title,authors,publishedDate,imageLinks,industryIdentifiers))`);
-    if(r.ok){
-      const d = await r.json();
-      if(d.items?.length){
-        // Prefer the item whose ISBN matches exactly
-        const hit = d.items.find(i =>
-          (i.volumeInfo.industryIdentifiers||[]).some(x => x.identifier.replace(/-/g,'') === isbn)
-        ) || d.items[0];
-        const v = hit.volumeInfo;
-        const cov = (v.imageLinks?.thumbnail || v.imageLinks?.smallThumbnail || '')
-          .replace('http:','https:').replace(/zoom=\d/,'zoom=3').replace('&edge=curl','');
-        result = { title:v.title||'', author:(v.authors||[]).join(', '),
-          year:(v.publishedDate||'').slice(0,4), cover:cov||null, src:'Google Books' };
-      }
-    }
-  }catch(e){} }
-
-  // ── SOURCE 2: Google Books — intitle search with ISBN as keyword ──
-  // Catches zh-TW books that Google indexes under the ISBN as a keyword
-  if(!result){ try{
-    const r = await tf(`https://www.googleapis.com/books/v1/volumes?q=${isbn}&maxResults=5&fields=items(volumeInfo(title,authors,publishedDate,imageLinks,industryIdentifiers))`);
-    if(r.ok){
-      const d = await r.json();
-      if(d.items?.length){
-        const hit = d.items.find(i =>
-          (i.volumeInfo.industryIdentifiers||[]).some(x => x.identifier.replace(/-/g,'') === isbn)
-        ) || d.items[0];
-        const v = hit.volumeInfo;
-        const cov = (v.imageLinks?.thumbnail || v.imageLinks?.smallThumbnail || '')
-          .replace('http:','https:').replace(/zoom=\d/,'zoom=3').replace('&edge=curl','');
-        if(v.title) result = { title:v.title, author:(v.authors||[]).join(', '),
-          year:(v.publishedDate||'').slice(0,4), cover:cov||null, src:'Google Books' };
-      }
-    }
-  }catch(e){} }
-
-  // ── SOURCE 3: Open Library books API ──
-  // Excellent coverage of Chinese books (zh-TW, zh-CN, HK)
-  if(!result){ try{
-    const r = await tf(`https://openlibrary.org/api/books?bibkeys=ISBN:${isbn}&format=json&jscmd=data`);
-    if(r.ok){
-      const d = await r.json();
-      const b = d[`ISBN:${isbn}`];
-      if(b?.title){
-        const cov = b.cover?.large || b.cover?.medium || b.cover?.small || null;
-        result = { title:b.title, author:(b.authors||[]).map(a=>a.name).join(', '),
-          year:(b.publish_date||'').replace(/\D/g,'').slice(0,4), cover:cov||null, src:'Open Library' };
-      }
-    }
-  }catch(e){} }
-
-  // ── SOURCE 4: Open Library search ──
-  if(!result){ try{
-    const r = await tf(`https://openlibrary.org/search.json?isbn=${isbn}&limit=1&fields=title,author_name,first_publish_year,cover_i`);
-    if(r.ok){
-      const d = await r.json();
-      const b = d.docs?.[0];
-      if(b?.title){
-        const cov = b.cover_i ? `https://covers.openlibrary.org/b/id/${b.cover_i}-M.jpg` : null;
-        result = { title:b.title, author:(b.author_name||[]).join(', '),
-          year:String(b.first_publish_year||''), cover:cov, src:'Open Library' };
-      }
-    }
-  }catch(e){} }
-
-  // ── SOURCE 5: Open Library — ISBN as direct path ──
-  if(!result){ try{
-    const r = await tf(`https://openlibrary.org/isbn/${isbn}.json`);
-    if(r.ok){
-      const b = await r.json();
-      // Fetch author name separately if we have an author key
-      let author = '';
-      if(b.authors?.[0]?.key){ try{
-        const ar = await tf(`https://openlibrary.org${b.authors[0].key}.json`, 3000);
-        if(ar.ok){ const ad = await ar.json(); author = ad.personal_name || ad.name || ''; }
-      }catch(e){} }
-      const covId = b.covers?.[0];
-      const cov = covId ? `https://covers.openlibrary.org/b/id/${covId}-M.jpg` : null;
-      if(b.title) result = { title:b.title, author, year:(b.publish_date||'').replace(/\D/g,'').slice(0,4), cover:cov||null, src:'Open Library' };
-    }
-  }catch(e){} }
-
-  // ── SOURCE 6: ISBNdb free (no auth for basic lookup) ──
-  if(!result){ try{
-    const r = await tf(`https://api2.isbndb.com/book/${isbn}`, 5000);
-    if(r.ok){
-      const d = await r.json();
-      const b = d.book;
-      if(b?.title) result = { title:b.title_long||b.title, author:(b.authors||[]).join(', '),
-        year:(b.date_published||'').slice(0,4), cover:b.image||null, src:'ISBNdb' };
-    }
-  }catch(e){} }
-
-  clearInterval(ticker);
-
-  // ── If we have metadata but no cover image, try Open Library cover by ISBN directly ──
-  if(result && !result.cover){
-    // This CDN serves covers by ISBN — works even when other sources lack image
-    result.cover = `https://covers.openlibrary.org/b/isbn/${isbn}-M.jpg`;
-  }
-
-  if(result?.title){
-    A.curl = result.cover || null;
-    document.getElementById('bp-ttl').textContent = result.title;
-    document.getElementById('bp-auth').textContent = result.author || '';
-    document.getElementById('bp-yr').textContent  = result.year ? result.year + ' 年出版' : '';
-    // Pre-fill manual fields as backup
-    document.getElementById('in-t').value = result.title;
-    document.getElementById('in-a').value = result.author || '';
-    document.getElementById('in-y').value = result.year || '';
-    const imgEl = document.getElementById('bp-img');
-    if(result.cover){
-      imgEl.style.display = 'block';
-      imgEl.src = result.cover;
-      imgEl.onerror = () => { imgEl.style.display='none'; };
-    } else {
-      imgEl.style.display = 'none';
-    }
-    nfEl.style.display = 'none';
-    prevEl.classList.add('show');
-  } else {
-    nfEl.style.display = 'block';
-    nfEl.style.color = 'var(--ink3)';
-    nfEl.textContent = '找不到此書，請切換「手動輸入」填寫書名與作者。';
-  }
-
-  document.getElementById('isbn-go').style.display = '';
-  document.getElementById('isbn-sp').classList.remove('on');
-}
 
 async function saveBook(){
   let title,author,year,cdata,curl,color;
-  if(A.tab==='isbn'&&document.getElementById('bprev').classList.contains('show')){
-    title=document.getElementById('bp-ttl').textContent;author=document.getElementById('bp-auth').textContent;
-    year=parseInt(document.getElementById('bp-yr').textContent)||0;
-    curl=A.curl;cdata=null;color=COLS[Math.floor(Math.random()*COLS.length)];
+  if(A.selBook&&!A.editing){
+    title=A.selBook.title;author=A.selBook.author||'';
+    year=parseInt(A.selBook.year)||0;curl=A.curl;cdata=null;
+    color=COLS[Math.floor(Math.random()*COLS.length)];
   }else{
-    title=document.getElementById('in-t').value.trim();author=document.getElementById('in-a').value.trim();
-    year=parseInt(document.getElementById('in-y').value)||0;cdata=A.cdata;curl=null;color=A.color;
+    title=document.getElementById('in-t').value.trim();
+    author=document.getElementById('in-a').value.trim();
+    year=parseInt(document.getElementById('in-y').value)||0;
+    cdata=A.cdata;curl=null;color=A.color;
   }
-  if(!title){toast('請輸入書名');return}
+  if(!title){toast('請輸入書名 Enter a title');return}
   if(A.editing){
     const ex=await dg('books',A.bid);
     await dp('books',{...ex,title,author,year,coverData:cdata||ex.coverData,coverUrl:curl||ex.coverUrl,color,status:A.status,updatedAt:Date.now()});
-    toast('已更新');
+    toast('已更新 Updated');
   }else{
-    await dp('books',{id:uid(),title,author:author||'',year,coverData:cdata||null,coverUrl:curl||null,color,status:A.status,createdAt:Date.now(),updatedAt:Date.now()});
-    toast('書籍已新增');
+    await dp('books',{id:uid(),title,author,year,coverData:cdata||null,coverUrl:curl||null,color,status:A.status,createdAt:Date.now(),updatedAt:Date.now()});
+    toast('已新增 Book added');
   }
   closeM('M-book');renderShelf();
 }
 async function delCurBook(){
-  if(!confirm('確定刪除此書？所有劃線與札記也將刪除。'))return;
+  if(!confirm('確定刪除此書？所有摘錄與筆記也將刪除。\nDelete this book and all its excerpts & notes?'))return;
   const hls=await di('highlights','bookId',A.bid);
   for(const h of hls)await dd('highlights',h.id);
-  await dd('journals',A.bid);await dd('books',A.bid);
-  closeM('M-book');toast('已刪除');goBack();
+  await dd('notes',A.bid).catch(()=>{});
+  await dd('books',A.bid);
+  closeM('M-book');toast('已刪除 Deleted');goBack();
 }
 
 // ── DETAIL ──
@@ -1152,24 +901,26 @@ async function loadDetail(id){
   document.getElementById('d-stxt').textContent=SL[b.status]||'';
   const src=b.coverData||b.coverUrl;
   const img=document.getElementById('d-img');const ph=document.getElementById('d-ph');
-  if(src){img.src=src;img.style.display='block';ph.style.display='none'}
-  else{img.style.display='none';ph.style.display='flex';ph.style.background=b.color||'#2C5F6E';ph.textContent=b.title}
-  dtab('hl');renderHls(id);loadJn(id);
+  if(src){
+    img.src=src;img.style.display='block';ph.style.display='none';
+    img.onerror=()=>{img.style.display='none';ph.style.display='flex';ph.style.background=b.color||'#2C5F6E';ph.textContent=b.title};
+  }else{img.style.display='none';ph.style.display='flex';ph.style.background=b.color||'#2C5F6E';ph.textContent=b.title}
+  dtab('hl');renderHls(id);loadNote(id);
 }
 function dtab(t){
-  document.querySelectorAll('.d-tab').forEach((b,i)=>b.classList.toggle('on',['hl','jn'][i]===t));
+  document.querySelectorAll('.d-tab').forEach((b,i)=>b.classList.toggle('on',['hl','note'][i]===t));
   document.getElementById('D-hl').classList.toggle('on',t==='hl');
-  document.getElementById('D-jn').classList.toggle('on',t==='jn');
+  document.getElementById('D-note').classList.toggle('on',t==='note');
   document.getElementById('hlfab').classList.toggle('show',t==='hl');
 }
 
-// ── HIGHLIGHTS ──
+// ── EXCERPTS / HIGHLIGHTS ──
 async function renderHls(id){
   const hls=await di('highlights','bookId',id);
-  hls.sort((a,b)=>b.createdAt-a.createdAt);
-  document.getElementById('hl-bar').textContent=hls.length?`${hls.length} 條劃線精華`:'';
+  hls.sort((a,b)=>(a.page||9999)-(b.page||9999)||b.createdAt-a.createdAt);
+  document.getElementById('hl-bar').textContent=hls.length?`${hls.length} excerpt${hls.length>1?'s':''} · 摘錄`:'';
   const list=document.getElementById('hl-list');
-  if(!hls.length){list.innerHTML='<div class="hl-empty">尚無劃線精華。<br>點擊「新增劃線」開始記錄。</div>';return}
+  if(!hls.length){list.innerHTML='<div class="hl-empty">No excerpts yet · 尚無摘錄<br><span style="font-size:.85em;color:var(--ink4)">Tap the button below to add · 點擊下方按鈕新增</span></div>';return}
   list.innerHTML=hls.map((h,i)=>`
     <div class="hl-item" style="animation-delay:${i*.04}s">
       <div class="hl-acts">
@@ -1178,20 +929,30 @@ async function renderHls(id){
         </button>
       </div>
       <div class="hl-q">${xe(h.text)}</div>
-      ${h.tags?.length?`<div class="hl-tags">${h.tags.map(t=>`<span class="htag">#${xe(t)}</span>`).join('')}</div>`:''}
+      <div class="hl-meta">
+        ${h.page?`<span class="hl-page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>p.${xe(h.page)}</span>`:''}
+        ${h.tags?.length?`<div class="hl-tags">${h.tags.map(t=>`<span class="htag">#${xe(t)}</span>`).join('')}</div>`:''}
+      </div>
       <div class="hl-date">${fd(h.createdAt)}</div>
     </div>`).join('');
 }
-function openAddHl(){A.hlid=null;resetHlM();document.getElementById('M-hl-ttl').textContent='新增劃線精華';document.getElementById('del-hl').style.display='none';openM('M-hl')}
+
+function openAddHl(){
+  A.hlid=null;resetHlM();
+  document.getElementById('M-hl-ttl').textContent='新增摘錄 Add Excerpt';
+  document.getElementById('del-hl').style.display='none';
+  openM('M-hl');
+}
 async function openEditHl(id){
   const h=await dg('highlights',id);if(!h)return;
   A.hlid=id;A.tags=[...(h.tags||[])];
-  document.getElementById('M-hl-ttl').textContent='編輯劃線精華';
+  document.getElementById('M-hl-ttl').textContent='編輯摘錄 Edit Excerpt';
   document.getElementById('del-hl').style.display='block';
   document.getElementById('hl-txt').value=h.text;
+  document.getElementById('hl-page').value=h.page||'';
   renderChips();openM('M-hl');
 }
-function resetHlM(){A.tags=[];document.getElementById('hl-txt').value='';document.getElementById('tag-in').value='';renderChips()}
+function resetHlM(){A.tags=[];document.getElementById('hl-txt').value='';document.getElementById('hl-page').value='';document.getElementById('tag-in').value='';renderChips()}
 function renderChips(){
   const area=document.getElementById('tga');const inp=document.getElementById('tag-in');
   area.querySelectorAll('.trm').forEach(x=>x.remove());
@@ -1201,46 +962,56 @@ function rmTag(t){A.tags=A.tags.filter(x=>x!==t);renderChips()}
 function onTagK(ev){if(ev.key==='Enter'||ev.key===','){ev.preventDefault();const v=ev.target.value.trim().replace(/,/g,'');if(v&&!A.tags.includes(v)){A.tags.push(v);renderChips()}ev.target.value=''}}
 async function saveHl(){
   const ti=document.getElementById('tag-in').value.trim();if(ti&&!A.tags.includes(ti))A.tags.push(ti);
-  const text=document.getElementById('hl-txt').value.trim();if(!text){toast('請輸入劃線內容');return}
-  if(A.hlid){const ex=await dg('highlights',A.hlid);await dp('highlights',{...ex,text,tags:[...A.tags],updatedAt:Date.now()});toast('已更新')}
-  else{await dp('highlights',{id:uid(),bookId:A.bid,text,tags:[...A.tags],createdAt:Date.now(),updatedAt:Date.now()});toast('已新增')}
+  const text=document.getElementById('hl-txt').value.trim();
+  const page=parseInt(document.getElementById('hl-page').value)||null;
+  if(!text){toast('請輸入摘錄內容 Enter excerpt text');return}
+  if(A.hlid){
+    const ex=await dg('highlights',A.hlid);
+    await dp('highlights',{...ex,text,page,tags:[...A.tags],updatedAt:Date.now()});
+    toast('已更新 Updated');
+  }else{
+    await dp('highlights',{id:uid(),bookId:A.bid,text,page,tags:[...A.tags],createdAt:Date.now(),updatedAt:Date.now()});
+    toast('已新增 Added');
+  }
   closeM('M-hl');renderHls(A.bid);
 }
-async function delCurHl(){if(!confirm('確定刪除？'))return;await dd('highlights',A.hlid);closeM('M-hl');toast('已刪除');renderHls(A.bid)}
+async function delCurHl(){if(!confirm('確定刪除？ Delete?'))return;await dd('highlights',A.hlid);closeM('M-hl');toast('已刪除 Deleted');renderHls(A.bid)}
 
-// ── JOURNAL ──
-async function loadJn(id){
-  const j=await dg('journals',id);const disp=document.getElementById('jn-disp');const ta=document.getElementById('jn-ta');
+// ── NOTES ──
+async function loadNote(id){
+  const j=await dg('notes',id);const disp=document.getElementById('note-disp');const ta=document.getElementById('note-ta');
   if(j?.content){disp.textContent=j.content;disp.classList.remove('empty')}
-  else{disp.textContent='尚無讀書札記。點擊「編輯」開始記錄。';disp.classList.add('empty')}
+  else{disp.innerHTML='尚無筆記。No notes yet.<br><span style="font-size:.85em">點擊「編輯 Edit」開始記錄。</span>';disp.classList.add('empty')}
   disp.style.display='block';ta.style.display='none';
-  document.getElementById('jn-btns').style.display='none';
-  document.getElementById('jn-edit-btn').style.display='';
+  document.getElementById('note-btns').style.display='none';
+  document.getElementById('note-edit-btn').style.display='';
 }
-function editJn(){
-  const d=document.getElementById('jn-disp');const ta=document.getElementById('jn-ta');
+function editNote(){
+  const d=document.getElementById('note-disp');const ta=document.getElementById('note-ta');
   ta.value=d.classList.contains('empty')?'':d.textContent;
   d.style.display='none';ta.style.display='block';
-  document.getElementById('jn-btns').style.display='flex';
-  document.getElementById('jn-edit-btn').style.display='none';ta.focus();
+  document.getElementById('note-btns').style.display='flex';
+  document.getElementById('note-edit-btn').style.display='none';ta.focus();
 }
-function cancelJn(){loadJn(A.bid)}
-async function saveJn(){
-  await dp('journals',{bookId:A.bid,content:document.getElementById('jn-ta').value.trim(),updatedAt:Date.now()});
-  loadJn(A.bid);toast('札記已儲存');
+function cancelNote(){loadNote(A.bid)}
+async function saveNote(){
+  await dp('notes',{bookId:A.bid,content:document.getElementById('note-ta').value.trim(),updatedAt:Date.now()});
+  loadNote(A.bid);toast('筆記已儲存 Saved');
 }
 
 // ── THREAD ──
 async function renderCloud(){
   const hls=await da('highlights');const map={};
   hls.forEach(h=>(h.tags||[]).forEach(t=>{map[t]=(map[t]||0)+1}));
-  const sorted=Object.entries(map).sort((a,b)=>b[1]-a[1]).slice(0,24);
-  document.getElementById('tcloud').innerHTML=sorted.map(([t,c])=>`<span class="htag${A.ttags.includes(t)?' on':''}" onclick="togTTag('${xe(t)}')">#${xe(t)} <span style="opacity:.45;font-size:.85em">${c}</span></span>`).join('');
+  const sorted=Object.entries(map).sort((a,b)=>b[1]-a[1]).slice(0,30);
+  document.getElementById('tcloud').innerHTML=sorted.length
+    ?sorted.map(([t,c])=>`<span class="htag${A.ttags.includes(t)?' on':''}" onclick="togTTag('${xe(t)}')">#${xe(t)} <span style="opacity:.45;font-size:.85em">${c}</span></span>`).join('')
+    :'<span style="font-family:var(--body);font-style:italic;font-size:0.82rem;color:var(--ink4);padding:0 22px">No tags yet · 尚無標籤</span>';
 }
 function togTTag(t){if(A.ttags.includes(t))A.ttags=A.ttags.filter(x=>x!==t);else A.ttags.push(t);renderCloud();runTS()}
 function onTS(v){A.tq=v;document.getElementById('tclr').style.display=v?'flex':'none';runTS()}
-function clearTS(){A.tq='';A.ttags=[];document.getElementById('tsearch').value='';document.getElementById('tclr').style.display='none';renderCloud();document.getElementById('tlist').innerHTML='';document.getElementById('tempty').classList.add('show');document.getElementById('t-count').textContent=''}
-function setSort(s){A.tsort=s;document.getElementById('s-t').classList.toggle('on',s==='time');document.getElementById('s-b').classList.toggle('on',s==='book');runTS()}
+function clearTS(){A.tq='';A.ttags=[];document.getElementById('tsearch').value='';document.getElementById('tclr').style.display='none';renderCloud();document.getElementById('tlist').innerHTML='';const em=document.getElementById('tempty');em.classList.add('show');em.innerHTML='Search a tag or tap one above<br>搜尋標籤或點擊上方快速篩選';document.getElementById('t-count').textContent=''}
+function setSort(s){A.tsort=s;['time','book','pg'].forEach(x=>document.getElementById('s-'+x).classList.toggle('on',s===(x==='pg'?'page':x)));runTS()}
 async function runTS(){
   const q=A.tq.trim().toLowerCase();const at=A.ttags;
   if(!at.length&&!q){document.getElementById('tlist').innerHTML='';document.getElementById('tempty').classList.add('show');document.getElementById('t-count').textContent='';return}
@@ -1248,22 +1019,26 @@ async function runTS(){
   const bm={};books.forEach(b=>bm[b.id]=b);
   let f=hls.filter(h=>{
     const ht=(h.tags||[]).map(t=>t.toLowerCase());
-    return(at.length?at.every(t=>ht.some(h2=>h2.includes(t.toLowerCase()))):true)&&(q?(ht.some(t=>t.includes(q))||h.text.toLowerCase().includes(q)):true);
+    const tagOk=at.length?at.every(t=>ht.some(h2=>h2.includes(t.toLowerCase()))):true;
+    const qOk=q?(ht.some(t=>t.includes(q))||h.text.toLowerCase().includes(q)):true;
+    return tagOk&&qOk;
   });
   if(A.tsort==='time')f.sort((a,b)=>b.createdAt-a.createdAt);
-  else f.sort((a,b)=>(bm[a.bookId]?.title||'').localeCompare(bm[b.bookId]?.title||'','zh-TW'));
-  document.getElementById('t-count').textContent=f.length?`${f.length} 條`:'';
+  else if(A.tsort==='book')f.sort((a,b)=>(bm[a.bookId]?.title||'').localeCompare(bm[b.bookId]?.title||'','zh-TW'));
+  else if(A.tsort==='page')f.sort((a,b)=>(a.page||9999)-(b.page||9999));
+  document.getElementById('t-count').textContent=f.length?`${f.length} result${f.length>1?'s':''}·條`:'';
   const em=document.getElementById('tempty');
-  if(!f.length){document.getElementById('tlist').innerHTML='';em.classList.add('show');em.innerHTML=`找不到「${xe(at.join('、')||q)}」的結果`;return}
+  if(!f.length){document.getElementById('tlist').innerHTML='';em.classList.add('show');em.innerHTML=`No results for「${xe(at.join('、')||q)}」`;return}
   em.classList.remove('show');
   document.getElementById('tlist').innerHTML=f.map((h,i)=>{
     const b=bm[h.bookId];
     return`<div class="tc" style="animation-delay:${i*.03}s">
-      <div class="tq">${xe(h.text)}</div>
+      <div class="tq">${xe(h.text)}${h.page?` <span class="tq-page">— p.${h.page}</span>`:''}
+      </div>
       ${h.tags?.length?`<div class="hl-tags" style="margin-bottom:8px">${h.tags.map(t=>`<span class="htag" onclick="togTTag('${xe(t)}')">#${xe(t)}</span>`).join('')}</div>`:''}
       <div class="tsrc">
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
-        <strong>${b?xe(b.title):'未知書籍'}</strong>
+        <strong>${b?xe(b.title):'Unknown'}</strong>
         <span>·</span><span>${fd(h.createdAt)}</span>
       </div>
     </div>`}).join('');
@@ -1278,28 +1053,34 @@ async function updStats(){
   document.getElementById('st').textContent=tags.size;
 }
 async function exportJ(){
-  const data={version:2,exportedAt:new Date().toISOString(),books:await da('books'),highlights:await da('highlights'),journals:await da('journals')};
+  const data={version:3,exportedAt:new Date().toISOString(),books:await da('books'),highlights:await da('highlights'),notes:await da('notes')};
   const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
   const url=URL.createObjectURL(blob);const a=document.createElement('a');
-  a.href=url;a.download=`jotter-${new Date().toISOString().slice(0,10)}.json`;a.click();URL.revokeObjectURL(url);toast('備份已下載');
+  a.href=url;a.download=`jotter-${new Date().toISOString().slice(0,10)}.json`;a.click();URL.revokeObjectURL(url);toast('備份已下載 Downloaded');
 }
 function importJ(){
   const inp=document.createElement('input');inp.type='file';inp.accept='.json';
-  inp.onchange=async e=>{const f=e.target.files[0];if(!f)return;
+  inp.onchange=async e=>{
+    const f=e.target.files[0];if(!f)return;
     const r=new FileReader();r.onload=async ev=>{
-      try{const d=JSON.parse(ev.target.result);
+      try{
+        const d=JSON.parse(ev.target.result);
         if(d.books)for(const b of d.books)await dp('books',b);
         if(d.highlights)for(const h of d.highlights)await dp('highlights',h);
-        if(d.journals)for(const j of d.journals)await dp('journals',j);
-        if(d.jots)for(const j of d.jots)await dp('highlights',{id:j.id||uid(),bookId:j.bookId,text:j.quote||j.body||'',tags:j.tags||[],createdAt:j.createdAt||Date.now(),updatedAt:Date.now()});
-        toast('✓ 匯入成功');updStats();renderShelf();
-      }catch{toast('檔案格式錯誤')}
-    };r.readAsText(f)};inp.click();
+        if(d.notes)for(const n of d.notes)await dp('notes',n);
+        // legacy: journals → notes
+        if(d.journals)for(const j of d.journals)await dp('notes',{bookId:j.bookId,content:j.content,updatedAt:j.updatedAt||Date.now()});
+        // legacy: jots → highlights
+        if(d.jots)for(const j of d.jots)await dp('highlights',{id:j.id||uid(),bookId:j.bookId,text:j.quote||j.body||'',page:null,tags:j.tags||[],createdAt:j.createdAt||Date.now(),updatedAt:Date.now()});
+        toast('✓ 匯入成功 Import successful');updStats();renderShelf();
+      }catch{toast('檔案格式錯誤 Invalid file')}
+    };r.readAsText(f);
+  };inp.click();
 }
 async function clearAll(){
-  if(!confirm('確定清除所有資料？不可復原。'))return;
-  await dc('books');await dc('highlights');await dc('journals');
-  toast('已清除');updStats();renderShelf();
+  if(!confirm('確定清除所有資料？不可復原。\nClear all data? Irreversible.'))return;
+  await dc('books');await dc('highlights');await dc('notes').catch(()=>{});
+  toast('已清除 Cleared');updStats();renderShelf();
 }
 
 // ── MODAL ──
@@ -1308,7 +1089,7 @@ function closeM(id){document.getElementById(id).classList.remove('open');if(id==
 
 // ── TOAST ──
 let tt;
-function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>el.classList.remove('on'),2300)}
+function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>el.classList.remove('on'),2400)}
 
 // ── INIT ──
 async function init(){
@@ -1316,7 +1097,11 @@ async function init(){
   renderSws();
   renderShelf();
   document.querySelectorAll('.bk').forEach(el=>el.addEventListener('click',ev=>{if(ev.target===el)closeM(el.id)}));
-  document.getElementById('isbn-in').addEventListener('keydown',ev=>{if(ev.key==='Enter')searchISBN()});
+  // Enter key for all search inputs
+  ['isbn-in','title-in','author-in'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)el.addEventListener('keydown',ev=>{if(ev.key==='Enter'){const mode=id.replace('-in','');doSearch(mode)}});
+  });
   if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
 }
 init();
