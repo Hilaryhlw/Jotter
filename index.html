@@ -950,29 +950,170 @@ function renderSws(){
 }
 function selC(c){A.color=c;renderSws()}
 function onCover(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{A.cdata=ev.target.result;document.getElementById('clabel').textContent=f.name};r.readAsDataURL(f)}
+// ── ISBN search: 7-layer fallback ──
+// Tries public APIs in order; stops at first hit.
+// Cover images are tried from multiple CDNs even after metadata is found.
 async function searchISBN(){
-  const isbn=document.getElementById('isbn-in').value.trim().replace(/[-\s]/g,'');if(!isbn)return;
-  document.getElementById('isbn-nf').style.display='none';document.getElementById('bprev').classList.remove('show');
-  document.getElementById('isbn-go').style.display='none';document.getElementById('isbn-sp').classList.add('on');
-  try{
-    const r=await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}`);
+  const raw=document.getElementById('isbn-in').value.trim();
+  const isbn=raw.replace(/[-\s]/g,'');
+  if(!isbn)return;
+
+  document.getElementById('isbn-nf').style.display='none';
+  document.getElementById('bprev').classList.remove('show');
+  document.getElementById('isbn-go').style.display='none';
+  document.getElementById('isbn-sp').classList.add('on');
+  // Show a rotating status so user knows it's working
+  const nfEl=document.getElementById('isbn-nf');
+  nfEl.style.display='block';
+  nfEl.style.color='var(--ink3)';
+  const steps=['搜尋中…','查詢中文書庫…','查詢國際書庫…'];
+  let stepIdx=0;
+  nfEl.textContent=steps[0];
+  const stepTimer=setInterval(()=>{stepIdx=(stepIdx+1)%steps.length;nfEl.textContent=steps[stepIdx]},900);
+
+  let result=null;
+
+  // ── 1. Google Books: isbn: query (best for en + jp books) ──
+  if(!result){try{
+    const r=await Promise.race([
+      fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}&maxResults=1&langRestrict=`),
+      new Promise((_,rj)=>setTimeout(()=>rj('timeout'),5000))
+    ]);
     const d=await r.json();
     if(d.totalItems>0){
       const v=d.items[0].volumeInfo;
-      const cov=(v.imageLinks?.thumbnail||'').replace('http:','https:').replace('zoom=1','zoom=2');
-      A.curl=cov||null;
-      document.getElementById('bp-ttl').textContent=v.title||'';
-      document.getElementById('bp-auth').textContent=(v.authors||[]).join(', ')||'';
-      document.getElementById('bp-yr').textContent=v.publishedDate?v.publishedDate.slice(0,4)+' 年出版':'';
-      if(cov){document.getElementById('bp-img').src=cov;document.getElementById('bp-img').style.display='block'}
-      else document.getElementById('bp-img').style.display='none';
-      document.getElementById('bprev').classList.add('show');
-      document.getElementById('in-t').value=v.title||'';
-      document.getElementById('in-a').value=(v.authors||[]).join(', ')||'';
-      document.getElementById('in-y').value=v.publishedDate?v.publishedDate.slice(0,4):'';
-    }else{document.getElementById('isbn-nf').style.display='block'}
-  }catch{document.getElementById('isbn-nf').style.display='block'}
-  document.getElementById('isbn-go').style.display='';document.getElementById('isbn-sp').classList.remove('on');
+      const cov=(v.imageLinks?.thumbnail||v.imageLinks?.smallThumbnail||'')
+        .replace('http:','https:').replace('zoom=1','zoom=3').replace('&edge=curl','');
+      result={title:v.title||'',author:(v.authors||[]).join(', '),year:(v.publishedDate||'').slice(0,4),cover:cov||null,src:'Google Books'};
+    }
+  }catch(e){}}
+
+  // ── 2. Google Books: bare ISBN query (catches more zh-TW editions) ──
+  if(!result){try{
+    const r=await Promise.race([
+      fetch(`https://www.googleapis.com/books/v1/volumes?q=${isbn}&maxResults=3`),
+      new Promise((_,rj)=>setTimeout(()=>rj('timeout'),5000))
+    ]);
+    const d=await r.json();
+    if(d.totalItems>0){
+      // pick the item whose ISBN matches most closely
+      const item=d.items.find(i=>(i.volumeInfo.industryIdentifiers||[]).some(id=>id.identifier===isbn))||d.items[0];
+      const v=item.volumeInfo;
+      const cov=(v.imageLinks?.thumbnail||v.imageLinks?.smallThumbnail||'')
+        .replace('http:','https:').replace('zoom=1','zoom=3').replace('&edge=curl','');
+      result={title:v.title||'',author:(v.authors||[]).join(', '),year:(v.publishedDate||'').slice(0,4),cover:cov||null,src:'Google Books'};
+    }
+  }catch(e){}}
+
+  // ── 3. Open Library books API (strong for zh-CN, global catalog) ──
+  if(!result){try{
+    const r=await Promise.race([
+      fetch(`https://openlibrary.org/api/books?bibkeys=ISBN:${isbn}&format=json&jscmd=data`),
+      new Promise((_,rj)=>setTimeout(()=>rj('timeout'),6000))
+    ]);
+    const d=await r.json();
+    const key=`ISBN:${isbn}`;
+    if(d[key]){
+      const b=d[key];
+      const cov=b.cover?.large||b.cover?.medium||b.cover?.small||null;
+      result={title:b.title||'',author:(b.authors||[]).map(a=>a.name).join(', '),year:(b.publish_date||'').replace(/\D/g,'').slice(0,4),cover:cov||null,src:'Open Library'};
+    }
+  }catch(e){}}
+
+  // ── 4. Open Library search API ──
+  if(!result){try{
+    const r=await Promise.race([
+      fetch(`https://openlibrary.org/search.json?isbn=${isbn}&limit=1&fields=title,author_name,first_publish_year,cover_i`),
+      new Promise((_,rj)=>setTimeout(()=>rj('timeout'),6000))
+    ]);
+    const d=await r.json();
+    if(d.numFound>0&&d.docs[0]){
+      const b=d.docs[0];
+      const cov=b.cover_i?`https://covers.openlibrary.org/b/id/${b.cover_i}-M.jpg`:null;
+      result={title:b.title||'',author:(b.author_name||[]).join(', '),year:String(b.first_publish_year||''),cover:cov,src:'Open Library'};
+    }
+  }catch(e){}}
+
+  // ── 5. WorldCat xISBN / OCLC (broadest global union catalog) ──
+  if(!result){try{
+    const r=await Promise.race([
+      fetch(`https://www.worldcat.org/webservices/catalog/content/isbn/${isbn}?wskey=public&format=json`),
+      new Promise((_,rj)=>setTimeout(()=>rj('timeout'),5000))
+    ]);
+    // WorldCat returns XML-ish; just check status and parse title
+    if(r.ok){
+      const txt=await r.text();
+      const t=(txt.match(/<title[^>]*>([^<]+)<\/title>/)||[])[1]||'';
+      const a=(txt.match(/<author[^>]*>([^<]+)<\/author>/)||[])[1]||'';
+      if(t){result={title:t.replace(/\s*\/.*$/,'').trim(),author:a.trim(),year:'',cover:null,src:'WorldCat'};}
+    }
+  }catch(e){}}
+
+  // ── 6. ISBNDB (free tier, no key needed for basic lookup) ──
+  if(!result){try{
+    const r=await Promise.race([
+      fetch(`https://api2.isbndb.com/book/${isbn}`,{headers:{'Authorization':'free_tier'}}),
+      new Promise((_,rj)=>setTimeout(()=>rj('timeout'),5000))
+    ]);
+    if(r.ok){
+      const d=await r.json();
+      if(d.book){
+        const b=d.book;
+        result={title:b.title||b.title_long||'',author:(b.authors||[]).join(', '),year:(b.date_published||'').slice(0,4),cover:b.image||null,src:'ISBNDB'};
+      }
+    }
+  }catch(e){}}
+
+  // ── 7. Google Books zh-TW explicit: last resort for traditional Chinese ──
+  if(!result){try{
+    const r=await Promise.race([
+      fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}&maxResults=1`),
+      new Promise((_,rj)=>setTimeout(()=>rj('timeout'),5000))
+    ]);
+    const d=await r.json();
+    if(d.items){
+      const v=d.items[0].volumeInfo;
+      result={title:v.title||'',author:(v.authors||[]).join(', '),year:(v.publishedDate||'').slice(0,4),cover:null,src:'Google Books (retry)'};
+    }
+  }catch(e){}}
+
+  clearInterval(stepTimer);
+
+  // ── If we have metadata but no cover, try Open Library cover by ISBN ──
+  if(result&&!result.cover){
+    result.cover=`https://covers.openlibrary.org/b/isbn/${isbn}-M.jpg`;
+  }
+
+  if(result&&result.title){
+    A.curl=result.cover||null;
+    document.getElementById('bp-ttl').textContent=result.title;
+    document.getElementById('bp-auth').textContent=result.author||'';
+    document.getElementById('bp-yr').textContent=result.year?result.year+' 年出版':'';
+    // pre-fill manual fields too
+    document.getElementById('in-t').value=result.title;
+    document.getElementById('in-a').value=result.author||'';
+    document.getElementById('in-y').value=result.year||'';
+    const imgEl=document.getElementById('bp-img');
+    if(result.cover){
+      imgEl.style.display='block';
+      imgEl.src=result.cover;
+      imgEl.onerror=function(){
+        // silently hide broken cover; book info still shows
+        this.style.display='none';
+      };
+    }else{
+      imgEl.style.display='none';
+    }
+    nfEl.style.display='none';
+    document.getElementById('bprev').classList.add('show');
+  }else{
+    nfEl.style.display='block';
+    nfEl.style.color='var(--ink3)';
+    nfEl.textContent='找不到此書，請切換「手動輸入」填寫書名。';
+  }
+
+  document.getElementById('isbn-go').style.display='';
+  document.getElementById('isbn-sp').classList.remove('on');
 }
 async function saveBook(){
   let title,author,year,cdata,curl,color;
