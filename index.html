@@ -151,7 +151,7 @@ nav{position:fixed;bottom:0;left:0;right:0;height:calc(var(--nav) + var(--safe))
 /* EXCERPTS (was highlights) */
 .ex-bar{padding:14px 22px 2px;font-family:var(--body);font-size:0.68rem;letter-spacing:.09em;text-transform:uppercase;color:var(--ink4)}
 .ex-list{padding:0 22px}
-.ex-item{padding:17px 0;border-bottom:1px solid var(--bg1);position:relative;animation:up .25s ease both}
+.ex-item{padding:17px 0;border-bottom:1px solid var(--bg1);animation:up .25s ease both}
 .ex-item:last-child{border-bottom:none}
 .ex-q{font-family:var(--body);font-style:italic;font-size:1.18rem;line-height:1.72;color:var(--ink);border-left:2px solid var(--red);padding-left:13px;margin-bottom:9px}
 .ex-meta{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:7px}
@@ -161,12 +161,10 @@ nav{position:fixed;bottom:0;left:0;right:0;height:calc(var(--nav) + var(--safe))
 .tag{padding:3px 10px;border-radius:2px;background:var(--bg1);color:var(--ink2);font-family:var(--body);font-size:0.76rem;letter-spacing:.03em;cursor:pointer;transition:all .12s}
 .tag:hover,.tag.on{background:var(--ink);color:var(--bg)}
 .ex-date{font-family:var(--body);font-size:0.74rem;color:var(--ink4)}
-.ex-acts{position:absolute;top:14px;right:0;display:flex;gap:2px;opacity:0;transition:opacity .15s}
-.ex-item:hover .ex-acts{opacity:1}
-@media(hover:none){.ex-acts{opacity:1}}
-.ab{width:28px;height:28px;border-radius:3px;display:flex;align-items:center;justify-content:center;color:var(--ink3);transition:all .12s}
-.ab:hover{background:var(--bg1);color:var(--ink)}
-.ab svg{width:13px;height:13px}
+.ex-acts{display:flex;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid var(--bg2)}
+.ab{display:inline-flex;align-items:center;gap:5px;padding:7px 16px;border-radius:4px;font-family:var(--body);font-size:0.78rem;color:var(--ink2);border:1px solid var(--bg2);background:var(--wh);transition:all .15s;cursor:pointer}
+.ab:hover{background:var(--bg1);border-color:var(--ink3);color:var(--ink)}
+.ab svg{width:13px;height:13px;flex-shrink:0}
 .ex-empty{padding:44px 22px;font-family:var(--body);font-style:italic;color:var(--ink3);line-height:1.7}
 
 /* NOTES (journal) */
@@ -1312,20 +1310,22 @@ async function renderExs(id){
   }
   list.innerHTML=exs.map((h,i)=>`
     <div class="ex-item" style="animation-delay:${i*.04}s">
-      <div class="ex-acts">
-        <button class="ab" onclick="openShareEx('${h.id}')" title="Share · 分享">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
-        </button>
-        <button class="ab" onclick="openEditEx2('${h.id}')" title="Edit · 編輯">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-        </button>
-      </div>
       <div class="ex-q">${xe(h.text)}</div>
       <div class="ex-meta">
         ${h.page?`<span class="ex-page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>p.${xe(String(h.page))}</span>`:''}
         ${h.tags?.length?`<div class="ex-tags">${h.tags.map(t=>`<span class="tag">#${xe(t)}</span>`).join('')}</div>`:''}
       </div>
       <div class="ex-date">${fd(h.createdAt)}</div>
+      <div class="ex-acts">
+        <button class="ab" onclick="openShareEx('${h.id}')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+          Share 分享
+        </button>
+        <button class="ab" onclick="openEditEx2('${h.id}')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          Edit 編輯
+        </button>
+      </div>
     </div>`).join('');
 }
 
