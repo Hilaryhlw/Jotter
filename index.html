@@ -151,7 +151,7 @@ nav{position:fixed;bottom:0;left:0;right:0;height:calc(var(--nav) + var(--safe))
 /* EXCERPTS (was highlights) */
 .ex-bar{padding:14px 22px 2px;font-family:var(--body);font-size:0.68rem;letter-spacing:.09em;text-transform:uppercase;color:var(--ink4)}
 .ex-list{padding:0 22px}
-.ex-item{padding:17px 0;border-bottom:1px solid var(--bg1);animation:up .25s ease both}
+.ex-item{padding:17px 0;border-bottom:1px solid var(--bg1);position:relative;animation:up .25s ease both}
 .ex-item:last-child{border-bottom:none}
 .ex-q{font-family:var(--body);font-style:italic;font-size:1.18rem;line-height:1.72;color:var(--ink);border-left:2px solid var(--red);padding-left:13px;margin-bottom:9px}
 .ex-meta{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:7px}
@@ -161,10 +161,12 @@ nav{position:fixed;bottom:0;left:0;right:0;height:calc(var(--nav) + var(--safe))
 .tag{padding:3px 10px;border-radius:2px;background:var(--bg1);color:var(--ink2);font-family:var(--body);font-size:0.76rem;letter-spacing:.03em;cursor:pointer;transition:all .12s}
 .tag:hover,.tag.on{background:var(--ink);color:var(--bg)}
 .ex-date{font-family:var(--body);font-size:0.74rem;color:var(--ink4)}
-.ex-acts{display:flex;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid var(--bg2)}
-.ab{display:inline-flex;align-items:center;gap:5px;padding:7px 16px;border-radius:4px;font-family:var(--body);font-size:0.78rem;color:var(--ink2);border:1px solid var(--bg2);background:var(--wh);transition:all .15s;cursor:pointer}
-.ab:hover{background:var(--bg1);border-color:var(--ink3);color:var(--ink)}
-.ab svg{width:13px;height:13px;flex-shrink:0}
+.ex-acts{position:absolute;top:14px;right:0;display:flex;gap:2px;opacity:0;transition:opacity .15s}
+.ex-item:hover .ex-acts{opacity:1}
+@media(hover:none){.ex-acts{opacity:1}}
+.ab{width:28px;height:28px;border-radius:3px;display:flex;align-items:center;justify-content:center;color:var(--ink3);transition:all .12s}
+.ab:hover{background:var(--bg1);color:var(--ink)}
+.ab svg{width:13px;height:13px}
 .ex-empty{padding:44px 22px;font-family:var(--body);font-style:italic;color:var(--ink3);line-height:1.7}
 
 /* NOTES (journal) */
@@ -183,6 +185,55 @@ nav{position:fixed;bottom:0;left:0;right:0;height:calc(var(--nav) + var(--safe))
 #ex-count-badge{font-family:var(--body);font-size:0.72rem;color:var(--ink4);letter-spacing:0;text-transform:none;font-style:italic;font-weight:400}
 .ex-inline-form{padding:20px 22px 100px}
 .ex-form-footer{display:flex;align-items:center;margin-top:16px;padding-top:14px;border-top:1px solid var(--bg1)}
+
+/* OCR */
+.ocr-btn{
+  display:flex;align-items:center;gap:6px;
+  padding:9px 14px;border-radius:4px;
+  border:1px dashed var(--ink3);
+  background:var(--wh);
+  font-family:var(--body);font-size:0.82rem;color:var(--ink2);
+  cursor:pointer;transition:all .15s;width:100%;justify-content:center;
+  margin-top:8px;
+}
+.ocr-btn:hover{border-color:var(--ink);background:var(--bg1);color:var(--ink)}
+.ocr-btn svg{width:15px;height:15px;flex-shrink:0}
+.ocr-status{
+  margin-top:10px;padding:12px 14px;
+  border-radius:6px;background:var(--bg1);
+  font-family:var(--body);font-size:0.82rem;color:var(--ink2);
+  display:none;align-items:center;gap:10px;
+}
+.ocr-status.show{display:flex}
+.ocr-spinner{
+  width:16px;height:16px;flex-shrink:0;
+  border:2px solid var(--bg2);border-top-color:var(--ink);
+  border-radius:50%;animation:rot .6s linear infinite;
+}
+.ocr-progress{
+  flex:1;height:3px;background:var(--bg2);border-radius:2px;
+  overflow:hidden;margin-top:2px;
+}
+.ocr-progress-bar{
+  height:100%;background:var(--red);border-radius:2px;
+  width:0%;transition:width .3s ease;
+}
+.ocr-preview{
+  margin-top:8px;border-radius:6px;overflow:hidden;
+  display:none;position:relative;
+}
+.ocr-preview.show{display:block}
+.ocr-preview img{width:100%;max-height:180px;object-fit:contain;background:#000;display:block}
+.ocr-preview-filter{
+  position:absolute;inset:0;
+  /* CSS filter preview for binarization hint */
+  pointer-events:none;
+}
+.ocr-tip{
+  font-family:var(--body);font-style:italic;font-size:0.72rem;
+  color:var(--ink4);margin-top:6px;line-height:1.5;display:none;
+}
+.ocr-tip.show{display:block}
 
 /* EXCERPT FAB */
 .exfab{position:fixed;bottom:20px;right:18px;display:none;align-items:center;gap:6px;padding:10px 17px;border-radius:24px;background:var(--ink);color:var(--bg);font-family:var(--body);font-size:0.8rem;box-shadow:0 4px 18px rgba(0,0,0,.3);z-index:150;transition:transform .18s,box-shadow .18s;cursor:pointer}
@@ -312,6 +363,8 @@ textarea.fi{resize:vertical;min-height:86px}
 ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--bg2)}
 select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 5 5-5' stroke='%237A7670' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;appearance:none}
 </style>
+<!-- Tesseract.js — OCR engine, loaded from CDN, cached offline by SW -->
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 </head>
 <body>
 
@@ -381,6 +434,34 @@ select.fi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
         <div class="fg">
           <label class="fl">Excerpt / Quote · 摘錄句子 *</label>
           <textarea class="fi" id="ex-txt2" rows="5" placeholder="Paste or type the excerpt…&#10;貼上或輸入書中精彩句子…"></textarea>
+
+          <!-- OCR: Camera / Image upload button -->
+          <button class="ocr-btn" onclick="triggerOCR()" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
+              <circle cx="12" cy="13" r="4"/>
+            </svg>
+            📸 OCR — Scan text from photo · 拍照識別文字
+          </button>
+          <input type="file" id="ocr-file-input" accept="image/*" capture="environment" style="display:none" onchange="handleOCRFile(this)">
+
+          <!-- Image preview -->
+          <div class="ocr-preview" id="ocr-preview">
+            <img id="ocr-preview-img" src="" alt="OCR preview">
+          </div>
+          <p class="ocr-tip" id="ocr-tip">
+            💡 Tip: For best results, ensure good lighting, hold the camera steady, and capture only the text area. Works with Kindle, Kobo, physical books &amp; any screen.<br>
+            建議在良好光線下拍攝，盡量只拍文字區域，識別率更高。
+          </p>
+
+          <!-- OCR status / progress -->
+          <div class="ocr-status" id="ocr-status">
+            <div class="ocr-spinner"></div>
+            <div style="flex:1">
+              <div id="ocr-status-text" style="margin-bottom:4px">Initialising OCR engine…</div>
+              <div class="ocr-progress"><div class="ocr-progress-bar" id="ocr-progress-bar"></div></div>
+            </div>
+          </div>
         </div>
         <div class="fg">
           <label class="fl">Page · 頁碼</label>
@@ -1122,6 +1203,7 @@ function openAddEx(){
   document.getElementById('ex-txt2').value='';
   document.getElementById('ex-page2').value='';
   document.getElementById('tag-in2').value='';
+  resetOCRUI();
   document.getElementById('del-ex2-wrap').style.display='none';
   document.getElementById('ex-cancel-btn').style.display='none';
   document.getElementById('ex-save-btn').textContent='Save 儲存';
@@ -1147,6 +1229,7 @@ async function openEditEx2(id){
 
 function cancelExEdit(){
   A.exid=null;A.tags2=[];
+  resetOCRUI();
   exSubTab('list');
 }
 
@@ -1310,22 +1393,20 @@ async function renderExs(id){
   }
   list.innerHTML=exs.map((h,i)=>`
     <div class="ex-item" style="animation-delay:${i*.04}s">
+      <div class="ex-acts">
+        <button class="ab" onclick="openShareEx('${h.id}')" title="Share · 分享">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+        </button>
+        <button class="ab" onclick="openEditEx2('${h.id}')" title="Edit · 編輯">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        </button>
+      </div>
       <div class="ex-q">${xe(h.text)}</div>
       <div class="ex-meta">
         ${h.page?`<span class="ex-page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>p.${xe(String(h.page))}</span>`:''}
         ${h.tags?.length?`<div class="ex-tags">${h.tags.map(t=>`<span class="tag">#${xe(t)}</span>`).join('')}</div>`:''}
       </div>
       <div class="ex-date">${fd(h.createdAt)}</div>
-      <div class="ex-acts">
-        <button class="ab" onclick="openShareEx('${h.id}')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
-          Share 分享
-        </button>
-        <button class="ab" onclick="openEditEx2('${h.id}')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-          Edit 編輯
-        </button>
-      </div>
     </div>`).join('');
 }
 
@@ -1521,6 +1602,174 @@ function toast(msg){
 }
 
 // ════ INIT ════
+// ════════════════════════════════════════════════════════
+//  OCR — Tesseract.js  (chi_tra + chi_sim + eng)
+//  Fully client-side, no server required
+//  Tesseract.js loaded from CDN on first use, then cached
+//  by the Service Worker for offline use
+// ════════════════════════════════════════════════════════
+
+let _ocrWorker = null;   // reuse worker across calls (expensive to init)
+let _ocrBusy   = false;
+
+function triggerOCR(){
+  document.getElementById('ocr-file-input').click();
+}
+
+async function handleOCRFile(input){
+  const file = input.files[0];
+  if(!file) return;
+  input.value = '';   // reset so same file can be selected again
+
+  // Show preview + tip
+  const previewEl = document.getElementById('ocr-preview');
+  const previewImg = document.getElementById('ocr-preview-img');
+  const tipEl = document.getElementById('ocr-tip');
+  const url = URL.createObjectURL(file);
+  previewImg.src = url;
+  previewEl.classList.add('show');
+  tipEl.classList.add('show');
+
+  // Run OCR
+  const text = await recognizeImageText(file);
+  URL.revokeObjectURL(url);
+
+  if(text){
+    // Append to existing text rather than overwrite (user may have typed something)
+    const ta = document.getElementById('ex-txt2');
+    ta.value = ta.value ? ta.value + '\n' + text : text;
+    ta.focus();
+    // Scroll textarea to end
+    ta.scrollTop = ta.scrollHeight;
+    toast('✓ Text extracted · 文字識別完成');
+  }
+}
+
+// ── Binarize image using Canvas for better OCR accuracy ──
+// Converts image to high-contrast black/white before passing to Tesseract
+function preprocessImageForOCR(file){
+  return new Promise((resolve) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      // Scale up small images; cap large ones at 2400px wide
+      const MAX = 2400;
+      let w = img.width, h = img.height;
+      if(w > MAX){ h = Math.round(h * MAX / w); w = MAX; }
+      if(w < 800){ h = Math.round(h * 800 / w); w = 800; }
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext('2d');
+
+      // Draw image
+      ctx.drawImage(img, 0, 0, w, h);
+
+      // Binarization: grayscale + adaptive threshold
+      const imageData = ctx.getImageData(0, 0, w, h);
+      const d = imageData.data;
+      for(let i = 0; i < d.length; i += 4){
+        // Convert to grayscale (luminance formula)
+        const lum = 0.299*d[i] + 0.587*d[i+1] + 0.114*d[i+2];
+        // Threshold at 140 (tuned for book/screen text)
+        const val = lum > 140 ? 255 : 0;
+        d[i] = d[i+1] = d[i+2] = val;
+        d[i+3] = 255;
+      }
+      ctx.putImageData(imageData, 0, 0);
+
+      URL.revokeObjectURL(url);
+      canvas.toBlob(blob => resolve(blob), 'image/png');
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); resolve(file); };
+    img.src = url;
+  });
+}
+
+function setOCRStatus(text, pct){
+  const statusEl = document.getElementById('ocr-status');
+  const textEl   = document.getElementById('ocr-status-text');
+  const barEl    = document.getElementById('ocr-progress-bar');
+  if(text === null){
+    statusEl.classList.remove('show');
+    return;
+  }
+  statusEl.classList.add('show');
+  textEl.textContent = text;
+  if(barEl) barEl.style.width = (pct||0) + '%';
+}
+
+// ── Core OCR function ──
+// Returns recognised text string, or empty string on failure
+async function recognizeImageText(file){
+  if(_ocrBusy){ toast('OCR is busy, please wait · 識別進行中，請稍候'); return ''; }
+  _ocrBusy = true;
+
+  try{
+    setOCRStatus('Preprocessing image · 圖像預處理中…', 5);
+
+    // Binarize for better accuracy
+    const processed = await preprocessImageForOCR(file);
+
+    setOCRStatus('Loading OCR engine · 載入識別引擎…', 15);
+
+    // Lazy-init worker (reuse across sessions)
+    if(!_ocrWorker){
+      // Tesseract.js v5 from CDN — Service Worker will cache this
+      const { createWorker } = Tesseract;
+      _ocrWorker = await createWorker('chi_tra+chi_sim+eng', 1, {
+        // Use CDN paths; SW will cache on first load
+        workerPath:  'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/worker.min.js',
+        langPath:    'https://tessdata.projectnaptha.com/4.0.0_fast',
+        corePath:    'https://cdn.jsdelivr.net/npm/tesseract.js-core@5/tesseract-core.wasm.js',
+        logger: m => {
+          if(m.status === 'recognizing text'){
+            const pct = Math.round(15 + m.progress * 80);
+            setOCRStatus(`Recognising · 識別中… ${Math.round(m.progress*100)}%`, pct);
+          } else if(m.status === 'loading language traineddata'){
+            setOCRStatus('Loading language data · 載入語言包… (first use only)', 20);
+          } else if(m.status === 'initializing api'){
+            setOCRStatus('Initialising · 初始化中…', 25);
+          }
+        }
+      });
+    }
+
+    setOCRStatus('Recognising text · 識別文字中…', 30);
+
+    const { data } = await _ocrWorker.recognize(processed);
+
+    setOCRStatus('Done · 完成', 100);
+    setTimeout(() => setOCRStatus(null), 800);
+
+    // Clean up: remove excess whitespace, fix common OCR artifacts
+    let text = data.text
+      .replace(/\r\n/g, '\n')
+      .replace(/\r/g, '\n')
+      .replace(/[ \t]+/g, ' ')         // collapse spaces
+      .replace(/\n{3,}/g, '\n\n')      // max 2 consecutive newlines
+      .replace(/[""]/g, '"')           // normalize quotes
+      .replace(/['']/g, "'")
+      .trim();
+
+    return text;
+
+  } catch(err){
+    console.error('OCR error:', err);
+    setOCRStatus(null);
+    toast('OCR failed · 識別失敗，請重試或手動輸入');
+    return '';
+  } finally {
+    _ocrBusy = false;
+  }
+}
+
+// Reset OCR UI when switching tabs or opening add form
+function resetOCRUI(){
+  document.getElementById('ocr-preview')?.classList.remove('show');
+  document.getElementById('ocr-tip')?.classList.remove('show');
+  setOCRStatus(null);
+}
+
 async function init(){
   await openDB();
   renderSws();
