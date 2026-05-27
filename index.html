@@ -87,9 +87,28 @@ nav{position:fixed;bottom:0;left:0;right:0;height:calc(var(--nav) + var(--safe))
 .b-edit{position:absolute;top:6px;left:7px;z-index:3;width:22px;height:22px;border-radius:50%;background:rgba(26,25,22,.72);color:var(--bg);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .15s}
 .bc:hover .b-edit{opacity:1}
 @media(hover:none){.b-edit{opacity:1}}
-.btext{padding-top:7px;height:56px;min-height:56px;max-height:56px;overflow:hidden;display:block}
-.btitle{font-family:var(--serif);font-size:0.82rem;font-weight:500;line-height:16px;color:var(--ink);height:32px;min-height:32px;max-height:32px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;margin-bottom:4px}
-.bauthor{font-family:var(--body);font-style:italic;font-size:0.72rem;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;height:20px;min-height:20px;max-height:20px;line-height:20px}
+/* title/author now live INSIDE the cover as a gradient overlay */
+.btext{display:none} /* hidden — text is inside cover overlay */
+.btitle{display:none}
+.bauthor{display:none}
+/* overlay gradient at bottom of cover */
+.b-overlay{
+  position:absolute;bottom:0;left:0;right:0;
+  background:linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.55) 50%, transparent 100%);
+  padding:28px 8px 7px 10px;
+  z-index:2;
+}
+.b-ov-title{
+  font-family:var(--serif);font-size:0.72rem;font-weight:500;
+  color:rgba(255,255,255,0.95);line-height:1.25;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+  overflow:hidden;margin-bottom:2px;
+}
+.b-ov-author{
+  font-family:var(--body);font-style:italic;font-size:0.6rem;
+  color:rgba(255,255,255,0.65);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;
+}
 #shelf-empty{display:none;text-align:center;padding:80px 24px;font-family:var(--body);font-style:italic;color:var(--ink3);line-height:1.8}
 #shelf-empty.show{display:block}
 
@@ -751,15 +770,15 @@ function bcard(b,i){
     <div class="bcover-wrap">
       <div class="bcover">
         ${img}
+        <div class="b-overlay">
+          <div class="b-ov-title">${xe(b.title)}</div>
+          <div class="b-ov-author">${xe(shortAuthor)}</div>
+        </div>
         <div class="sdot sd-${b.status}"></div>
         <button class="b-edit" onclick="event.stopPropagation();openEdit('${b.id}')">
           <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
         </button>
       </div>
-    </div>
-    <div class="btext">
-      <div class="btitle">${xe(b.title)}</div>
-      <div class="bauthor">${xe(shortAuthor)}</div>
     </div>
   </div>`;
 }
