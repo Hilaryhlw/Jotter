@@ -69,7 +69,7 @@ nav{position:fixed;bottom:0;left:0;right:0;height:calc(var(--nav) + var(--safe))
 .sg-label{display:flex;align-items:baseline;gap:7px;font-family:var(--body);font-style:italic;font-size:0.88rem;color:var(--ink2);margin-bottom:13px}
 .sg-label .sn{font-family:var(--body);font-size:0.7rem;color:var(--ink3);letter-spacing:.06em;text-transform:uppercase;font-style:normal}
 .sg-label::after{content:'';flex:1;height:1px;background:var(--bg1);margin-left:4px}
-.bgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px 12px}
+.bgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px 12px;align-items:start}
 @media(min-width:480px){.bgrid{grid-template-columns:repeat(4,1fr)}}
 @media(min-width:700px){.bgrid{grid-template-columns:repeat(5,1fr)}}
 .bc{cursor:pointer;display:block;animation:up .3s ease both}
@@ -87,9 +87,9 @@ nav{position:fixed;bottom:0;left:0;right:0;height:calc(var(--nav) + var(--safe))
 .b-edit{position:absolute;top:6px;left:7px;z-index:3;width:22px;height:22px;border-radius:50%;background:rgba(26,25,22,.72);color:var(--bg);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .15s}
 .bc:hover .b-edit{opacity:1}
 @media(hover:none){.b-edit{opacity:1}}
-.btext{overflow:hidden;padding-top:7px}
-.btitle{font-family:var(--serif);font-size:0.82rem;font-weight:500;line-height:1.25;color:var(--ink);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;height:34px;min-height:34px;max-height:34px;margin-bottom:3px}
-.bauthor{font-family:var(--body);font-style:italic;font-size:0.72rem;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;height:18px;min-height:18px;max-height:18px;line-height:18px}
+.btext{padding-top:7px;height:56px;min-height:56px;max-height:56px;overflow:hidden;display:block}
+.btitle{font-family:var(--serif);font-size:0.82rem;font-weight:500;line-height:16px;color:var(--ink);height:32px;min-height:32px;max-height:32px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;margin-bottom:4px}
+.bauthor{font-family:var(--body);font-style:italic;font-size:0.72rem;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;height:20px;min-height:20px;max-height:20px;line-height:20px}
 #shelf-empty{display:none;text-align:center;padding:80px 24px;font-family:var(--body);font-style:italic;color:var(--ink3);line-height:1.8}
 #shelf-empty.show{display:block}
 
@@ -746,6 +746,7 @@ function bcard(b,i){
   const img=src
     ?`<img src="${xe(src)}" alt="${xe(b.title)}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`+`<div class="bph" style="background:${b.color||'#2C5F6E'};display:none"><div class="bph-t">${xe(b.title)}</div><div class="bph-a">${xe(b.author||'')}</div></div>`
     :`<div class="bph" style="background:${b.color||'#2C5F6E'}"><div class="bph-t">${xe(b.title)}</div><div class="bph-a">${xe(b.author||'')}</div></div>`;
+  const shortAuthor=(b.author||'').length>26?(b.author||'').slice(0,24)+'…':(b.author||'');
   return`<div class="bc" style="animation-delay:${i*.04}s" onclick="showDetail('${b.id}')">
     <div class="bcover-wrap">
       <div class="bcover">
@@ -758,7 +759,7 @@ function bcard(b,i){
     </div>
     <div class="btext">
       <div class="btitle">${xe(b.title)}</div>
-      <div class="bauthor">${xe(b.author||'')}</div>
+      <div class="bauthor">${xe(shortAuthor)}</div>
     </div>
   </div>`;
 }
